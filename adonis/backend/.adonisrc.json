@@ -1,0 +1,55 @@
+{
+    "typescript": true,
+    "commands": [
+        "./commands",
+        "@adonisjs/core/build/commands/index.js",
+        "@adonisjs/repl/build/commands",
+        "@adonisjs/lucid/build/commands",
+        "@adonisjs/bouncer/build/commands"
+    ],
+    "exceptionHandlerNamespace": "App/Exceptions/Handler",
+    "aliases": {
+        "App": "app",
+        "Dot": "dot",
+        "Config": "config",
+        "Database": "database",
+        "Contracts": "contracts"
+    },
+    "preloads": [
+        "./start/routes",
+        "./start/kernel",
+        "./start/bouncer",
+        {
+            "file": "./start/validator",
+            "environment": [
+                "web"
+            ]
+        }
+    ],
+    "providers": [
+        "./providers/AppProvider",
+        "@adonisjs/core",
+        "@japa/preset-adonis/TestsProvider",
+        "@adonisjs/auth",
+        "@adonisjs/lucid",
+        "@adonisjs/bouncer",
+        "@adonisjs/i18n"
+    ],
+    "aceProviders": [
+        "@adonisjs/repl"
+    ],
+    "tests": {
+        "suites": [
+            {
+                "name": "functional",
+                "files": [
+                    "tests/functional/**/*.spec(.ts|.js)"
+                ],
+                "timeout": 60000
+            }
+        ]
+    },
+    "metaFiles": [
+        "resources/lang/**/*.(json|yaml)"
+    ]
+}
