@@ -1,12 +1,9 @@
 
 import { BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
-import DotBaseModel from '../../../dot/models/DotBaseModel'
+import { DotBaseTranslation } from '../../../dot/models/DotBaseModel'
 import Category from '../Category'
 
-export default class CategoryTranslation extends DotBaseModel {
-  @column()
-  public locale: string
-
+export default class CategoryTranslation extends DotBaseTranslation {
   @column()
   public name: string | null
 

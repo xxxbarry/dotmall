@@ -1,6 +1,6 @@
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.resource('stores', 'StoresController').except(
+Route.resource('product_translations', 'ProductTranslationsController').except(
   ['edit', 'create']
 ).middleware({
   "store": "auth",

@@ -1,25 +1,27 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import  { CreateCategoryValidator, DestroyCategoryValidator, ListCategoriesValidator, ShowCategoryValidator, UpdateCategoryValidator } from 'App/Validators/CategoryValidator'
+import { CreateStoreTranslationValidator, DestroyStoreTranslationValidator, ListStoreTranslationsValidator, ShowStoreTranslationValidator, UpdateStoreTranslationValidator } from 'App/Validators/StoreTranslationValidator'
 import { Image } from 'App/Models/File'
 import { ModelObject } from '@ioc:Adonis/Lucid/Orm';
-import Category from 'App/Models/Category';
+import StoreTranslation from 'App/Models/translations/StoreTranslation';
+import Store from 'App/Models/accounts/business/stores/Store';
 
-export default class CategoriesController {
+export default class StoreTranslationsController {
   /**
-    * returns the user's categories as pangination list
+    * returns the user's storeTranslations as pangination list
     * @param {HttpContextContract}
     * @returns {Promise<{meta: any;data: ModelObject[];}>}
-    * @memberof CategoriesController
+    * @memberof StoreTranslationsController
     * @example
-    * curl -X GET -H "Content-Type: application/json" -d '{"page": 1}' http://localhost:3333/api/v1/categories
+    * curl -X GET -H "Content-Type: application/json" -d '{"page": 1}' http://localhost:3333/api/v1/storeTranslations
     */
   public async index({ request, bouncer }: HttpContextContract): Promise<{
     meta: any;
     data: ModelObject[];
   }> {
-    const payload = await request.validate(ListCategoriesValidator)
-    await bouncer.with('CategoryPolicy').authorize('viewList', payload)
-    var categoriesQuery = Category.query()
+
+    const payload = await request.validate(ListStoreTranslationsValidator)
+    await bouncer.with('StoreTranslationPolicy').authorize('viewList', payload)
+    var storeTranslationsQuery = StoreTranslation.query()
     var page = 1
     var limit = 24
 
@@ -27,119 +29,110 @@ export default class CategoriesController {
       for (let i = 0; i < payload.search_by!.length; i++) {
         const element = payload.search_by![i];
         if (i == 0) {
-          categoriesQuery = categoriesQuery.where(element, 'like', `%${payload.search}%`)
+          storeTranslationsQuery = storeTranslationsQuery.where(element, 'like', `%${payload.search}%`)
         } else {
-          categoriesQuery = categoriesQuery.orWhere(element, 'like', `%${payload.search}%`)
+          storeTranslationsQuery = storeTranslationsQuery.orWhere(element, 'like', `%${payload.search}%`)
         }
       }
     }
     if (payload.sort) {
-      categoriesQuery = categoriesQuery.orderBy(payload.sort, payload.order)
+      storeTranslationsQuery = storeTranslationsQuery.orderBy(payload.sort, payload.order)
     }
     if (payload.load) {
       for (const load of payload.load) {
-        categoriesQuery = categoriesQuery.preload(load)
+        storeTranslationsQuery = storeTranslationsQuery.preload(load)
       }
     }
     if (payload.where) {
       for (const key in payload.where) {
-        categoriesQuery = categoriesQuery.where(key, payload.where[key])
+        storeTranslationsQuery = storeTranslationsQuery.where(key, payload.where[key])
       }
     }
     page = payload.page || page
     limit = payload.limit || limit
 
-    return (await categoriesQuery.paginate(page, Math.min(limit, 24))).toJSON()
+    return (await storeTranslationsQuery.paginate(page, Math.min(limit, 24))).toJSON()
   }
 
   /**
-   * creates a new category for the user
+   * creates a new storeTranslation for the user
    * @param {HttpContextContract}
-   * @returns {Promise<{ category: ModelObject; photo: Image | null; }>}
-   * @memberof CategoriesController
+   * @returns {Promise<{ storeTranslation: ModelObject; photo: Image | null; }>}
+   * @memberof StoreTranslationsController
    * @example
-   * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Category", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/categories
+   * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My StoreTranslation", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/storeTranslations
    */
-  public async store({ request, bouncer }: HttpContextContract): Promise<{ category: ModelObject; photo: Image | null; }> {
+  public async store({ request, bouncer }: HttpContextContract): Promise<{ storeTranslation: ModelObject }> {
 
-    await bouncer.with('CategoryPolicy').authorize('create', null)
-    const payload = await request.validate(CreateCategoryValidator)
-    const category = await Category.create({
+    const payload = await request.validate(CreateStoreTranslationValidator)
+    var store = (await Store.find(payload.store_id))!
+    await bouncer.with('StoreTranslationPolicy').authorize('create', store)
+    const storeTranslation = await StoreTranslation.create({
+      locale: payload.locale,
       name: payload.name,
       description: payload.description,
     })
-    var photo: Image | null = null;
-    if (payload.photo) {
-      photo = await category.setPhoto(payload.photo)
-    }
     return {
-      category: category.toJSON(),
-      photo: photo,
+      storeTranslation: storeTranslation.toJSON()
     }
   }
 
   /**
-   * returns the category info
+   * returns the storeTranslation info
    * @param {HttpContextContract}
-   * @returns {Promise<Category>}
-   * @memberof CategoriesController
+   * @returns {Promise<StoreTranslation>}
+   * @memberof StoreTranslationsController
    * @example
-   * curl -X GET -H "Content-Type: application/json" http://localhost:3333/api/v1/categories/1
+   * curl -X GET -H "Content-Type: application/json" http://localhost:3333/api/v1/storeTranslations/1
    */
-  public async show({ auth, request, bouncer }: HttpContextContract): Promise<any> {
-    const payload = await request.validate(ShowCategoryValidator)
-    var category = (await Category.find(payload.params.id))!
-    await bouncer.with('CategoryPolicy').authorize('view', category)
+  public async show({ request, bouncer }: HttpContextContract): Promise<any> {
+    const payload = await request.validate(ShowStoreTranslationValidator)
+    var storeTranslation = (await StoreTranslation.find(payload.params.id))!
+    await bouncer.with('StoreTranslationPolicy').authorize('view', storeTranslation)
     if (payload.load) {
       for (const load of payload.load) {
-        await category.load(load)
+        await storeTranslation.load(load)
       }
     }
-    if (!payload.load?.includes('photo')) {
-      await category.load('photo')
-    }
-    return category.toJSON()
+    return storeTranslation.toJSON()
   }
 
   /**
-   * updates the category info
+   * updates the storeTranslation info
    * @param {HttpContextContract}
-   * @returns {Promise<Category>}
-   * @memberof CategoriesController
+   * @returns {Promise<StoreTranslation>}
+   * @memberof StoreTranslationsController
    * @example
-   * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Category", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/categories/1
+   * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My StoreTranslation", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/storeTranslations/1
    */
-  public async update({ request, bouncer }: HttpContextContract): Promise<any> {
+  public async update({ request, bouncer }: HttpContextContract): Promise<{
+    storeTranslation: ModelObject;
+  }> {
     // validate also params.id
-    const payload = await request.validate(UpdateCategoryValidator)
-    const category = (await Category.find(payload.params.id))!
-    await bouncer.with('CategoryPolicy').authorize('update', category)
-    category.name = payload.name ?? category.name
-    category.description = payload.description ?? category.description
-    await category.save()
-    var photo: Image | null = null;
-    if (payload.photo) {
-      await category.setPhoto(payload.photo)
-    }
+    const payload = await request.validate(UpdateStoreTranslationValidator)
+    const storeTranslation = (await StoreTranslation.find(payload.params.id))!
+    await bouncer.with('StoreTranslationPolicy').authorize('update', storeTranslation)
+    storeTranslation.name = payload.name ?? storeTranslation.name
+    storeTranslation.description = payload.description ?? storeTranslation.description
+    await storeTranslation.save()
     return {
-      category: category.toJSON(),
-      photo: photo,
+      storeTranslation: storeTranslation.toJSON(),
     }
   }
 
   /**
-   * deletes the category
+   * deletes the storeTranslation
    * @param {HttpContextContract}
    * @returns {Promise<void>}
-   * @memberof CategoriesController
+   * @memberof StoreTranslationsController
    * @example
-   * curl -X DELETE -H "Content-Type: application/json" http://localhost:3333/api/v1/categories/{categoryId}
+   * curl -X DELETE -H "Content-Type: application/json" http://localhost:3333/api/v1/storeTranslations/{storeTranslationId}
    */
   public async destroy({ request, bouncer }: HttpContextContract): Promise<void> {
-    const payload = await request.validate(DestroyCategoryValidator)
-    const category = (await Category.find(payload.params.id))!
-    await bouncer.with('CategoryPolicy').authorize('delete', category)
-    return await category.delete()
+    const payload = await request.validate(DestroyStoreTranslationValidator)
+    const storeTranslation = (await StoreTranslation.find(payload.params.id))!
+    await bouncer.with('StoreTranslationPolicy').authorize('delete', storeTranslation)
+    return await storeTranslation.delete()
   }
 
 

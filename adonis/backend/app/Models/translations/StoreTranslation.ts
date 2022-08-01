@@ -1,6 +1,5 @@
-import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, BelongsTo, column } from '@ioc:Adonis/Lucid/Orm'
-import DotBaseModel, { DotBaseTranslation } from 'Dot/models/DotBaseModel'
+import { belongsTo, BelongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { DotBaseTranslation } from 'Dot/models/DotBaseModel'
 import Store from '../accounts/business/stores/Store'
 
 export default class StoreTranslation extends DotBaseTranslation {
@@ -14,5 +13,5 @@ export default class StoreTranslation extends DotBaseTranslation {
   public storeId: string
 
   @belongsTo(() => Store)
-  public section: BelongsTo<typeof Store>
+  public store: BelongsTo<typeof Store>
 }

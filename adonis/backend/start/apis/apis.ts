@@ -19,9 +19,11 @@ Route.group(() => {
     })
     Route.group(() => {
         require("./v1/stores")
+        require("./v1/store_translations")
     })
     Route.group(() => {
         require("./v1/categories")
+        require("./v1/category_translations")
     })
     Route.group(() => {
       require("./v1/sections")
