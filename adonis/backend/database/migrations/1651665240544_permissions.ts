@@ -7,6 +7,7 @@ export default class Permissions extends DotBaseSchema {
   public useSoftDeletes = false
   public useValidatedAt = false
   public useRelatedTo = true
+  public usePivotTable = true
   // useTranslation
   // public useTranslation = true
   public setup(table: Knex.CreateTableBuilder): void {

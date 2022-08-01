@@ -11,8 +11,8 @@ export default class SubAccountsSchema extends DotBaseSchema {
     table.string('name').notNullable();
     // all account have a bio field
     table.text('description').nullable()
-    // avatar is file
-    // table.string('avatar_file_id').references('files.id').nullable()
+    // photo is file
+    // table.string('photo_file_id').references('files.id').nullable()
     // cover is file
     // table.string('cover_file_id').references('files.id').nullable()
     table

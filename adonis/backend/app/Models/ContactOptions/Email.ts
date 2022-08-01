@@ -1,7 +1,6 @@
-import { BaseModel, belongsTo, BelongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import {  column } from '@ioc:Adonis/Lucid/Orm'
 import { DateTime } from 'luxon'
-import DotBaseModel from '../../../dot/models/DorBaseModel'
-import User from '../User'
+import DotBaseModel from '../../../dot/models/DotBaseModel'
 
 export default class Email extends DotBaseModel {
 
@@ -14,34 +13,17 @@ export default class Email extends DotBaseModel {
   @column.dateTime()
   public validatedAt: DateTime
 
-  // @column.dateTime({ autoCreate: true })
-  // public createdAt: DateTime
+  @column.dateTime({ autoCreate: true })
+  public createdAt: DateTime
 
-  // @column.dateTime({ autoCreate: true, autoUpdate: true })
-  // public updatedAt: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  public updatedAt: DateTime
 
   //
   @column({ serializeAs: null })
-  public relatedTo: string
+  public relatedId: string
 
   @column({ serializeAs: null })
   public relatedType: string
 
-  @belongsTo(() => User)
-  public user: BelongsTo<typeof User>
-
-  //
-  // @column()
-  // public userId: string
-
-  // belongsTo returns the [User] that owns the [ContactOption]
-  // @belongsTo(() => User)
-  // public user: BelongsTo<typeof User>
-
-  // static method to test if the given email is valid
-  // the given email must match the regex pattern of email
-  // public static async test(_email: string) {
-  //   const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-  //   return emailRegexp.test(_email);
-  // }
 }

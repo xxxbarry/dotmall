@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
-import DotBaseModel from '../../../../../dot/models/DorBaseModel'
+import DotBaseModel from '../../../../../dot/models/DotBaseModel'
 
 export default class Order extends DotBaseModel {
 

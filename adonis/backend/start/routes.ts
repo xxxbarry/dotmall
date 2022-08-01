@@ -18,14 +18,41 @@
 |
 */
 import Route from '@ioc:Adonis/Core/Route'
-import { AccountType } from 'App/Models/accounts/Account'
+import { AccountType } from 'App/Models/Account'
 import { BusinessAccountData } from 'App/Models/accounts/business/BusinessAccountData'
+import Email from 'App/Models/ContactOptions/Email'
 import User from 'App/Models/User'
+import DotBaseModel from 'Dot/models/DotBaseModel'
 import './apis/apis'
 
 Route.get('/c', "UsersController.signup")
 
+// TEST
 Route.get('/', async () => {
+  var user = await User.create({
+    password: "mail@mail"
+  })
+  for (let i = 0; i < 20; i++) {
+    var email = await Email.create({
+      value: "mail@mail",
+    })
+    await user.related('emails').attach({
+      [email.id]: {
+        id: DotBaseModel.generateId(),
+        tag: "users.emails"
+      }
+    })
+  }
+  return user
+})
+// TEST
+Route.get('/get', async () => {
+  var user = await User.first()
+  await user?.load("emails")
+  return user
+})
+
+Route.get('/b', async () => {
   // return I18n.locale('en').formatMessage('validator.app.name')
   var user = await User.create({
     password: "mail@mail"
@@ -43,8 +70,8 @@ Route.get('/', async () => {
     relatedType: "User",
   })
   await user.related('phones').create({
-    value: "214657606315",
-    relatedType: "User",
+    // value: "214657606315",
+    // relatedType: "User",
   });
 
   var account = await user.related('accounts').create({
@@ -67,12 +94,12 @@ Route.get('/', async () => {
     secondary: "sefez",
   });
   var phones = await merchantProfile.related("phones").createMany([
-    {
-      value: "213657606315",
-    },
-    {
-      value: "913657606315",
-    },
+    // {
+    //   value: "213657606315",
+    // },
+    // {
+    //   value: "913657606315",
+    // },
   ]);
   var emails = await merchantProfile.related("emails").createMany([
     {
@@ -89,7 +116,7 @@ Route.get('/', async () => {
     name: "store",
     description: "description",
   });
-  
+
   // await store.related("address").create({
   //   primary: "City 450 - Street 1",
   //   secondary: "Apartment 1, Floor 1",
@@ -104,7 +131,7 @@ Route.get('/', async () => {
   // await store.related("email").create({
   //   value: "example@mail.com",
   // });
-  // await store.related("avatar").create({
+  // await store.related("photo").create({
   //   path: "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png",
   // });
   // var category0 = await store.related("categories").create({

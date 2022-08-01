@@ -1,16 +1,18 @@
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import DotValidator from './DotValidator'
+import { AccountType } from 'App/Models/Account'
 
-export default class CreateAccountValidator implements DotValidator {
+export class CreateAccountValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
+    super()
   }
   public schema = schema.create({
     name: schema.string.optional(),
     description: schema.string.optional(),
     type: schema.string({}, []),
-    // avatar is optional, but if it is provided, it must be a valid image
-    avatar: schema.file.optional({}, [
+    // photo is optional, but if it is provided, it must be a valid image
+    photo: schema.file.optional({}, [
     ]),
   })
 
@@ -18,25 +20,25 @@ export default class CreateAccountValidator implements DotValidator {
 }
 
 /*
- * UpdateAccountValidator 
+ * UpdateAccountValidator
  */
-export class UpdateAccountValidator implements DotValidator {
+export class UpdateAccountValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
-
+    super()
   }
   public schema = schema.create({
     params: schema.object().members({
       id: schema.string({ trim: true }, [
         rules.required(),
         rules.minLength(14),
-        rules.exists({ table: 'accounts', column: 'id', where: { user_id: this.ctx.auth.user!.id } }),
+        rules.exists({ table: 'accounts', column: 'id' }),
       ]),
     }),
     name: schema.string.optional(),
     description: schema.string.optional(),
     // type: schema.string.optional(),
-    // avatar is optional, but if it is provided, it must be a valid image
-    avatar: schema.file.optional(),
+    // photo is optional, but if it is provided, it must be a valid image
+    photo: schema.file.optional(),
   })
 
   public messages = {}
@@ -45,34 +47,37 @@ export class UpdateAccountValidator implements DotValidator {
  * Show Account Validator
  *
  */
-export class ShowAccountValidator implements DotValidator {
+export class ShowAccountValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
-
+    super()
   }
   public schema = schema.create({
     params: schema.object().members({
       id: schema.string({ trim: true }, [
         rules.required(),
         rules.minLength(14),
-        rules.exists({ table: 'accounts', column: 'id', where: { user_id: this.ctx.auth.user!.id } }),
+        rules.exists({ table: 'accounts', column: 'id' }),
       ]),
     }),
+    load: schema.array.optional().members(
+      schema.enum.optional(["users", "photos", "customer", "merchant",/* "merchant.store"*/] as const)
+    ),
   })
   public messages = {}
 }
 /*
- * Destroy Account Validator 
+ * Destroy Account Validator
  */
-export class DestroyAccountValidator implements DotValidator {
+export class DestroyAccountValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
-
+    super()
   }
   public schema = schema.create({
     params: schema.object().members({
       id: schema.string({ trim: true }, [
         rules.required(),
         rules.minLength(14),
-        rules.exists({ table: 'accounts', column: 'id', where: { user_id: this.ctx.auth.user!.id } }),
+        rules.exists({ table: 'accounts', column: 'id' }),
       ]),
     }),
   })
@@ -88,11 +93,11 @@ export class DestroyAccountValidator implements DotValidator {
  * - Filtering
  * - Searching
  * - Filtering
- * 
+ *
  */
-export class ListAccountsValidator implements DotValidator {
+export class ListAccountsValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
-
+    super()
   }
   public schema = schema.create({
     // query: schema.object().members({
@@ -106,14 +111,18 @@ export class ListAccountsValidator implements DotValidator {
       order: schema.enum.optional(["asc", "desc"] as const),
       // type: schema.enum.optional(["personal', 'business"] as const),
       search: schema.string.optional([rules.minLength(1),]),
-      // filter: schema.string.optional({}, [
-      //   rules.minLength(1),
-      // ]),
-      load: schema.array.optional().members(
-        schema.enum.optional(["user", "avatar", "customer", "merchant",/* "merchant.store"*/] as const)
+      search_by: schema.array.optional([rules.requiredIfExists('search')]).members(
+        schema.enum(["name"] as const)
       ),
-
-    // }),
+      load: schema.array.optional().members(
+        schema.enum(["users", "photos", "customer", "merchant",/* "merchant.store"*/] as const)
+      ),
+      where: schema.object.optional().members({
+        user_id: schema.string.optional(),
+        type: schema.enum.optional(["business", "business"] as const),
+        name: schema.string.optional(),
+        description: schema.string.optional(),
+      })
   })
 
   public messages = {}

@@ -3,6 +3,7 @@ import SubAccountSchema from '../../../dot/SubAccountsSchema'
 
 export default class Accounts extends SubAccountSchema {
   protected tableName = 'accounts'
+  public usePivotTable: boolean = true
 
   public setup(table: Knex.CreateTableBuilder): void {
     // account_type should be enum (personal, business, company)

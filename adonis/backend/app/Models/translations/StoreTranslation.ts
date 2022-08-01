@@ -1,13 +1,18 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, belongsTo, BelongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import DotBaseModel, { DotBaseTranslation } from 'Dot/models/DotBaseModel'
+import Store from '../accounts/business/stores/Store'
 
-export default class StoreTranslation extends BaseModel {
-  @column({ isPrimary: true })
-  public id: number
+export default class StoreTranslation extends DotBaseTranslation {
+  @column()
+  public name: string
 
-  @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  @column()
+  public description: string|null
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+  @column()
+  public storeId: string
+
+  @belongsTo(() => Store)
+  public section: BelongsTo<typeof Store>
 }

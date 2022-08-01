@@ -1,8 +1,8 @@
 import { BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
-import DotBaseModel from '../../../dot/models/DorBaseModel'
+import DotBaseModel, { DotBaseTranslation } from '../../../dot/models/DotBaseModel'
 import Product from '../accounts/business/stores/Product'
 
-export default class ProductTranslation extends DotBaseModel {
+export default class ProductTranslation extends DotBaseTranslation {
   @column()
   public locale: string
 

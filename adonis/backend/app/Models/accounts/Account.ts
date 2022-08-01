@@ -1,19 +1,18 @@
-import { afterDelete, beforeFetch, belongsTo, BelongsTo, column, HasOne, hasOne,  ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
-import User from '../User'
-import DotBaseModel from '../../../dot/models/DorBaseModel'
-import CustomerProfile from './profiles/CustomerProfile'
-import MerchantProfile from './profiles/MerchantProfile'
+import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
+import { column, ManyToMany, beforeFetch, ModelQueryBuilderContract, hasOne, HasOne, afterDelete, manyToMany } from '@ioc:Adonis/Lucid/Orm'
+import { usePivot, usedPivot } from 'Dot/hooks/orm'
+import DotBaseModel from 'Dot/models/DotBaseModel'
+import Email from '../ContactOptions/Email'
+import Phone from '../ContactOptions/Phone'
 import { Image } from '../File'
+import User from '../User'
 import { BusinessAccountData } from './business/BusinessAccountData'
 import { PersonalAccountData } from './PersonalAccountData'
-import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
+import CustomerProfile from './profiles/CustomerProfile'
+import MerchantProfile from './profiles/MerchantProfile'
 
-export enum AccountType {
-  business = 'business',
-  personal = 'personal',
-}
 export default class Account extends DotBaseModel {
-
+  static table: string = 'accounts'
   @column()
   public type: AccountType
 
@@ -25,25 +24,27 @@ export default class Account extends DotBaseModel {
 
   @column()
   public userId: string
-  
+
   @column({
-    prepare: (value: BusinessAccountData|PersonalAccountData) => JSON.stringify(value),
+    prepare: (value: BusinessAccountData | PersonalAccountData) => JSON.stringify(value),
     consume: (value: string) => JSON.parse(value),
   })
-  public data: BusinessAccountData|PersonalAccountData
+  public data: BusinessAccountData | PersonalAccountData
 
-  @hasOne(() => Image, { foreignKey: "relatedTo", 
+  @usePivot(() => Image)
+  public photos: ManyToMany<typeof Image>
+
+  // load photo after fetch
+  @beforeFetch()
+  public static async loadPhoto(query: ModelQueryBuilderContract<typeof Account>) {
+    query.preload('photos')
+  }
+
+
+  @hasOne(() => CustomerProfile, {
+    foreignKey: "relatedId",
     onQuery: (builder) => {
-      builder.where('related_type', 'user_account_avatar')
-    }
-  })
-  public avatar: HasOne<typeof Image>
-
-  @belongsTo(() => User)
-  public user: BelongsTo<typeof User>
-
-  @hasOne(() => CustomerProfile, { foreignKey: "relatedTo",
-    onQuery: (builder) => {
+      builder.where('related_type', 'accounts:customer')
       builder.preload('addresses')
       builder.preload('phones')
       builder.preload('emails')
@@ -51,8 +52,10 @@ export default class Account extends DotBaseModel {
   })
   public customer: HasOne<typeof CustomerProfile>
 
-  @hasOne(() => MerchantProfile, { foreignKey: "relatedTo", 
+  @hasOne(() => MerchantProfile, {
+    foreignKey: "relatedId",
     onQuery: (builder) => {
+      builder.where('related_type', 'accounts:merchant')
       builder.preload('address')
       builder.preload('phones')
       builder.preload('emails')
@@ -60,44 +63,57 @@ export default class Account extends DotBaseModel {
     }
   })
   public merchant: HasOne<typeof MerchantProfile>
-  // load avatar after fetch
-  @beforeFetch()
-  public static async loadAvatar(query: ModelQueryBuilderContract<typeof Account>) {
-    query.preload('avatar')
-  }
 
-  // before delete, delete avatar
+  // before delete, delete photo
   @afterDelete()
-  public static async deleteAvatar(instance: Account) {
-    var avatar = await Image.findBy('relatedTo', instance.id)
-    if (avatar) {
-      await avatar.delete()
+  public static async deletePhoto(instance: Account) {
+    var photo = await Image.findBy('relatedId', instance.id)
+    if (photo) {
+      await photo.delete()
     }
   }
 
   /**
-   * set avatar from MultipartFile
+   * set photo from MultipartFile
    * @param {MultipartFileContract} image
    * @param {boolean} [deleteOld=false]
    * @returns {Promise<Image>}
    */
-  public async setAvatar(image: MultipartFileContract, deleteOld: boolean = true): Promise<Image> {
-    var currentAvatar = await Image.findBy('relatedTo', this.id)
-    var avatar = await Image.uploadAndCreate<Image>({
+  public async setPhoto(image: MultipartFileContract, deleteOld: boolean = true): Promise<Image> {
+    var currentPhoto = await Image.query().where('related_type', 'accounts:photo').where('related_id', this.id).first()
+    var photo = await Image.uploadAndCreate<Image>({
       multipartFile: image,
-      relatedTo: this.id,
-      relatedType: Account,
+      relatedId: this.id,
+      relatedType: `${Account.table}:photo`,
     })
-    if (deleteOld && avatar && currentAvatar) {
-      await currentAvatar.delete()
+    if (deleteOld && photo && currentPhoto) {
+      await currentPhoto.delete()
     }
-    return avatar
+    return photo
   }
+
+  @manyToMany(()=>User, {
+    pivotForeignKey: 'phone_id',
+    pivotRelatedForeignKey: 'related_id',
+    pivotTable: "phones_pivot",
+    pivotColumns: ['tag'],
+    onQuery: (builder) => {
+      // if (tag) {
+      //   builder.wherePivot('tag', tag);
+      // }
+    }
+  })
+  public users: ManyToMany<typeof User>
 }
-export abstract class AccountData  {
+export abstract class AccountData {
   constructor(data: any) {
     for (let key in data) {
       this[key] = data[key]
     }
   }
+}
+
+export enum AccountType {
+  business = 'business',
+  personal = 'personal',
 }

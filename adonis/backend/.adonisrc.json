@@ -19,12 +19,7 @@
         "./start/routes",
         "./start/kernel",
         "./start/bouncer",
-        {
-            "file": "./start/validator",
-            "environment": [
-                "web"
-            ]
-        }
+        "./start/validator"
     ],
     "providers": [
         "./providers/AppProvider",

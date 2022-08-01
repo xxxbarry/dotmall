@@ -1,13 +1,40 @@
 import { DateTime } from 'luxon'
 import Hash from '@ioc:Adonis/Core/Hash'
-import { column, beforeSave, BaseModel, hasMany, HasMany, beforeFetch, afterCreate, hasManyThrough, HasManyThrough } from '@ioc:Adonis/Lucid/Orm'
+import { column, beforeSave, ManyToMany, manyToMany, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
 import Email from './ContactOptions/Email'
 import Phone from './ContactOptions/Phone'
+import DotBaseModel from '../../dot/models/DotBaseModel'
+import { usePivot } from '../../dot/hooks/orm'
 import Account from './accounts/Account'
-import DotBaseModel from '../../dot/models/DorBaseModel'
-import MerchantProfile from './accounts/profiles/MerchantProfile'
 
+export enum AuthPivotTags {
+  user = "auth:users"
+}
 export default class User extends DotBaseModel {
+  public table = 'users'
+
+  // @usePivot(() => Account)
+  @hasMany(() => Account)
+  public accounts: HasMany<typeof Account>
+
+
+  @usePivot(() => Email)
+  public emails: ManyToMany<typeof Email>
+
+
+  @manyToMany(()=>Phone, {
+    pivotForeignKey: 'related_id',
+    pivotRelatedForeignKey: 'phone_id',
+    pivotTable: "phones_pivot",
+    pivotColumns: ['tag'],
+    onQuery: (builder) => {
+      // if (tag) {
+      //   builder.wherePivot('tag', tag);
+      // }
+    }
+  })
+  public phones: ManyToMany<typeof Phone>
+
   // hasPermission(mp: ModelPermission) {
   //   var permission = this.related('permissions').where('value', mp.value).first()
   // }
@@ -30,37 +57,23 @@ export default class User extends DotBaseModel {
       user.password = await Hash.make(user.password)
     }
   }
-  // Relations
-  @hasMany(() => Email, { foreignKey: 'relatedTo'})
-  public emails: HasMany<typeof Email>
 
-  @hasMany(() => Phone, { foreignKey: 'relatedTo'})
-  public phones: HasMany<typeof Phone>
-
-  @hasMany(() => Account, {
-    onQuery: (builder) => {
-      // builder.preload('merchant')
-      // builder.preload('customer')
-      // builder.preload('avatar')
-    }
-  })
-  public accounts: HasMany<typeof Account>
 
   // has many through relationship with merchants
-  @hasManyThrough([() => MerchantProfile, () => Account],
-    {
-      onQuery: (builder) => {
-        builder.preload('address')
-        builder.preload('phones')
-        builder.preload('emails')
-        builder.preload('stores')
-      }
-    }
-  )
-  public merchants: HasManyThrough<typeof MerchantProfile, typeof Account>
+  // @hasManyThrough([() => MerchantProfile, () => Account],
+  //   {
+  //     onQuery: (builder) => {
+  //       builder.preload('address')
+  //       builder.preload('phones')
+  //       builder.preload('emails')
+  //       builder.preload('stores')
+  //     }
+  //   }
+  // )
+  // public merchants: HasManyThrough<typeof MerchantProfile, typeof Account>
 
   // user has many Permissions
-  // @hasMany(() => Permission, { foreignKey: 'relatedTo'})
+  // @hasMany(() => Permission, { foreignKey: 'relatedId'})
   // public permissions: HasMany<typeof Permission>
 
   // @afterCreate()

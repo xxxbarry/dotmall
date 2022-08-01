@@ -5,7 +5,3 @@ Route.resource('/accounts', 'AccountsController').except(
 ).middleware({
     "*": "auth",
 })
-// Route.get('/', "AccountsController.index").middleware(['auth'])
-// Route.get('/:id', "AccountsController.show").middleware(['auth'])
-// Route.post('/', "AccountsController.create").middleware(['auth'])
-// Route.delete('/:id', "AccountsController.destroy").middleware(['auth'])
