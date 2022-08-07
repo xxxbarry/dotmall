@@ -5,6 +5,8 @@ import CustomerProfile from 'App/Models/accounts/profiles/CustomerProfile'
 
 export default class CustomerPolicy extends BasePolicy {
 	public async viewList(user: User, payload: any) {
+    return true
+
 		if (user) {
 			var account = await Account.find(payload.where.account_id)
 			return account && user.id === account.userId

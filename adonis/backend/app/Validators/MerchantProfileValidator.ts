@@ -35,7 +35,11 @@ export class UpdateMerchantProfileValidator implements DotValidator {
     description: schema.string.optional(),
     // type: schema.string.optional(),
     // photo is optional, but if it is provided, it must be a valid image
-    photo: schema.file.optional(),
+
+    photo: schema.file.optional({
+      extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp',  'bmp'],
+      size: '2mb',
+    },[]),
   })
 
   public messages = {}
@@ -97,16 +101,14 @@ export class ListMerchantProfilesValidator implements DotValidator {
 
   }
   public schema = schema.create({
-    page: schema.number.optional([
-      rules.range(1, Infinity),
-    ]),
+    page: schema.number.optional(),
     limit: schema.number.optional([
       rules.range(1, 24),
     ]),
     sort: schema.enum.optional(['created_at', 'updated_at'] as const),
     order: schema.enum.optional(["asc", "desc"] as const),
     search: schema.string.optional([rules.minLength(1),]),
-    search_by: schema.array.optional([rules.requiredIfExists('search')]).members(
+    search_in: schema.array.optional([rules.requiredIfExists('search')]).members(
       schema.enum([] as const)
     ),
     load: schema.array.optional().members(

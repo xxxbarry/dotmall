@@ -16,6 +16,7 @@ export default abstract class DotBaseSchema extends BaseSchema {
   public useValidatedAt: boolean = false;
   public useStatus: boolean = false;
   public useUUID: boolean = true;
+  public useUserRelation: boolean = false;
   public useRelatedTo: boolean = true;
   public useTranslation: string | null = null;
   public usePivotTable: boolean = false
@@ -69,6 +70,9 @@ export default abstract class DotBaseSchema extends BaseSchema {
         table.string('related_id').nullable()
         table.string('related_type').nullable()
       }
+      if (this.useUserRelation) {
+        table.string('user_id').notNullable().references('users.id').onDelete('CASCADE')
+      }
 
     })
 
@@ -76,11 +80,11 @@ export default abstract class DotBaseSchema extends BaseSchema {
       this.schema.createTable(this.tableName + '_pivot', (table) => {
         if (this.useUUID) {
           table.uuid('id').primary();
-          table.uuid(this.modelName + '_id').references(this.tableName + '.id')
+          table.uuid(this.modelName + '_id').references(this.tableName + '.id').onDelete('CASCADE')
           table.uuid('related_id');
         } else {
           table.increments('id').primary();
-          table.integer(this.modelName + '_id').unsigned().references(this.tableName + '.id')
+          table.integer(this.modelName + '_id').unsigned().references(this.tableName + '.id').onDelete('CASCADE')
           table.integer('related_id').unsigned()
         }
 

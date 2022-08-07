@@ -1,6 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import  { CreateCategoryValidator, DestroyCategoryValidator, ListCategoriesValidator, ShowCategoryValidator, UpdateCategoryValidator } from 'App/Validators/CategoryValidator'
-import { Image } from 'App/Models/File'
+import { CreateCategoryValidator, DestroyCategoryValidator, ListCategoriesValidator, ShowCategoryValidator, UpdateCategoryValidator } from 'App/Validators/CategoryValidator'
+import File, { Image } from 'App/Models/File'
 import { ModelObject } from '@ioc:Adonis/Lucid/Orm';
 import Category from 'App/Models/Category';
 
@@ -24,8 +24,8 @@ export default class CategoriesController {
     var limit = 24
 
     if (payload.search) {
-      for (let i = 0; i < payload.search_by!.length; i++) {
-        const element = payload.search_by![i];
+      for (let i = 0; i < payload.search_in!.length; i++) {
+        const element = payload.search_in![i];
         if (i == 0) {
           categoriesQuery = categoriesQuery.where(element, 'like', `%${payload.search}%`)
         } else {
@@ -60,7 +60,7 @@ export default class CategoriesController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Category", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/categories
    */
-  public async store({ request, bouncer }: HttpContextContract): Promise<{ category: ModelObject; photo: Image | null; }> {
+  public async store({ request, bouncer }: HttpContextContract) {
 
     await bouncer.with('CategoryPolicy').authorize('create', null)
     const payload = await request.validate(CreateCategoryValidator)
@@ -70,11 +70,17 @@ export default class CategoriesController {
     })
     var photo: Image | null = null;
     if (payload.photo) {
-      photo = await category.setPhoto(payload.photo)
+      photo = await File.attachModel<Image>({
+        related_id: category.id,
+        file: payload.photo,
+        tag: 'categories:photo',
+      })
     }
     return {
-      category: category.toJSON(),
-      photo: photo,
+      category: {
+        ...category.toJSON(),
+        photos: [...(()=>photo ? [photo]:[])()],
+      },
     }
   }
 
@@ -95,10 +101,10 @@ export default class CategoriesController {
         await category.load(load)
       }
     }
-    if (!payload.load?.includes('photo')) {
-      await category.load('photo')
+    if (!payload.load?.includes('photos')) {
+      await category.load('photos')
     }
-    return category.toJSON()
+    return {category:category.toJSON()}
   }
 
   /**
@@ -119,11 +125,18 @@ export default class CategoriesController {
     await category.save()
     var photo: Image | null = null;
     if (payload.photo) {
-      await category.setPhoto(payload.photo)
+      photo = await File.attachModel<Image>({
+        related_id: category.id,
+        file: payload.photo,
+        deleteOld: true,
+        tag: 'categories:photo',
+      })
     }
     return {
-      category: category.toJSON(),
-      photo: photo,
+      category: {
+        ...category.toJSON(),
+        photos: [...(()=>photo ? [photo]:[])()],
+      },
     }
   }
 

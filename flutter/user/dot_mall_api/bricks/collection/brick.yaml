@@ -1,0 +1,18 @@
+name: collection
+description: collection manager
+version: 0.1.0+1
+
+environment:
+  mason: ">=0.1.0-dev.31 <0.1.0"
+
+vars:
+  name:
+    type: string
+    description: collection name
+    default: users
+    prompt: What is the collection name?
+  methods:
+    type: string
+    description: "JSON Array of developers ([{'name': 'Dash'}])"
+    default: '[{"name": "Dash", "description": "Dash is a collection manager"}]'
+    prompt: What is the list of developers?

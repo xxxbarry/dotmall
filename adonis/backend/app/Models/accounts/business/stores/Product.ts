@@ -7,11 +7,9 @@ import Category from 'App/Models/Category'
 import { Image } from 'App/Models/File'
 import Store from './Store'
 import Section from './Section'
+import Price from 'App/Models/Price'
 
 export default class Product extends DotBaseModel {
-
-  @column()
-  public categoryId: string
 
   @column()
   public name: string
@@ -20,7 +18,22 @@ export default class Product extends DotBaseModel {
   public description: string
 
   @column()
+  public body: string
+
+  @column()
   public slug: string
+
+  @column()
+  public barcode: string
+
+  @column({
+    prepare: (value: Object) => JSON.stringify(value),
+    consume: (value: string) => JSON.parse(value),
+  })
+  public meta: Object
+
+  @column()
+  public product_type: string
 
   @column()
   public storeId: string
@@ -36,6 +49,11 @@ export default class Product extends DotBaseModel {
 
   @hasMany(() => ProductTranslation)
   public translations: HasMany<typeof ProductTranslation>
+
+  // @hasMany(() => Price)
+  // public prices: HasMany<typeof Price>
+  @column()
+  public price: number
 
   @belongsTo(() => Store)
   public store: BelongsTo<typeof Store>

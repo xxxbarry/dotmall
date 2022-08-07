@@ -26,8 +26,8 @@ export default class StoreTranslationsController {
     var limit = 24
 
     if (payload.search) {
-      for (let i = 0; i < payload.search_by!.length; i++) {
-        const element = payload.search_by![i];
+      for (let i = 0; i < payload.search_in!.length; i++) {
+        const element = payload.search_in![i];
         if (i == 0) {
           storeTranslationsQuery = storeTranslationsQuery.where(element, 'like', `%${payload.search}%`)
         } else {

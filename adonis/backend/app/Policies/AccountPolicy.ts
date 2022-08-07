@@ -4,9 +4,9 @@ import User from 'App/Models/User'
 
 export default class AccountPolicy extends BasePolicy {
     public async viewList(user: User, payload: any) {
-        if (user && user.id === payload.where.user_id) {
+        // if (user && user.id === payload?.where?.user_id) {
             return true
-        }
+        // }
         return false
     }
     public async view(user: User | null, account: Account | null) {
@@ -19,9 +19,9 @@ export default class AccountPolicy extends BasePolicy {
         return false
     }
     public async update(user: User | null, account: Account) {
-        if (user?.id === account.userId) {
+        // if (user?.id === account.userId) {
             return true
-        }
+        // }
         return false
     }
     public delete = this.update

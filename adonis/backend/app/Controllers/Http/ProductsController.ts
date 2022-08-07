@@ -24,8 +24,8 @@ export default class ProductsController {
     var limit = 24
 
     if (payload.search) {
-      for (let i = 0; i < payload.search_by!.length; i++) {
-        const element = payload.search_by![i];
+      for (let i = 0; i < payload.search_in!.length; i++) {
+        const element = payload.search_in![i];
         if (i == 0) {
           productsQuery = productsQuery.where(element, 'like', `%${payload.search}%`)
         } else {
@@ -67,6 +67,14 @@ export default class ProductsController {
     const product = await Product.create({
       name: payload.name,
       description: payload.description,
+      storeId: payload.store_id,
+      sectionId: payload.section_id,
+      product_type: payload.product_type,
+      barcode: payload.barcode,
+      price: payload.price,
+      body: payload.body,
+      meta: payload.meta,
+      slug: payload.slug,
     })
     var photo: Image | null = null;
     if (payload.photo) {
@@ -86,7 +94,7 @@ export default class ProductsController {
    * @example
    * curl -X GET -H "Content-Type: application/json" http://localhost:3333/api/v1/products/1
    */
-  public async show({ auth, request, bouncer }: HttpContextContract): Promise<any> {
+  public async show({ request, bouncer }: HttpContextContract): Promise<any> {
     const payload = await request.validate(ShowProductValidator)
     var product = (await Product.find(payload.params.id))!
     await bouncer.with('ProductPolicy').authorize('view', product)
@@ -116,6 +124,15 @@ export default class ProductsController {
     await bouncer.with('ProductPolicy').authorize('update', product)
     product.name = payload.name ?? product.name
     product.description = payload.description ?? product.description
+    product.storeId = payload.store_id ?? product.storeId
+    product.sectionId = payload.section_id ?? product.sectionId
+    product.product_type = payload.product_type ?? product.product_type
+    product.barcode = payload.barcode ?? product.barcode
+    product.price = payload.price ?? product.price
+    product.body = payload.body ?? product.body
+    product.meta = payload.meta ?? product.meta
+    product.slug = payload.slug ?? product.slug
+
     await product.save()
     var photo: Image | null = null;
     if (payload.photo) {

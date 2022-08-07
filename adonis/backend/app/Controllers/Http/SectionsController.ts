@@ -25,8 +25,8 @@ export default class SectionsController {
 
 
     if (payload.search) {
-      for (let i = 0; i < payload.search_by!.length; i++) {
-        const element = payload.search_by![i];
+      for (let i = 0; i < payload.search_in!.length; i++) {
+        const element = payload.search_in![i];
         if (i == 0) {
           sectionsQuery = sectionsQuery.where(element, 'like', `%${payload.search}%`)
         } else {
@@ -68,6 +68,8 @@ export default class SectionsController {
     const section = await Section.create({
       name: payload.name,
       description: payload.description,
+      storeId: payload.store_id,
+      slug: payload.slug,
     })
     var photo: Image | null = null;
     if (payload.photo) {
@@ -117,6 +119,8 @@ export default class SectionsController {
     await bouncer.with('SectionPolicy').authorize('update', section)
     section.name = payload.name ?? section.name
     section.description = payload.description ?? section.description
+    section.slug = payload.slug ?? section.slug
+    section.storeId = payload.store_id ?? section.storeId
     await section.save()
     var photo: Image | null = null;
     if (payload.photo) {

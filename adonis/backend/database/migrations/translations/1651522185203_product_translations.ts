@@ -10,9 +10,9 @@ export default class ProductTranslations extends DotBaseSchema {
     public setup(table: Knex.CreateTableBuilder): void {
         table.string('locale', 5).notNullable();
         table.string('name').nullable()
-        table.string('description').nullable()
+        table.string('description', 500).nullable()
         table.text('body').nullable()
-        table.double('price').nullable()
+        table.string('slug').nullable()
         table
             .string('product_id')
             .references('products.id')

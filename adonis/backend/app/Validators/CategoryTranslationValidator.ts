@@ -8,7 +8,7 @@ export class CreateCategoryTranslationValidator extends DotValidator {
   }
   public schema = schema.create({
 
-    category_id: schema.string.optional({}, [
+    category_id: schema.string({}, [
       rules.exists({ table: 'categories', column: 'id' }),
     ]),
     name: schema.string.optional(),
@@ -38,6 +38,7 @@ export class UpdateCategoryTranslationValidator extends DotValidator {
     }),
     name: schema.string.optional(),
     description: schema.string.optional(),
+
   })
 
   public messages = {}
@@ -102,9 +103,7 @@ export class ListCategoryTranslationsValidator extends DotValidator {
   }
   public schema = schema.create({
     // query: schema.object().members({
-    page: schema.number.optional([
-      rules.range(1, Infinity),
-    ]),
+    page: schema.number.optional(),
     limit: schema.number.optional([
       rules.range(1, 24),
     ]),
@@ -112,7 +111,7 @@ export class ListCategoryTranslationsValidator extends DotValidator {
     order: schema.enum.optional(["asc", "desc"] as const),
     // type: schema.enum.optional(["personal', 'business"] as const),
     search: schema.string.optional([rules.minLength(1),]),
-    search_by: schema.array.optional([rules.requiredIfExists('search')]).members(
+    search_in: schema.array.optional([rules.requiredIfExists('search')]).members(
       schema.enum(["name", "description", 'locale'] as const)
     ),
     load: schema.array.optional().members(

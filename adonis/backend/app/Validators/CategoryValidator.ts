@@ -12,8 +12,11 @@ export class CreateCategoryValidator extends DotValidator {
   public schema = schema.create({
     name: schema.string.optional(),
     description: schema.string.optional(),
-    photo: schema.file.optional({}, [
-    ]),
+
+    photo: schema.file.optional({
+      extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp',  'bmp'],
+      size: '2mb',
+    },[])
   })
 
   public messages = {}
@@ -37,7 +40,11 @@ export class UpdateCategoryValidator extends DotValidator {
     name: schema.string.optional(),
     description: schema.string.optional(),
     // photo is optional, but if it is provided, it must be a valid image
-    photo: schema.file.optional(),
+
+    photo: schema.file.optional({
+      extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp',  'bmp'],
+      size: '2mb',
+    },[]),
   })
 
   public messages = {}
@@ -59,7 +66,7 @@ export class ShowCategoryValidator extends DotValidator {
       ]),
     }),
     load: schema.array.optional().members(
-      schema.enum.optional(["parent", "children", "translations", "photo"] as const)
+      schema.enum.optional(["parent", "children", "translations", "photos"] as const)
     ),
   })
   public messages = {}
@@ -100,9 +107,7 @@ export class ListCategoriesValidator extends DotValidator {
   }
   public schema = schema.create({
     // query: schema.object().members({
-    page: schema.number.optional([
-      rules.range(1, Infinity),
-    ]),
+    page: schema.number.optional(),
     limit: schema.number.optional([
       rules.range(1, 24),
     ]),
@@ -110,11 +115,11 @@ export class ListCategoriesValidator extends DotValidator {
     order: schema.enum.optional(["asc", "desc"] as const),
     // type: schema.enum.optional(["personal', 'business"] as const),
     search: schema.string.optional([rules.minLength(1),]),
-    search_by: schema.array.optional([rules.requiredIfExists('search')]).members(
+    search_in: schema.array.optional([rules.requiredIfExists('search')]).members(
       schema.enum(["name", "description"] as const)
     ),
     load: schema.array.optional().members(
-      schema.enum.optional(["parent", "children", "translations", "photo"] as const)
+      schema.enum.optional(["parent", "children", "translations", "photos"] as const)
     ),
     where: schema.object.optional().members({
       name: schema.string.optional(),

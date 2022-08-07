@@ -7,8 +7,8 @@ import { string } from '@ioc:Adonis/Core/Helpers'
 
 export default class Phone extends DotBaseModel {
 
-  // @column()
-  // public code: number
+  @column()
+  public userId: string
 
   @column()
   public value: string

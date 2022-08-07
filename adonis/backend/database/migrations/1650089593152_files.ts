@@ -6,6 +6,7 @@ export default class Files extends DotBaseSchema {
   public useTimestamps = true
   public useSoftDeletes = true
   public useRelatedTo = true
+  public useUserRelation = true
   public usePivotTable = true
   // public useTranslation = true
   public setup(table: Knex.CreateTableBuilder): void {

@@ -13,10 +13,10 @@ export default class ProductTranslation extends DotBaseTranslation {
   public description: string | null
 
   @column()
-  public body: string | null
+  public slug: string | null
 
   @column()
-  public price: number | null
+  public body: string | null
 
   @column()
   public productId: string

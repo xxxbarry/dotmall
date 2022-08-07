@@ -1,0 +1,10 @@
+builders:
+  collectionGeneratorBuilder:
+    import: 'package:generators/generators.dart'
+    builder_factories: [
+      'tableGeneratorBuilder',
+    ]
+    auto_apply: dependents
+    build_extensions: {".dart": [".table.part"]}
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]

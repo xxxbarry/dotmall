@@ -1,0 +1,7 @@
+targets:
+  $default:
+    builders:
+      generators|collectionGeneratorBuilder:
+        enabled: True
+        generate_for:
+          - lib/**/*

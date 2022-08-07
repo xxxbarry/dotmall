@@ -2,7 +2,6 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { CreateCategoryTranslationValidator, DestroyCategoryTranslationValidator, ListCategoryTranslationsValidator, ShowCategoryTranslationValidator, UpdateCategoryTranslationValidator } from 'App/Validators/CategoryTranslationValidator'
 import { ModelObject } from '@ioc:Adonis/Lucid/Orm';
 import CategoryTranslation from 'App/Models/translations/CategoryTranslation';
-import Category from 'App/Models/Category';
 
 export default class CategoryTranslationsController {
   /**
@@ -22,8 +21,8 @@ export default class CategoryTranslationsController {
     var limit = 24
 
     if (payload.search) {
-      for (let i = 0; i < payload.search_by!.length; i++) {
-        const element = payload.search_by![i];
+      for (let i = 0; i < payload.search_in!.length; i++) {
+        const element = payload.search_in![i];
         if (i == 0) {
           categoryTranslationsQuery = categoryTranslationsQuery.where(element, 'like', `%${payload.search}%`)
         } else {
@@ -58,7 +57,7 @@ export default class CategoryTranslationsController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My CategoryTranslation", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/categoryTranslations
    */
-  public async store({ request, bouncer }: HttpContextContract): Promise<{ categoryTranslation: ModelObject }> {
+  public async store({ request, bouncer }: HttpContextContract): Promise<{ category_translation: ModelObject }> {
 
     const payload = await request.validate(CreateCategoryTranslationValidator)
     await bouncer.with('CategoryTranslationPolicy').authorize('create', null)
@@ -66,9 +65,10 @@ export default class CategoryTranslationsController {
       locale: payload.locale,
       name: payload.name,
       description: payload.description,
+      categoryId: payload.category_id
     })
     return {
-      categoryTranslation: categoryTranslation.toJSON()
+      category_translation: categoryTranslation.toJSON()
     }
   }
 
@@ -89,7 +89,7 @@ export default class CategoryTranslationsController {
         await categoryTranslation.load(load)
       }
     }
-    return categoryTranslation.toJSON()
+    return {category_translation:categoryTranslation.toJSON()}
   }
 
   /**
@@ -101,7 +101,7 @@ export default class CategoryTranslationsController {
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My CategoryTranslation", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/categoryTranslations/1
    */
   public async update({ request, bouncer }: HttpContextContract): Promise<{
-    categoryTranslation: ModelObject;
+    category_translation: ModelObject;
   }> {
     // validate also params.id
     const payload = await request.validate(UpdateCategoryTranslationValidator)
@@ -111,7 +111,7 @@ export default class CategoryTranslationsController {
     categoryTranslation.description = payload.description ?? categoryTranslation.description
     await categoryTranslation.save()
     return {
-      categoryTranslation: categoryTranslation.toJSON(),
+      category_translation: categoryTranslation.toJSON(),
     }
   }
 

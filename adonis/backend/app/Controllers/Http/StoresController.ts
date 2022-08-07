@@ -1,6 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import  { CreateStoreValidator, DestroyStoreValidator, ListStoresValidator, ShowStoreValidator, UpdateStoreValidator } from 'App/Validators/StoreValidator'
-import { Image } from 'App/Models/File'
+import File, { Image } from 'App/Models/File'
 import { ModelObject } from '@ioc:Adonis/Lucid/Orm';
 import Store, { StoreStatus } from 'App/Models/accounts/business/stores/Store';
 
@@ -25,8 +25,8 @@ export default class StoresController {
 
 
     if (payload.search) {
-      for (let i = 0; i < payload.search_by!.length; i++) {
-        const element = payload.search_by![i];
+      for (let i = 0; i < payload.search_in!.length; i++) {
+        const element = payload.search_in![i];
         if (i == 0) {
           storesQuery = storesQuery.where(element, 'like', `%${payload.search}%`)
         } else {
@@ -61,8 +61,7 @@ export default class StoresController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Store", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/stores
    */
-  public async store({ request, bouncer }: HttpContextContract): Promise<{ store: ModelObject; photo: Image | null; }> {
-
+  public async store({ request, bouncer }: HttpContextContract) {
     const payload = await request.validate(CreateStoreValidator)
     await bouncer.with('StorePolicy').authorize('create', payload)
     const store = await Store.create({
@@ -73,11 +72,15 @@ export default class StoresController {
     })
     var photo: Image | null = null;
     if (payload.photo) {
-      photo = await store.setPhoto(payload.photo)
+      photo = await File.attachModel<Image>({
+        related_id: store.id,
+        file: payload.photo,
+        tag: 'stores:photo',
+      })
     }
     return {
-      store: store.toJSON(),
-      photo: photo,
+      ...store.toJSON(),
+      photos: [photo],
     }
   }
 
@@ -122,11 +125,16 @@ export default class StoresController {
     await store.save()
     var photo: Image | null = null;
     if (payload.photo) {
-      photo = await store.setPhoto(payload.photo)
+      photo = await File.attachModel<Image>({
+        related_id: store.id,
+        file: payload.photo,
+        deleteOld: true,
+        tag: 'stores:photo',
+      })
     }
     return {
-      store: store.toJSON(),
-      photo: photo,
+      ...store.toJSON(),
+      photos: [photo],
     }
   }
 

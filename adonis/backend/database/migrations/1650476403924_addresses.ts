@@ -7,6 +7,7 @@ export default class Addresses extends DotBaseSchema {
   public useSoftDeletes = true
   public useValidatedAt = true
   public useRelatedTo = true
+  public useUserRelation = true
   public usePivotTable = true
   // useTranslation
   // public useTranslation = true

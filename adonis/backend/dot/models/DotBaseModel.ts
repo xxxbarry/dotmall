@@ -1,12 +1,11 @@
-import { BaseModel, beforeCreate, column, ExtractModelRelations, LucidModel, ModelRelations } from "@ioc:Adonis/Lucid/Orm";
+import { BaseModel, beforeCreate, column } from "@ioc:Adonis/Lucid/Orm";
 import {customAlphabet} from 'nanoid';
-import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
-import { Image } from "App/Models/File";
 
 const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnoprstuvwxyz';
 const nanoid = customAlphabet(alphabet, 14);
 
 export default class DotBaseModel/*<T extends LucidModel>*/ extends BaseModel {
+
     @column({ isPrimary: true })
     public id: string
     /**

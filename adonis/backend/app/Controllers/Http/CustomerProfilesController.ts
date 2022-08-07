@@ -24,8 +24,8 @@ export default class CustomerProfilesController {
 
 
         if (payload.search) {
-          for (let i = 0; i < payload.search_by!.length; i++) {
-            const element = payload.search_by![i];
+          for (let i = 0; i < payload.search_in!.length; i++) {
+            const element = payload.search_in![i];
             if (i == 0) {
               customersQuery = customersQuery.where(element, 'like', `%${payload.search}%`)
             } else {
@@ -88,7 +88,7 @@ export default class CustomerProfilesController {
                 await customer!.load(load)
             }
         }
-        return customer!.toJSON()
+        return {customer_profile:customer!.toJSON()}
     }
 
     /**

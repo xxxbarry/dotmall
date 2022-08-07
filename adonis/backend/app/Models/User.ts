@@ -5,7 +5,8 @@ import Email from './ContactOptions/Email'
 import Phone from './ContactOptions/Phone'
 import DotBaseModel from '../../dot/models/DotBaseModel'
 import { usePivot } from '../../dot/hooks/orm'
-import Account from './accounts/Account'
+import Account from './Account'
+import File from './File'
 
 export enum AuthPivotTags {
   user = "auth:users"
@@ -21,6 +22,9 @@ export default class User extends DotBaseModel {
   @usePivot(() => Email)
   public emails: ManyToMany<typeof Email>
 
+  @usePivot(() => File)
+  public files: ManyToMany<typeof File>
+
 
   @manyToMany(()=>Phone, {
     pivotForeignKey: 'related_id',
@@ -35,10 +39,6 @@ export default class User extends DotBaseModel {
   })
   public phones: ManyToMany<typeof Phone>
 
-  // hasPermission(mp: ModelPermission) {
-  //   var permission = this.related('permissions').where('value', mp.value).first()
-  // }
-
   @column({ serializeAs: null })
   public password: string
 
@@ -50,6 +50,8 @@ export default class User extends DotBaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+  name: any
+  description: any
 
   @beforeSave()
   public static async hashPassword(user: User) {

@@ -16,18 +16,23 @@ export default class CategoryPolicy extends BasePolicy {
         return true;
     }
     // create a category
+    @action({ allowGuest: true })
     public async create(user: User | null, payload: any) {
+      return true
         if (user) {
             return true
         }
         return false
     }
     // update a category
-    public async update(user: User | null, category: Category) {
+    @action({ allowGuest: true })
+    public async update(user: User | null, category: Category) {return true
         if (user) {
                 return true
         }
         return false
     }
+
+    @action({ allowGuest: true })
     public delete = this.update
 }

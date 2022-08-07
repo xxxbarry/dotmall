@@ -14,7 +14,11 @@ export class CreateStoreValidator extends DotValidator {
     ]),
     name: schema.string.optional(),
     description: schema.string.optional(),
-    photo: schema.file.optional({}, []),
+
+    photo: schema.file.optional({
+      extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp',  'bmp'],
+      size: '2mb',
+    },[])
   })
 
   public messages = {}
@@ -37,7 +41,11 @@ export class UpdateStoreValidator extends DotValidator {
     }),
     name: schema.string.optional(),
     description: schema.string.optional(),
-    photo: schema.file.optional(),
+
+    photo: schema.file.optional({
+      extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp',  'bmp'],
+      size: '2mb',
+    },[]),
   })
 
   public messages = {}
@@ -120,7 +128,7 @@ export class ListStoresValidator extends DotValidator {
       order: schema.enum.optional(["asc", "desc"] as const),
       // type: schema.enum.optional(["personal', 'business"] as const),
       search: schema.string.optional([rules.minLength(1),]),
-      search_by: schema.array.optional([rules.requiredIfExists('search')]).members(
+      search_in: schema.array.optional([rules.requiredIfExists('search')]).members(
         schema.enum(["name","description"] as const)
       ),
       load: schema.array.optional().members(

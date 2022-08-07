@@ -18,7 +18,7 @@ export default class Products extends DotBaseSchema {
 
     // addetional data as json
     table.json('meta').nullable()
-    table.double('price').defaultTo(0)
+    table.double('price').notNullable()
 
     table.string('product_type')
 

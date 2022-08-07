@@ -8,14 +8,19 @@ export class CreateAccountValidator extends DotValidator {
     super()
   }
   public schema = schema.create({
+    user_id: schema.string({ trim: true }, [
+      rules.minLength(14),
+      rules.exists({ table: 'users', column: 'id' }),
+    ]),
     name: schema.string.optional(),
     description: schema.string.optional(),
-    type: schema.string({}, []),
+    type: schema.enum.optional<AccountType[]>(Object.values(AccountType)),
     // photo is optional, but if it is provided, it must be a valid image
-    photo: schema.file.optional({}, [
-    ]),
+    photo: schema.file.optional({
+      extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp',  'bmp'],
+      size: '2mb',
+    },[]),
   })
-
   public messages = {}
 }
 
@@ -36,9 +41,14 @@ export class UpdateAccountValidator extends DotValidator {
     }),
     name: schema.string.optional(),
     description: schema.string.optional(),
-    // type: schema.string.optional(),
+    // type is enum, but it is optional
+    type: schema.enum.optional<AccountType[]>(Object.values(AccountType)),
     // photo is optional, but if it is provided, it must be a valid image
-    photo: schema.file.optional(),
+
+    photo: schema.file.optional({
+      extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp',  'bmp'],
+      size: '2mb',
+    },[]),
   })
 
   public messages = {}
@@ -101,9 +111,7 @@ export class ListAccountsValidator extends DotValidator {
   }
   public schema = schema.create({
     // query: schema.object().members({
-      page: schema.number.optional([
-        rules.range(1, Infinity),
-      ]),
+      page: schema.number.optional(),
       limit: schema.number.optional([
         rules.range(1, 24),
       ]),
@@ -111,7 +119,7 @@ export class ListAccountsValidator extends DotValidator {
       order: schema.enum.optional(["asc", "desc"] as const),
       // type: schema.enum.optional(["personal', 'business"] as const),
       search: schema.string.optional([rules.minLength(1),]),
-      search_by: schema.array.optional([rules.requiredIfExists('search')]).members(
+      search_in: schema.array.optional([rules.requiredIfExists('search')]).members(
         schema.enum(["name"] as const)
       ),
       load: schema.array.optional().members(

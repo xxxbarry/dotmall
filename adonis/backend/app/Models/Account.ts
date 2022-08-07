@@ -1,6 +1,5 @@
-import { afterDelete, BaseModel, beforeFetch, belongsTo, BelongsTo, column, hasOne, HasOne, ManyToMany, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
+import { afterDelete, beforeFetch, BelongsTo, belongsTo, column, hasOne, HasOne, ManyToMany, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
 import { usedPivot, usePivot } from 'Dot/hooks/orm'
-import { DateTime } from 'luxon'
 import DotBaseModel from '../../dot/models/DotBaseModel'
 import { BusinessAccountData } from './accounts/business/BusinessAccountData'
 import { PersonalAccountData } from './accounts/PersonalAccountData'
@@ -8,9 +7,6 @@ import CustomerProfile from './accounts/profiles/CustomerProfile'
 import MerchantProfile from './accounts/profiles/MerchantProfile'
 import { Image } from './File'
 import User from './User'
-import Phone from './ContactOptions/Phone'
-import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
-
 export default class Account extends DotBaseModel {
   static table: string = 'accounts'
   @column()
@@ -24,6 +20,8 @@ export default class Account extends DotBaseModel {
 
   @column()
   public userId: string
+  @belongsTo(() => User)
+  public users: BelongsTo<typeof User>
 
   @column({
     prepare: (value: BusinessAccountData | PersonalAccountData) => JSON.stringify(value),
@@ -40,8 +38,6 @@ export default class Account extends DotBaseModel {
     query.preload('photos')
   }
 
-  @usedPivot(() => User, () => Phone)
-  public users: ManyToMany<typeof User>
 
   @hasOne(() => CustomerProfile, {
     foreignKey: "relatedId",
@@ -75,24 +71,7 @@ export default class Account extends DotBaseModel {
     }
   }
 
-  /**
-   * set photo from MultipartFile
-   * @param {MultipartFileContract} image
-   * @param {boolean} [deleteOld=false]
-   * @returns {Promise<Image>}
-   */
-  public async setPhoto(image: MultipartFileContract, deleteOld: boolean = true): Promise<Image> {
-    var currentPhoto = await Image.query().where('related_type', 'accounts:photo').where('related_id', this.id).first()
-    var photo = await Image.uploadAndCreate<Image>({
-      multipartFile: image,
-      relatedId: this.id,
-      relatedType: `${Account.table}:photo`,
-    })
-    if (deleteOld && photo && currentPhoto) {
-      await currentPhoto.delete()
-    }
-    return photo
-  }
+
 }
 export abstract class AccountData {
   constructor(data: any) {

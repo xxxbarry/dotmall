@@ -1,8 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:dot_mall/src/features/auth/domain/entities/auth.dart';
 import 'package:dot_mall/src/features/core/presentation/widgets/gradient_box.dart';
 import 'package:dot_mall/src/features/core/presentation/widgets/inputs.dart';
 import 'package:flutter/material.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:dot_mall/src/features/core/dot_mall_sdk/dot_mall_sdk.dart'
+    as api;
+
+import '../../../core/dot_mall_sdk/collections/collection.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({Key? key}) : super(key: key);
@@ -62,7 +67,46 @@ class _AuthPageState extends State<AuthPage> {
                         ),
                         FormElementBox(
                           child: OutlinedButton.icon(
-                            onPressed: () {},
+                            onPressed: () async {
+                              var manager = api.Manager(
+                                configs: api.Configs(prodEndpoint: ""),
+                              );
+                              manager.init();
+                              // var data = await manager.categories.create(
+                              //   options: CollectionPostOptions(
+                              //     data: FormData.fromMap(
+                              //       {
+                              //         'name': 'test',
+                              //         'description': 'test',
+                              //         'photo': await MultipartFile.fromFile(
+                              //           'assets/images/200w/logo_black.png',
+                              //           filename: 'logo_black.png',
+                              //         ),
+                              //       },
+                              //     ),
+                              //   ),
+                              // );
+
+                              // var data = await manager.categories.update(
+                              //   'xvFy69eKzWvv9X',
+                              //   options: CollectionPostOptions(
+                              //     data: FormData.fromMap(
+                              //       {
+                              //         'name': 'testsregerg',
+                              //         'description': 'testergerger',
+                              //         'photo': await MultipartFile.fromFile(
+                              //           'assets/images/200w/logo_black.png',
+                              //           filename: 'logo_black.png',
+                              //         ),
+                              //       },
+                              //     ),
+                              //   ),
+                              // );
+
+                              var data = await manager.categories
+                                  .delete('iY31XQi7K84Jcv');
+                              print(data);
+                            },
                             label: Text('إنشاء حساب'.toUpperCase()),
                             icon: const Icon(FluentIcons.person_16_regular),
                           ),

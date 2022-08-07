@@ -10,10 +10,31 @@ export class CreateProductValidator extends DotValidator {
     super()
   }
   public schema = schema.create({
-    name: schema.string.optional(),
-    description: schema.string.optional(),
-    photo: schema.file.optional({}, [
+    name: schema.string({}, [
+      rules.minLength(3),
+      rules.maxLength(255),
     ]),
+    description: schema.string({}, [
+      rules.minLength(3),
+      rules.maxLength(255),
+    ]),
+    body: schema.string.optional(),
+    slug: schema.string.optional(),
+    barcode: schema.string.optional(),
+    product_type: schema.string.optional(),
+    price: schema.number([
+    ]),
+    meta: schema.object.optional().anyMembers(),
+    store_id: schema.string({}, [
+      rules.exists({ table: 'stores', column: 'id' }),
+    ]),
+    section_id: schema.string({}, [
+      rules.exists({ table: 'sections', column: 'id' }),
+    ]),
+    photo: schema.file.optional({
+      extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp',  'bmp'],
+      size: '2mb',
+    },[])
   })
 
   public messages = {}
@@ -29,15 +50,34 @@ export class UpdateProductValidator extends DotValidator {
   public schema = schema.create({
     params: schema.object().members({
       id: schema.string({ trim: true }, [
-        rules.required(),
         rules.minLength(14),
         rules.exists({ table: 'products', column: 'id' }),
       ]),
     }),
-    name: schema.string.optional(),
-    description: schema.string.optional(),
-    // photo is optional, but if it is provided, it must be a valid image
-    photo: schema.file.optional(),
+    name: schema.string({}, [
+      rules.minLength(3),
+      rules.maxLength(255),
+    ]),
+    description: schema.string({}, [
+      rules.minLength(3),
+      rules.maxLength(255),
+    ]),
+    body: schema.string.optional(),
+    slug: schema.string.optional(),
+    barcode: schema.string.optional(),
+    product_type: schema.string.optional(),
+    price: schema.number(),
+    meta: schema.object.optional().anyMembers(),
+    store_id: schema.string({}, [
+      rules.exists({ table: 'stores', column: 'id' }),
+    ]),
+    section_id: schema.string({}, [
+      rules.exists({ table: 'sections', column: 'id' }),
+    ]),
+    photo: schema.file.optional({
+      extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp',  'bmp'],
+      size: '2mb',
+    },[])
   })
 
   public messages = {}
@@ -59,7 +99,7 @@ export class ShowProductValidator extends DotValidator {
       ]),
     }),
     load: schema.array.optional().members(
-      schema.enum.optional(["parent", "children", "translations", "photo"] as const)
+      schema.enum.optional(["section", "store", "translations", "photo"] as const)
     ),
   })
   public messages = {}
@@ -100,21 +140,37 @@ export class ListProductsValidator extends DotValidator {
   }
   public schema = schema.create({
     // query: schema.object().members({
-    page: schema.number.optional([
-      rules.range(1, Infinity),
-    ]),
+    page: schema.number.optional(),
     limit: schema.number.optional([
       rules.range(1, 24),
     ]),
-    sort: schema.enum.optional(['name', 'description', 'created_at', 'updated_at'] as const),
+
+    sort: schema.enum.optional([
+      'name',
+      'description',
+      'body',
+      'slug',
+      'barcode',
+      'product_type',
+      'price',
+      'created_at',
+      'updated_at'] as const),
     order: schema.enum.optional(["asc", "desc"] as const),
     // type: schema.enum.optional(["personal', 'business"] as const),
     search: schema.string.optional([rules.minLength(1),]),
-    search_by: schema.array.optional([rules.requiredIfExists('search')]).members(
-      schema.enum(["name", "description"] as const)
+    search_in: schema.array.optional([rules.requiredIfExists('search')]).members(
+      schema.enum([
+        'name',
+        'description',
+        'body',
+        'slug',
+        'barcode',
+        'product_type',
+        'price'
+      ] as const)
     ),
     load: schema.array.optional().members(
-      schema.enum.optional(["parent", "children", "translations", "photo"] as const)
+      schema.enum.optional(["section", "store", "translations", "photo"] as const)
     ),
     where: schema.object.optional().members({
       name: schema.string.optional(),

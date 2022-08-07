@@ -1,7 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Account, { AccountType } from 'App/Models/Account'
 import  { CreateAccountValidator, DestroyAccountValidator, ListAccountsValidator, ShowAccountValidator, UpdateAccountValidator } from 'App/Validators/AccountValidator'
-import { Image } from 'App/Models/File'
+import File, { Image } from 'App/Models/File'
 import { ModelObject } from '@ioc:Adonis/Lucid/Orm';
 
 export default class AccountsController {
@@ -25,8 +25,8 @@ export default class AccountsController {
 
 
     if (payload.search) {
-      for (let i = 0; i < payload.search_by!.length; i++) {
-        const element = payload.search_by![i];
+      for (let i = 0; i < payload.search_in!.length; i++) {
+        const element = payload.search_in![i];
         if (i == 0) {
           accountsQuery = accountsQuery.where(element, 'like', `%${payload.search}%`)
         } else {
@@ -61,22 +61,30 @@ export default class AccountsController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Account", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/accounts
    */
-  public async store({ request, auth, bouncer }: HttpContextContract): Promise<{ account: ModelObject; photo: Image | null; }> {
-
+  public async store({ request, auth, bouncer }: HttpContextContract) {
     await bouncer.with('AccountPolicy').authorize('create', null)
     const payload = await request.validate(CreateAccountValidator)
-    const account = await auth.user!.related("accounts").create({
+    const account = await Account.create({
       name: payload.name,
       description: payload.description,
       type: payload.type as AccountType,
+      userId: payload.user_id,
     })
+    var jsons = account.toJSON();
     var photo: Image | null = null;
     if (payload.photo) {
-      photo = await account.setPhoto(payload.photo)
+      photo = await File.attachModel<Image>({
+        related_id: account.id,
+        file: payload.photo,
+        deleteOld: true,
+        tag: 'accounts:avatar',
+      })
     }
     return {
-      account: account.toJSON(),
-      photo: photo,
+      account: {
+        ...account.toJSON(),
+        photos: [...(()=>photo ? [photo]:[])()],
+      },
     }
   }
 
@@ -88,7 +96,7 @@ export default class AccountsController {
    * @example
    * curl -X GET -H "Content-Type: application/json" http://localhost:3333/api/v1/accounts/1
    */
-  public async show({ auth, request, bouncer }: HttpContextContract): Promise<any> {
+  public async show({ auth, request, bouncer }: HttpContextContract) {
     const payload = await request.validate(ShowAccountValidator)
     var account = await Account.query().where('id', payload.params.id).first()
     await bouncer.with('AccountPolicy').authorize('view', account)
@@ -100,7 +108,7 @@ export default class AccountsController {
     if (!payload.load?.includes('photos')) {
       await account!.load('photos')
     }
-    return account!.toJSON()
+    return {account:account!.toJSON()}
   }
 
   /**
@@ -118,14 +126,23 @@ export default class AccountsController {
     await bouncer.with('AccountPolicy').authorize('update', account)
     account.name = payload.name ?? account.name
     account.description = payload.description ?? account.description
+    account.type = payload.type ?? account.type;
     await account.save()
     var photo: Image | null = null;
     if (payload.photo) {
-      await account.setPhoto(payload.photo)
+      photo = await File.attachModel<Image>({
+        related_id: account.id,
+        file: payload.photo,
+        deleteOld: true,
+        tag: 'accounts:avatar',
+      })
     }
+    var jsons = account.toJSON();
     return {
-      account: account.toJSON(),
-      photo: photo,
+      account: {
+        ...jsons,
+        photos: [...(()=>photo ? [photo]:[])()],
+      },
     }
   }
 

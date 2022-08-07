@@ -4,8 +4,8 @@ import Route from '@ioc:Adonis/Core/Route'
 Route.group(() => {
 
     Route.group(() => {
-        require("./v1/auth/users")
-    }).prefix("auth/users")
+        require("./v1/users")
+    })//.prefix("users")
 
     //
     Route.group(() => {
@@ -18,6 +18,10 @@ Route.group(() => {
         require("./v1/customer_profiles")
     })
     Route.group(() => {
+      require("./v1/sections")
+      require("./v1/section_translations")
+    })
+    Route.group(() => {
         require("./v1/stores")
         require("./v1/store_translations")
     })
@@ -26,7 +30,8 @@ Route.group(() => {
         require("./v1/category_translations")
     })
     Route.group(() => {
-      require("./v1/sections")
+        require("./v1/products")
+        require("./v1/product_translations")
     })
 
 

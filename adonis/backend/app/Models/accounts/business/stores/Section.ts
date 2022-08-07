@@ -23,13 +23,11 @@ export default class Section extends DotBaseModel {
   @column()
   public slug: string
 
-
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
-
 
   @belongsTo(() => Store)
   public account: BelongsTo<typeof Store>
@@ -40,13 +38,13 @@ export default class Section extends DotBaseModel {
   @hasMany(() => Section)
   public children: HasMany<typeof Section>
 
-
   @hasMany(() => SectionTranslation)
   public translations: HasMany<typeof SectionTranslation>
 
+  @belongsTo(() => Store)
+  public store: BelongsTo<typeof Store>
 
-
-
+  ////////////////////////////////////////////////////////////////////////////////
   @hasOne(() => Image, { foreignKey: "relatedId",
     onQuery: (builder) => {
       builder.where('related_type', 'sections:photo')
