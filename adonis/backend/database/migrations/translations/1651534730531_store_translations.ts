@@ -13,6 +13,6 @@ export default class StoreTranslations extends DotBaseSchema {
     table
       .string('store_id')
       .references('stores.id')
-      .onDelete('CASCADE')
+      .onDelete('CASCADE').notNullable()
   }
 }

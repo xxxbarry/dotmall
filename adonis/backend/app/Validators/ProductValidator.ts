@@ -1,6 +1,7 @@
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import DotValidator from './DotValidator'
+import { ProductType } from 'App/Models/accounts/business/stores/Product'
 
 /**
  * CreateProductValidator
@@ -21,7 +22,7 @@ export class CreateProductValidator extends DotValidator {
     body: schema.string.optional(),
     slug: schema.string.optional(),
     barcode: schema.string.optional(),
-    product_type: schema.string.optional(),
+    type: schema.enum.optional<ProductType[]>(Object.values(ProductType)),
     price: schema.number([
     ]),
     meta: schema.object.optional().anyMembers(),
@@ -65,7 +66,7 @@ export class UpdateProductValidator extends DotValidator {
     body: schema.string.optional(),
     slug: schema.string.optional(),
     barcode: schema.string.optional(),
-    product_type: schema.string.optional(),
+    type: schema.string.optional(),
     price: schema.number(),
     meta: schema.object.optional().anyMembers(),
     store_id: schema.string({}, [
@@ -151,7 +152,7 @@ export class ListProductsValidator extends DotValidator {
       'body',
       'slug',
       'barcode',
-      'product_type',
+      'type',
       'price',
       'created_at',
       'updated_at'] as const),
@@ -165,7 +166,7 @@ export class ListProductsValidator extends DotValidator {
         'body',
         'slug',
         'barcode',
-        'product_type',
+        'type',
         'price'
       ] as const)
     ),

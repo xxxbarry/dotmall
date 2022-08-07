@@ -20,7 +20,7 @@ export default class Products extends DotBaseSchema {
     table.json('meta').nullable()
     table.double('price').notNullable()
 
-    table.string('product_type')
+    table.string('type')
 
     table
       .string('store_id')

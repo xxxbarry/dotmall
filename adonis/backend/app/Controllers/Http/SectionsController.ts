@@ -61,7 +61,7 @@ export default class SectionsController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Section", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/sections
    */
-  public async store({ request, bouncer }: HttpContextContract): Promise<{ section: ModelObject; photo: Image | null; }> {
+  public async store({ request, bouncer }: HttpContextContract): Promise<any> {
 
     await bouncer.with('SectionPolicy').authorize('create', null)
     const payload = await request.validate(CreateSectionValidator)
@@ -76,8 +76,10 @@ export default class SectionsController {
       photo = await section.setPhoto(payload.photo)
     }
     return {
-      section: section.toJSON(),
-      photo: photo,
+      section: {
+        ...section.toJSON(),
+        photos: [...(()=>photo ? [photo]:[])()],
+      },
     }
   }
 
@@ -101,7 +103,7 @@ export default class SectionsController {
     if (!payload.load?.includes('photo')) {
       await section.load('photo')
     }
-    return section.toJSON()
+    return {section: section.toJSON()}
   }
 
   /**
@@ -127,8 +129,10 @@ export default class SectionsController {
       await section.setPhoto(payload.photo)
     }
     return {
-      section: section.toJSON(),
-      photo: photo,
+      section: {
+        ...section.toJSON(),
+        photos: [...(()=>photo ? [photo]:[])()],
+      },
     }
   }
 

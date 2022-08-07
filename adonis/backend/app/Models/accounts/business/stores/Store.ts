@@ -95,7 +95,7 @@ export default class Store extends DotBaseModel {
   public merchant: BelongsTo<typeof MerchantProfile>
 
   // merchantProfileId
-  @column({serializeAs: null})
+  @column()
   public merchantProfileId: string
 
 

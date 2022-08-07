@@ -113,9 +113,7 @@ export class ListSectionsValidator extends DotValidator {
   }
   public schema = schema.create({
     // query: schema.object().members({
-      page: schema.number.optional([
-        rules.range(1, Infinity),
-      ]),
+      page: schema.number.optional(),
       limit: schema.number.optional([
         rules.range(1, 24),
       ]),

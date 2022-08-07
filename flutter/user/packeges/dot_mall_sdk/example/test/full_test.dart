@@ -4,6 +4,10 @@ import 'package:example/models/category/model.dart';
 import 'package:example/models/category_translation/model.dart';
 import 'package:example/models/customer_profile/model.dart';
 import 'package:example/models/merchant_profiles/model.dart';
+import 'package:example/models/section/model.dart';
+import 'package:example/models/section_translation/model.dart';
+import 'package:example/models/store/model.dart';
+import 'package:example/models/store_translation/model.dart';
 import 'package:example/models/user/model.dart';
 import 'package:test/test.dart';
 
@@ -12,7 +16,7 @@ void main() {
   var manager = Manager(configs);
   // user signup
   var userCredentials = const UserAuthCredentials(
-    username: "213657606332",
+    username: "213657606340",
     password: "password",
   );
   User? user;
@@ -370,6 +374,319 @@ void main() {
       try {
         await CustomerProfiles(manager).delete(
           customerProfile!.id,
+        );
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+  });
+
+  // MerchantProfile group
+  // has only accountId
+  var merchantProfiles = <MerchantProfile>[];
+  MerchantProfile? merchantProfile;
+  group('MerchantProfile', () {
+    test('create', () async {
+      try {
+        merchantProfile = await MerchantProfiles(manager).create(
+          accountId: account!.id,
+        );
+        expect(merchantProfile!.id, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('list', () async {
+      try {
+        var response = await MerchantProfiles(manager).list();
+        merchantProfiles = response.data;
+        expect(response.data, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('find', () async {
+      try {
+        merchantProfile = await MerchantProfiles(manager).find(
+          merchantProfile!.id,
+        );
+        expect(merchantProfile, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('update', () async {
+      try {
+        merchantProfile = await MerchantProfiles(manager).update(
+          merchantProfile!.id,
+        );
+        expect(merchantProfile, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('delete', () async {
+      try {
+        await MerchantProfiles(manager).delete(
+          merchantProfile!.id,
+        );
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+  });
+
+  // Store group
+  var stores = <Store>[];
+  Store? store;
+  group('Store', () {
+    test('create', () async {
+      try {
+        store = await Stores(manager).create(
+          merchantProfileId: merchantProfile!.id,
+          name: "test",
+          description: "tests",
+        );
+        expect(store!.id, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('list', () async {
+      try {
+        var response = await Stores(manager).list();
+        stores = response.data;
+        expect(response.data, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('find', () async {
+      try {
+        store = await Stores(manager).find(store!.id);
+        expect(store, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('update', () async {
+      try {
+        store = await Stores(manager).update(
+          store!.id,
+          name: "updated",
+          description: "updated",
+        );
+        expect(store, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('delete', () async {
+      try {
+        await Stores(manager).delete(
+          store!.id,
+        );
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+  });
+
+  // StoreTranslation group
+  // only name and description
+  var storeTranslations = <StoreTranslation>[];
+  StoreTranslation? storeTranslation;
+  group('StoreTranslation', () {
+    test('create', () async {
+      try {
+        storeTranslation = await StoreTranslations(manager).create(
+          locale: Languages.en,
+          storeId: store!.id,
+          name: "test",
+          description: "tests",
+        );
+        expect(storeTranslation!.id, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('list', () async {
+      try {
+        var response = await StoreTranslations(manager).list();
+        storeTranslations = response.data;
+        expect(response.data, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('find', () async {
+      try {
+        storeTranslation = await StoreTranslations(manager).find(
+          storeTranslation!.id,
+        );
+        expect(storeTranslation, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('update', () async {
+      try {
+        storeTranslation = await StoreTranslations(manager).update(
+          storeTranslation!.id,
+          name: "updated",
+          description: "updated",
+        );
+        expect(storeTranslation, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('delete', () async {
+      try {
+        await StoreTranslations(manager).delete(
+          storeTranslation!.id,
+        );
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+  });
+
+  // Section group
+  // Section is just like Category but has storeId
+  var sections = <Section>[];
+  Section? section;
+  group('Section', () {
+    test('create', () async {
+      try {
+        section = await Sections(manager).create(
+          storeId: store!.id,
+          name: "test",
+          description: "tests",
+        );
+        expect(section!.id, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('list', () async {
+      try {
+        var response = await Sections(manager).list();
+        sections = response.data;
+        expect(response.data, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('find', () async {
+      try {
+        section = await Sections(manager).find(section!.id);
+        expect(section, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('update', () async {
+      try {
+        section = await Sections(manager).update(
+          section!.id,
+          name: "updated",
+          description: "updated",
+        );
+        expect(section, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('delete', () async {
+      try {
+        await Sections(manager).delete(
+          section!.id,
+        );
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+  });
+
+  // SectionTranslation group
+  // only name and description and locale and sectionId and slug
+  var sectionTranslations = <SectionTranslation>[];
+  SectionTranslation? sectionTranslation;
+  group('SectionTranslation', () {
+    test('create', () async {
+      try {
+        sectionTranslation = await SectionTranslations(manager).create(
+          locale: Languages.en,
+          sectionId: section!.id,
+          name: "test",
+          description: "tests",
+        );
+        expect(sectionTranslation!.id, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('list', () async {
+      try {
+        var response = await SectionTranslations(manager).list();
+        sectionTranslations = response.data;
+        expect(response.data, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('find', () async {
+      try {
+        sectionTranslation = await SectionTranslations(manager).find(
+          sectionTranslation!.id,
+        );
+        expect(sectionTranslation, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('update', () async {
+      try {
+        sectionTranslation = await SectionTranslations(manager).update(
+          sectionTranslation!.id,
+          name: "updated",
+          description: "updated",
+        );
+        expect(sectionTranslation, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('delete', () async {
+      try {
+        await SectionTranslations(manager).delete(
+          sectionTranslation!.id,
         );
       } on ValidationException catch (e) {
         expect(e.errors, isNotNull);

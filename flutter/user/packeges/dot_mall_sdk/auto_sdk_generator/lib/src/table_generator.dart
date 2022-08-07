@@ -387,6 +387,13 @@ class TableAnnotationGenerator extends GeneratorForAnnotation<Table> {
               return {${() {
                 var init = '';
                 for (var key in visitor.columns.keys) {
+                  var typeWithNullability =
+                      "${visitor.fields.firstWhere((e) => e.name == key).type.getDisplayString(withNullability: true)}";
+                  var typeWithoutNullability =
+                      "${visitor.fields.firstWhere((e) => e.name == key).type.getDisplayString(withNullability: false)}";
+                  var isNullable =
+                      typeWithNullability != typeWithoutNullability;
+                  //
                   bool isEnum = visitor.fields
                       .firstWhere((e) => e.name == key)
                       .type
@@ -396,7 +403,7 @@ class TableAnnotationGenerator extends GeneratorForAnnotation<Table> {
                       .isNotEmpty;
                   if (isEnum) {
                     init +=
-                        '"${key.snakeCase}": ${className.toLowerCase()}.${key.camelCase}.name,\n';
+                        '"${key.snakeCase}": ${className.toLowerCase()}.${key.camelCase}${isNullable ? '?' : ''}.name,\n';
                   } else {
                     init +=
                         '"${key.snakeCase}": ${className.toLowerCase()}.$key,\n';

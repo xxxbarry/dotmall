@@ -16,6 +16,6 @@ export default class ProductTranslations extends DotBaseSchema {
         table
             .string('product_id')
             .references('products.id')
-            .onDelete('CASCADE')
+            .onDelete('CASCADE').notNullable()
     }
 }

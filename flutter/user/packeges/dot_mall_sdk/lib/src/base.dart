@@ -5,8 +5,6 @@ import 'package:dio/dio.dart';
 
 import 'package:dot_mall_sdk/src/collections/collection.dart';
 
-import 'collections/categories/collection.dart';
-
 export 'collections/collection.dart';
 export 'collections/collections.dart';
 export 'collections/model.dart';
@@ -216,69 +214,19 @@ class ValidationError {
   }
 }
 
-// /// [Auth<T extends Collection>] is a class that provides authentication for the DotMall API.
-// class Auth<T extends Collection> {
-//   final T collection;
-//   Token? token;
-//   Auth({
-//     required this.collection,
-//     required this.token,
-//   });
-
-//   /// [signin] is a static method used to signin
-//   /// return a [Future<Auth<T>>]
-//   static Future<Auth<T>> signin<T extends Collection>(
-//     String username,
-//     String password,
-//   ) async {
-//     final token = await collection.client.post(
-//       'auth/signin',
-//       data: {
-//         'username': username,
-//         'password': password,
-//       },
-//     );
-//     return Auth(
-//       collection: collection,
-//       token: Token(
-//         token: token.data['token'],
-//         expires: DateTime.parse(token.data['expires']),
-//         type: null,
-//       ),
-//     );
-//   }
-// }
-
-// /// [Token]
-// class Token {
-//   final TokenType type;
-//   final String value;
-//   final DateTime? expires;
-//   Token({
-//     required this.type,
-//     required this.value,
-//     this.expires,
-//   });
-// }
-
-// // [TokenType] enum
-// enum TokenType {
-//   bearer,
-//   basic,
-// }
-
 /// Configs is a class that provides configuration for the DotMallSDK.
 class Configs {
-  String get endpoint => mode == Mode.production ? prodEndpoint : devEndpoint;
+  String get endpoint =>
+      mode == RunMode.production ? prodEndpoint : devEndpoint;
   final String prodEndpoint;
   final String devEndpoint;
-  final Mode mode;
+  final RunMode mode;
   final Languages? language;
   final AuthCollection Function(Manager)? auth;
   Configs({
     this.prodEndpoint = "http://127.0.0.1:3333/api/v1/",
     this.devEndpoint = "http://127.0.0.1:3333/api/v1/",
-    this.mode = Mode.development,
+    this.mode = RunMode.development,
     this.language,
     this.auth,
   });
@@ -286,7 +234,7 @@ class Configs {
   Configs copyWith({
     String? prodEndpoint,
     String? devEndpoint,
-    Mode? mode,
+    RunMode? mode,
     Languages? language,
   }) {
     return Configs(
@@ -310,7 +258,7 @@ class Configs {
     return Configs(
       prodEndpoint: map['prodEndpoint'],
       devEndpoint: map['devEndpoint'],
-      mode: Mode.values[map['mode']],
+      mode: RunMode.values[map['mode']],
       language: Languages.values[map['language']],
     );
   }
@@ -352,8 +300,8 @@ enum Languages {
   fr,
 }
 
-/// Mode is a class that provides the mode of the DotMallSDK.
-enum Mode {
+/// RunMode is a class that provides the mode of the DotMallSDK.
+enum RunMode {
   development,
   production,
 }

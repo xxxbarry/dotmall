@@ -1,6 +1,8 @@
-name: dot_mall_sdk
+name: dotmall_sdk
 description: A starting point for Dart libraries or applications.
 version: 1.0.0
+publish_to: none
+
 # homepage: https://www.example.com
 
 environment:
@@ -12,8 +14,10 @@ dependencies:
   recase:
   inflection3: ^0.5.3+2
   source_gen: ^1.2.2
-  annotations:
-    path: annotations
+  auto_sdk_annotations:
+    path: auto_sdk_annotations
+  auto_sdk_generator:
+    path: auto_sdk_generator
   code_builder: ^4.2.0
 
 dev_dependencies:

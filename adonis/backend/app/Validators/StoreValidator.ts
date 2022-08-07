@@ -9,7 +9,6 @@ export class CreateStoreValidator extends DotValidator {
   public schema = schema.create({
 
     merchant_profile_id: schema.string({}, [
-      rules.required(),
       rules.exists({ table: 'merchant_profiles', column: 'id' }),
     ]),
     name: schema.string.optional(),
@@ -118,9 +117,7 @@ export class ListStoresValidator extends DotValidator {
   }
   public schema = schema.create({
     // query: schema.object().members({
-      page: schema.number.optional([
-        rules.range(1, Infinity),
-      ]),
+      page: schema.number.optional(),
       limit: schema.number.optional([
         rules.range(1, 24),
       ]),

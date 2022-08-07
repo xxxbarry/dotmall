@@ -62,7 +62,7 @@ export default class StoreTranslationsController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My StoreTranslation", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/storeTranslations
    */
-  public async store({ request, bouncer }: HttpContextContract): Promise<{ storeTranslation: ModelObject }> {
+  public async store({ request, bouncer }: HttpContextContract): Promise<{ store_translation: ModelObject }> {
 
     const payload = await request.validate(CreateStoreTranslationValidator)
     var store = (await Store.find(payload.store_id))!
@@ -71,9 +71,11 @@ export default class StoreTranslationsController {
       locale: payload.locale,
       name: payload.name,
       description: payload.description,
+      storeId: payload.store_id,
     })
+    var json = storeTranslation.toJSON()
     return {
-      storeTranslation: storeTranslation.toJSON()
+      store_translation: json
     }
   }
 
@@ -94,7 +96,9 @@ export default class StoreTranslationsController {
         await storeTranslation.load(load)
       }
     }
-    return storeTranslation.toJSON()
+    return {
+      store_translation: storeTranslation.toJSON()
+    }
   }
 
   /**
@@ -106,7 +110,7 @@ export default class StoreTranslationsController {
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My StoreTranslation", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/storeTranslations/1
    */
   public async update({ request, bouncer }: HttpContextContract): Promise<{
-    storeTranslation: ModelObject;
+    store_translation: ModelObject;
   }> {
     // validate also params.id
     const payload = await request.validate(UpdateStoreTranslationValidator)
@@ -116,7 +120,7 @@ export default class StoreTranslationsController {
     storeTranslation.description = payload.description ?? storeTranslation.description
     await storeTranslation.save()
     return {
-      storeTranslation: storeTranslation.toJSON(),
+      store_translation: storeTranslation.toJSON(),
     }
   }
 

@@ -79,8 +79,10 @@ export default class StoresController {
       })
     }
     return {
-      ...store.toJSON(),
-      photos: [photo],
+      store: {
+        ...store.toJSON(),
+        photos: [...(()=>photo ? [photo]:[])()],
+      },
     }
   }
 
@@ -104,7 +106,9 @@ export default class StoresController {
     if (!payload.load?.includes('photo')) {
       await store!.load('photo')
     }
-    return store!.toJSON()
+    return {
+      store: store.toJSON(),
+    }
   }
 
   /**
@@ -133,8 +137,10 @@ export default class StoresController {
       })
     }
     return {
-      ...store.toJSON(),
-      photos: [photo],
+      store: {
+        ...store.toJSON(),
+        photos: [...(()=>photo ? [photo]:[])()],
+      },
     }
   }
 

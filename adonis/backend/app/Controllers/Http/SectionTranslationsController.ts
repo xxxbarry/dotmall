@@ -57,7 +57,7 @@ export default class SectionTranslationsController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My SectionTranslation", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/sectionTranslations
    */
-  public async store({ request, bouncer }: HttpContextContract): Promise<{ sectionTranslation: ModelObject }> {
+  public async store({ request, bouncer }: HttpContextContract): Promise<{ section_translation: ModelObject }> {
 
     const payload = await request.validate(CreateSectionTranslationValidator)
     await bouncer.with('SectionTranslationPolicy').authorize('create', null)
@@ -65,9 +65,10 @@ export default class SectionTranslationsController {
       locale: payload.locale,
       name: payload.name,
       description: payload.description,
+      sectionId: payload.section_id,
     })
     return {
-      sectionTranslation: sectionTranslation.toJSON()
+      section_translation: sectionTranslation.toJSON()
     }
   }
 
@@ -88,7 +89,7 @@ export default class SectionTranslationsController {
         await sectionTranslation.load(load)
       }
     }
-    return sectionTranslation.toJSON()
+    return {section_translation:sectionTranslation.toJSON()}
   }
 
   /**
@@ -100,7 +101,7 @@ export default class SectionTranslationsController {
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My SectionTranslation", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/sectionTranslations/1
    */
   public async update({ request, bouncer }: HttpContextContract): Promise<{
-    sectionTranslation: ModelObject;
+    section_translation: ModelObject;
   }> {
     // validate also params.id
     const payload = await request.validate(UpdateSectionTranslationValidator)
@@ -110,7 +111,7 @@ export default class SectionTranslationsController {
     sectionTranslation.description = payload.description ?? sectionTranslation.description
     await sectionTranslation.save()
     return {
-      sectionTranslation: sectionTranslation.toJSON(),
+      section_translation: sectionTranslation.toJSON(),
     }
   }
 

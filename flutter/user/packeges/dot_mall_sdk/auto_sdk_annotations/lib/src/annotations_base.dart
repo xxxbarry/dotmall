@@ -1,8 +1,5 @@
 // Table
-import 'package:code_builder/code_builder.dart';
 import 'package:dot_mall_sdk/dot_mall_sdk.dart';
-import 'package:inflection3/inflection3.dart';
-import 'package:recase/recase.dart';
 
 class Table {
   final bool useTranslations;

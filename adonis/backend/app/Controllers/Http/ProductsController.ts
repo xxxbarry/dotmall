@@ -69,7 +69,7 @@ export default class ProductsController {
       description: payload.description,
       storeId: payload.store_id,
       sectionId: payload.section_id,
-      product_type: payload.product_type,
+      type: payload.type,
       barcode: payload.barcode,
       price: payload.price,
       body: payload.body,
@@ -126,7 +126,7 @@ export default class ProductsController {
     product.description = payload.description ?? product.description
     product.storeId = payload.store_id ?? product.storeId
     product.sectionId = payload.section_id ?? product.sectionId
-    product.product_type = payload.product_type ?? product.product_type
+    product.type = payload.type ?? product.type
     product.barcode = payload.barcode ?? product.barcode
     product.price = payload.price ?? product.price
     product.body = payload.body ?? product.body

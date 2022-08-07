@@ -13,6 +13,6 @@ export default class CategoryTranslations extends DotBaseSchema {
     table
       .string('category_id')
       .references('categories.id')
-      .onDelete('CASCADE')
+      .onDelete('CASCADE').notNullable()
   }
 }

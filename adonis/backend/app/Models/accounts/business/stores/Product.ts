@@ -26,14 +26,15 @@ export default class Product extends DotBaseModel {
   @column()
   public barcode: string
 
+
   @column({
     prepare: (value: Object) => JSON.stringify(value),
     consume: (value: string) => JSON.parse(value),
   })
-  public meta: Object
+  public meta : Object
 
   @column()
-  public product_type: string
+  public type: ProductType
 
   @column()
   public storeId: string
@@ -46,6 +47,12 @@ export default class Product extends DotBaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  @column.dateTime()
+  public deletedAt: DateTime
+
+  @column.dateTime()
+  public validatedAt: DateTime
 
   @hasMany(() => ProductTranslation)
   public translations: HasMany<typeof ProductTranslation>
@@ -70,7 +77,7 @@ export default class Product extends DotBaseModel {
   // load photo after fetch
   @beforeFetch()
   public static async loadPhoto(query: ModelQueryBuilderContract<typeof Category>) {
-    query.preload('photo')
+    query.preload('photos')
   }
 
   /**
@@ -91,4 +98,9 @@ export default class Product extends DotBaseModel {
     }
     return photo
   }
+}
+
+export enum ProductType {
+  product="product",
+  // service="service",
 }

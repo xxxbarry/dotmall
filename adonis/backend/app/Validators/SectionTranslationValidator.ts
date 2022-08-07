@@ -11,9 +11,6 @@ export class CreateSectionTranslationValidator extends DotValidator {
     section_id: schema.string.optional({}, [
       rules.exists({ table: 'sections', column: 'id' }),
     ]),
-    store_id: schema.string({}, [
-      rules.exists({ table: 'stores', column: 'id' }),
-    ]),
     name: schema.string.optional(),
     description: schema.string.optional(),
     slug: schema.string.optional(),

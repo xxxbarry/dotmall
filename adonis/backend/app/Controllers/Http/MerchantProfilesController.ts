@@ -90,7 +90,7 @@ export default class MerchantProfilesController {
                 await merchant!.load(load)
             }
         }
-        return merchant!.toJSON()
+        return {merchant_profile:merchant!.toJSON()}
     }
 
     /**

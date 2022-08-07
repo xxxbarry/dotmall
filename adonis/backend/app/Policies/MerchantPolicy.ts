@@ -6,6 +6,7 @@ import { ListMerchantProfilesValidator } from 'App/Validators/MerchantProfileVal
 
 export default class MerchantPolicy extends BasePolicy {
 	public async viewList(user: User, payload: any) {
+    return true
 		if (user) {
 			var account = await Account.find(payload.where.account_id)
 			return account && user.id === account.userId
@@ -13,9 +14,11 @@ export default class MerchantPolicy extends BasePolicy {
 		return false
 	}
 	public async view(user: User, merchantProfile: MerchantProfile) {
+    return true
 		return true
 	}
 	public async create(user: User, accountId: string) {
+    return true
 		var account = await Account.find(accountId)
 		if (account && user.id === account.userId) {
 			return true
@@ -23,6 +26,7 @@ export default class MerchantPolicy extends BasePolicy {
 		return false
 	}
 	public async update(user: User,  merchantProfile: MerchantProfile) {
+    return true
 		return this.create(user, merchantProfile.accountId)
 	}
 	public delete = this.update
