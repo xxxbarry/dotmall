@@ -4,9 +4,6 @@ import 'package:dotmall/src/features/core/presentation/widgets/gradient_box.dart
 import 'package:dotmall/src/features/core/presentation/widgets/inputs.dart';
 import 'package:flutter/material.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:dotmall/src/features/core/dotmall_sdk/dotmall_sdk.dart' as api;
-
-import '../../../core/dotmall_sdk/collections/collection.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({Key? key}) : super(key: key);
@@ -67,10 +64,6 @@ class _AuthPageState extends State<AuthPage> {
                         FormElementBox(
                           child: OutlinedButton.icon(
                             onPressed: () async {
-                              var manager = api.Manager(
-                                configs: api.Configs(prodEndpoint: ""),
-                              );
-                              manager.init();
                               // var data = await manager.categories.create(
                               //   options: CollectionPostOptions(
                               //     data: FormData.fromMap(
@@ -101,10 +94,6 @@ class _AuthPageState extends State<AuthPage> {
                               //     ),
                               //   ),
                               // );
-
-                              var data = await manager.categories
-                                  .delete('iY31XQi7K84Jcv');
-                              print(data);
                             },
                             label: Text('إنشاء حساب'.toUpperCase()),
                             icon: const Icon(FluentIcons.person_16_regular),

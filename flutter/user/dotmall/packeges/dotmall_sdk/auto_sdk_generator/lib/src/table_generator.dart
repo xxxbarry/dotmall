@@ -327,41 +327,62 @@ class TableAnnotationGenerator extends GeneratorForAnnotation<Table> {
                       .where((e) => e.name == "Enum")
                       .toList()
                       .isNotEmpty;
+                  // read from anotation of current field if exists the parameter useEnumIndex
+                  var useEnumValue = visitor.columns[key]
+                          ?.getField("useEnumValue")
+                          ?.toBoolValue() ??
+                      true;
 
                   if (typeWithNullability == 'DateTime?') {
                     init +=
-                        '${key.camelCase}: DateTime.tryParse(map["${key.snakeCase}"] ?? ""),\n';
+                        '${key.camelCase}: DateTime.tryParse(map["${key.snakeCase}"].toString()),\n';
                   } else if (typeWithoutNullability == 'DateTime') {
                     init +=
                         '${key.camelCase}: DateTime.parse(map["${key.snakeCase}"]),\n';
-                  } else if (isEnum) {
+                  } else if (typeWithNullability == 'double?') {
+                    init +=
+                        '${key.camelCase}: double.tryParse(map["${key.snakeCase}"].toString()),\n';
+                  } else if (typeWithNullability == 'double') {
+                    init +=
+                        '${key.camelCase}: double.parse(map["${key.snakeCase}"].toString()),\n';
+                  } else if (isEnum && useEnumValue) {
                     init +=
                         '${key.camelCase}:$typeWithoutNullability.values.firstWhere((e) => e.name == map["${key.snakeCase}"]),';
+                  } else if (isEnum) {
+                    init +=
+                        '${key.camelCase}:$typeWithoutNullability.values[map["${key.snakeCase}"]],';
                   } else {
                     init += '${key.camelCase}: map["${key.snakeCase}"],\n';
                   }
                 }
                 for (var key in visitor.relations.keys) {
-                  init += '''${key.camelCase}: [${() {
-                    var init = '';
+                  init += '''${key.camelCase}: ${() {
+                    var _init = '';
                     var field = visitor.fields.firstWhere((e) => e.name == key);
                     var anotation = visitor.relations[key];
                     var val = anotation?.getField("from")?.toStringValue();
-                    var hasMany = visitor.fields
-                        .firstWhere((e) {
-                          return e.displayName == key;
-                        })
-                        .metadata
-                        .firstWhere((e) => e.element?.displayName == 'HasMany');
-                    if (hasMany != null) {
-                      init += '''
-                           for (var item in map["${key.snakeCase}"]  ?? [])
-                             ${pluralize(val!).pascalCase}.modelFromMap(item),
+                    var anots = visitor.fields.firstWhere((e) {
+                      return e.displayName == key;
+                    }).metadata;
+                    var hasMany = anots
+                        ?.where((e) => e?.element?.displayName == 'HasMany');
+                    var hasOne = anots
+                        ?.where((e) => e?.element?.displayName == 'HasOne');
+                    if (hasMany.length > 0) {
+                      _init += '''
+                           [for (var item in map["${key.snakeCase}"]  ?? [])
+                             ${pluralize(val!).pascalCase}.modelFromMap(item)]
                         ''';
+                    } else if (hasOne.length > 0) {
+                      _init += '''
+                             ${pluralize(val!).pascalCase}.modelFromMap(map["${key.snakeCase}"])
+                        ''';
+                    } else {
+                      _init += '''[]''';
                     }
                     // init += '${an}, ';
-                    return init;
-                  }()}],\n''';
+                    return _init;
+                  }()},\n''';
                 }
                 return init;
               }()});
@@ -401,19 +422,51 @@ class TableAnnotationGenerator extends GeneratorForAnnotation<Table> {
                       .where((e) => e.name == "Enum")
                       .toList()
                       .isNotEmpty;
-                  if (isEnum) {
+                  var useEnumValue = visitor.columns[key]
+                          ?.getField("useEnumValue")
+                          ?.toBoolValue() ??
+                      false;
+                  if (isEnum && useEnumValue) {
                     init +=
                         '"${key.snakeCase}": ${className.toLowerCase()}.${key.camelCase}${isNullable ? '?' : ''}.name,\n';
+                  }
+                  if (isEnum) {
+                    init +=
+                        '"${key.snakeCase}": ${className.toLowerCase()}.${key.camelCase}${isNullable ? '?' : ''}.index,\n';
                   } else {
                     init +=
                         '"${key.snakeCase}": ${className.toLowerCase()}.$key,\n';
                   }
                 }
                 for (var key in visitor.relations.keys) {
-                  init += '''"${key.snakeCase}":
-                    ${className.toLowerCase()}.$key
-                      .map((item) => item.toMap()).toList()
-                  ,\n''';
+                  var typeWithNullability =
+                      "${visitor.fields.firstWhere((e) => e.name == key).type.getDisplayString(withNullability: true)}";
+                  var typeWithoutNullability =
+                      "${visitor.fields.firstWhere((e) => e.name == key).type.getDisplayString(withNullability: false)}";
+                  var nullableMark =
+                      typeWithNullability != typeWithoutNullability ? '?' : '';
+                  var anots = visitor.fields.firstWhere((e) {
+                    return e.displayName == key;
+                  }).metadata;
+                  var hasMany =
+                      anots?.where((e) => e?.element?.displayName == 'HasMany');
+                  var hasOne =
+                      anots?.where((e) => e?.element?.displayName == 'HasOne');
+
+                  if (hasMany.length > 0) {
+                    init += '''
+                           "${key.snakeCase}": [for (var item in ${className.toLowerCase()}.${key.camelCase}  ?? [])
+                             item$nullableMark.modelToMap()],
+                        ''';
+                  } else if (hasOne.length > 0) {
+                    init += '''
+                             "${key.snakeCase}": ${className.toLowerCase()}.${key.camelCase}$nullableMark.toMap(),
+                        ''';
+                  }
+                  // init += '''"${key.snakeCase}":
+                  //   ${className.toLowerCase()}.$key
+                  //     .map((item) => item.toMap()).toList()
+                  // ,\n''';
                 }
                 return init;
               }()}};
@@ -572,11 +625,18 @@ class TableAnnotationGenerator extends GeneratorForAnnotation<Table> {
                     .where((e) => e.name == "Enum")
                     .toList()
                     .isNotEmpty;
+                var useEnumValue = visitor.columns[key]
+                        ?.getField("useEnumValue")
+                        ?.toBoolValue() ??
+                    false;
                 var behaviorAs = visitor.columns[key]
                     ?.getField("behaviorAs")
                     ?.toStringValue();
-                if (isEnum) {
+                if (isEnum && useEnumValue) {
                   return "if (${(behaviorAs ?? key)} != null) '${(behaviorAs ?? key).snakeCase}': ${(behaviorAs ?? key)}.name";
+                }
+                if (isEnum) {
+                  return "if (${(behaviorAs ?? key)} != null) '${(behaviorAs ?? key).snakeCase}': ${(behaviorAs ?? key)}.index";
                 } else {
                   return "if (${(behaviorAs ?? key)} != null) '${(behaviorAs ?? key).snakeCase}': ${(behaviorAs ?? key)}";
                 }
@@ -651,11 +711,18 @@ class TableAnnotationGenerator extends GeneratorForAnnotation<Table> {
                     .where((e) => e.name == "Enum")
                     .toList()
                     .isNotEmpty;
+                var useEnumValue = visitor.columns[key]
+                        ?.getField("useEnumValue")
+                        ?.toBoolValue() ??
+                    false;
                 var behaviorAs = visitor.columns[key]
                     ?.getField("behaviorAs")
                     ?.toStringValue();
-                if (isEnum) {
+                if (isEnum && useEnumValue) {
                   return "if (${(behaviorAs ?? key)} != null) '${(behaviorAs ?? key).snakeCase}': ${(behaviorAs ?? key)}.name";
+                }
+                if (isEnum) {
+                  return "if (${(behaviorAs ?? key)} != null) '${(behaviorAs ?? key).snakeCase}': ${(behaviorAs ?? key)}.index";
                 } else {
                   return "if (${(behaviorAs ?? key)} != null) '${(behaviorAs ?? key).snakeCase}': ${(behaviorAs ?? key)}";
                 }
@@ -763,39 +830,57 @@ class TableAnnotationGenerator extends GeneratorForAnnotation<Table> {
             ),
         ),
         // relations
-        ...(() {
-          var _methods = <Method>[];
-          for (var key in visitor.relations.keys) {
-            var field = visitor.fields.firstWhere((e) => e.name == key);
-            var anotation = visitor.relations[key];
-            var val = anotation?.getField("from")?.toStringValue();
-            var hasMany = visitor.fields
-                .firstWhere((e) {
-                  return e.displayName == key;
-                })
-                .metadata
-                .firstWhere((e) => e.element?.displayName == 'HasMany');
-            if (hasMany != null) {
-              _methods.add(
-                Method(
-                  (m) => m
-                    ..name = pluralize(key).snakeCase
-                    ..returns = refer(pluralize(val!).pascalCase)
-                    ..optionalParameters.addAll([
-                      Parameter((p) => p
-                        ..name = 'options'
-                        ..named = true
-                        ..type = refer('RequestOptions?')),
-                    ])
-                    ..body = Code(
-                        '''return ${pluralize(val).pascalCase}(manager);'''),
-                ),
-              );
-            }
-          }
-          ;
-          return _methods;
-        })(),
+        // ...(() {
+        //   var _methods = <Method>[];
+        //   for (var key in visitor.relations.keys) {
+        //     var field = visitor.fields.firstWhere((e) => e.name == key);
+        //     var anotation = visitor.relations[key];
+        //     var val = anotation?.getField("from")?.toStringValue();
+
+        //     var anots = visitor.fields.firstWhere((e) {
+        //       return e.displayName == key;
+        //     }).metadata;
+        //     var hasMany =
+        //         anots?.where((e) => e?.element?.displayName == 'HasMany');
+        //     var hasOne =
+        //         anots?.where((e) => e?.element?.displayName == 'HasOne');
+        //     if (hasMany.length > 0) {
+        //       _methods.add(
+        //         Method(
+        //           (m) => m
+        //             ..name = pluralize(key).snakeCase
+        //             ..returns = refer(pluralize(val!).pascalCase)
+        //             ..optionalParameters.addAll([
+        //               Parameter((p) => p
+        //                 ..name = 'options'
+        //                 ..named = true
+        //                 ..type = refer('RequestOptions?')),
+        //             ])
+        //             ..body = Code(
+        //                 '''return ${pluralize(val).pascalCase}(manager);'''),
+        //         ),
+        //       );
+        //     } else if (hasOne.length > 0) {
+        //       _methods.add(
+        //         Method(
+        //           (m) => m
+        //             ..name = singularize(key).snakeCase
+        //             ..returns = refer(pluralize(val!).pascalCase)
+        //             ..optionalParameters.addAll([
+        //               Parameter((p) => p
+        //                 ..name = 'options'
+        //                 ..named = true
+        //                 ..type = refer('RequestOptions?')),
+        //             ])
+        //             ..body = Code(
+        //                 '''return ${pluralize(val).pascalCase}(manager);'''),
+        //         ),
+        //       );
+        //     }
+        //   }
+        //   ;
+        //   return _methods;
+        // })(),
       ]));
     var paginatedModel = Class(
       (c) => c

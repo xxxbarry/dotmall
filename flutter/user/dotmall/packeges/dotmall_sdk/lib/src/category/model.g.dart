@@ -22,12 +22,10 @@ class Categories extends Collection<Category> {
       name: map["name"],
       description: map["description"],
       slug: map["slug"],
-      photos: [
-        for (var item in map["photos"] ?? []) Files.modelFromMap(item),
-      ],
+      photos: [for (var item in map["photos"] ?? []) Files.modelFromMap(item)],
       translations: [
         for (var item in map["translations"] ?? [])
-          CategoryTranslations.modelFromMap(item),
+          CategoryTranslations.modelFromMap(item)
       ],
     );
   }
@@ -38,9 +36,10 @@ class Categories extends Collection<Category> {
       "name": category.name,
       "description": category.description,
       "slug": category.slug,
-      "photos": category.photos.map((item) => item.toMap()).toList(),
-      "translations":
-          category.translations.map((item) => item.toMap()).toList(),
+      "photos": [for (var item in category.photos ?? []) item.modelToMap()],
+      "translations": [
+        for (var item in category.translations ?? []) item.modelToMap()
+      ],
     };
   }
 
@@ -170,14 +169,6 @@ class Categories extends Collection<Category> {
         rethrow;
       }
     }
-  }
-
-  Files photos({RequestOptions? options}) {
-    return Files(manager);
-  }
-
-  CategoryTranslations translations({RequestOptions? options}) {
-    return CategoryTranslations(manager);
   }
 }
 

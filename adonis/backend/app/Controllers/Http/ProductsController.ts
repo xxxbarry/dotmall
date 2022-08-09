@@ -75,6 +75,8 @@ export default class ProductsController {
       body: payload.body,
       meta: payload.meta,
       slug: payload.slug,
+      status: payload.status,
+      quantity: payload.quantity,
     })
     var photo: Image | null = null;
     if (payload.photo) {
@@ -132,6 +134,8 @@ export default class ProductsController {
     product.body = payload.body ?? product.body
     product.meta = payload.meta ?? product.meta
     product.slug = payload.slug ?? product.slug
+    product.status = payload.status ?? product.status
+    product.quantity = payload.quantity ?? product.quantity
 
     await product.save()
     var photo: Image | null = null;

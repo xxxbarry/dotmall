@@ -1,5 +1,6 @@
 import DotBaseSchema from '../../dot/DotBaseSchema';
 import { Knex } from 'knex'
+import User from 'App/Models/User';
 
 export default class Addresses extends DotBaseSchema {
   protected tableName = 'addresses'
@@ -7,19 +8,19 @@ export default class Addresses extends DotBaseSchema {
   public useSoftDeletes = true
   public useValidatedAt = true
   public useRelatedTo = true
-  public useUserRelation = true
+  public useRelations = [User]
   public usePivotTable = true
   // useTranslation
   // public useTranslation = true
   public setup(table: Knex.CreateTableBuilder): void {
     // the address primary is line 1
-    table.string('primary').nullable()
+    table.string('primary').notNullable()
     table.string('secondary').nullable()
     table.string('city').nullable()
     table.string('state').nullable()
     table.string('zip').nullable()
     table.string('country').nullable()
-    table.string('latitude').nullable()
-    table.string('longitude').nullable()
+    table.double('latitude').nullable()
+    table.double('longitude').nullable()
   }
 }

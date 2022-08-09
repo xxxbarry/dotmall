@@ -82,6 +82,6 @@ export abstract class AccountData {
 }
 
 export enum AccountType {
-  business = 'business',
-  personal = 'personal',
+  personal = 0,
+  business = 1,
 }

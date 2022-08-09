@@ -13,3 +13,6 @@ export 'store_translation/model.dart';
 export 'user/model.dart';
 export 'section/model.dart';
 export 'section_translation/model.dart';
+export 'address/model.dart';
+// export 'order/model.dart';
+// export 'order_item/model.dart';

@@ -23,16 +23,14 @@ class Stores extends Collection<Store> {
       description: map["description"],
       status: map["status"],
       merchantProfileId: map["merchant_profile_id"],
-      createdAt: DateTime.tryParse(map["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(map["updated_at"] ?? ""),
-      validatedAt: DateTime.tryParse(map["validated_at"] ?? ""),
-      deletedAt: DateTime.tryParse(map["deleted_at"] ?? ""),
-      photos: [
-        for (var item in map["photos"] ?? []) Files.modelFromMap(item),
-      ],
+      createdAt: DateTime.tryParse(map["created_at"].toString()),
+      updatedAt: DateTime.tryParse(map["updated_at"].toString()),
+      validatedAt: DateTime.tryParse(map["validated_at"].toString()),
+      deletedAt: DateTime.tryParse(map["deleted_at"].toString()),
+      photos: [for (var item in map["photos"] ?? []) Files.modelFromMap(item)],
       translations: [
         for (var item in map["translations"] ?? [])
-          StoreTranslations.modelFromMap(item),
+          StoreTranslations.modelFromMap(item)
       ],
     );
   }
@@ -48,8 +46,10 @@ class Stores extends Collection<Store> {
       "updated_at": store.updatedAt,
       "validated_at": store.validatedAt,
       "deleted_at": store.deletedAt,
-      "photos": store.photos.map((item) => item.toMap()).toList(),
-      "translations": store.translations.map((item) => item.toMap()).toList(),
+      "photos": [for (var item in store.photos ?? []) item.modelToMap()],
+      "translations": [
+        for (var item in store.translations ?? []) item.modelToMap()
+      ],
     };
   }
 
@@ -199,14 +199,6 @@ class Stores extends Collection<Store> {
         rethrow;
       }
     }
-  }
-
-  Files photos({RequestOptions? options}) {
-    return Files(manager);
-  }
-
-  StoreTranslations translations({RequestOptions? options}) {
-    return StoreTranslations(manager);
   }
 }
 

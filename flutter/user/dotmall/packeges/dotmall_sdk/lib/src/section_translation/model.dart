@@ -8,7 +8,8 @@ part 'model.g.dart';
 class SectionTranslation extends Model implements ModelTranslation {
   @Column.primary()
   final String id;
-  @Column.required()
+  @override
+  @Column.required(useEnumValue: true)
   final Languages locale;
   @Column()
   final String name;

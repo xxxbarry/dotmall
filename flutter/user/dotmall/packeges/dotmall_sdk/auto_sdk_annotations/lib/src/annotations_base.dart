@@ -22,7 +22,9 @@ class Column<T> {
   final String? behaviorAs;
   final bool? auto;
   final bool? secret;
+  final bool? useEnumValue;
   const Column({
+    this.useEnumValue = false,
     this.auto = false,
     this.secret = false,
     this.primary = false,
@@ -37,6 +39,7 @@ class Column<T> {
 
   // primary factory
   const Column.primary({
+    this.useEnumValue = false,
     this.primary = true,
     this.secret = false,
     this.searchable = true,
@@ -51,6 +54,7 @@ class Column<T> {
 
   // auto construtor
   const Column.auto({
+    this.useEnumValue = false,
     this.secret = false,
     this.primary = false,
     this.searchable = true,
@@ -65,6 +69,7 @@ class Column<T> {
 
   // required factory
   const Column.required({
+    this.useEnumValue = false,
     this.secret = false,
     this.primary = false,
     this.searchable = true,
@@ -109,6 +114,28 @@ class HasMany<T extends Model> extends Relation {
     super.foreignKey,
     super.localKey,
     super.type = RelationType.hasMany,
+    required this.from,
+  });
+}
+
+class HasOne<T extends Model> extends Relation {
+  final String from;
+  const HasOne({
+    super.name,
+    super.foreignKey,
+    super.localKey,
+    super.type = RelationType.hasOne,
+    required this.from,
+  });
+}
+
+class BelongsTo<T extends Model> extends Relation {
+  final String from;
+  const BelongsTo({
+    super.name,
+    super.foreignKey,
+    super.localKey,
+    super.type = RelationType.belongsTo,
     required this.from,
   });
 }

@@ -20,8 +20,8 @@ class CustomerProfiles extends Collection<CustomerProfile> {
     return CustomerProfile(
       id: map["id"],
       accountId: map["account_id"],
-      deletedAt: DateTime.tryParse(map["deleted_at"] ?? ""),
-      validatedAt: DateTime.tryParse(map["validated_at"] ?? ""),
+      deletedAt: DateTime.tryParse(map["deleted_at"].toString()),
+      validatedAt: DateTime.tryParse(map["validated_at"].toString()),
     );
   }
 

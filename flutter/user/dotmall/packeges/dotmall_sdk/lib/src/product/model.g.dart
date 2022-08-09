@@ -25,21 +25,20 @@ class Products extends Collection<Product> {
       body: map["body"],
       storeId: map["store_id"],
       sectionId: map["section_id"],
-      type: ProductType.values.firstWhere((e) => e.name == map["type"]),
-      status: map["status"],
+      type: ProductType.values[map["type"]],
+      status: ProductStatus.values[map["status"]],
+      quantity: map["quantity"],
       barcode: map["barcode"],
-      price: map["price"],
+      price: double.tryParse(map["price"].toString()),
       meta: map["meta"],
-      createdAt: DateTime.tryParse(map["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(map["updated_at"] ?? ""),
-      deletedAt: DateTime.tryParse(map["deleted_at"] ?? ""),
-      validatedAt: DateTime.tryParse(map["validated_at"] ?? ""),
-      photos: [
-        for (var item in map["photos"] ?? []) Files.modelFromMap(item),
-      ],
+      createdAt: DateTime.tryParse(map["created_at"].toString()),
+      updatedAt: DateTime.tryParse(map["updated_at"].toString()),
+      deletedAt: DateTime.tryParse(map["deleted_at"].toString()),
+      validatedAt: DateTime.tryParse(map["validated_at"].toString()),
+      photos: [for (var item in map["photos"] ?? []) Files.modelFromMap(item)],
       translations: [
         for (var item in map["translations"] ?? [])
-          ProductTranslations.modelFromMap(item),
+          ProductTranslations.modelFromMap(item)
       ],
     );
   }
@@ -53,8 +52,9 @@ class Products extends Collection<Product> {
       "body": product.body,
       "store_id": product.storeId,
       "section_id": product.sectionId,
-      "type": product.type?.name,
-      "status": product.status,
+      "type": product.type?.index,
+      "status": product.status.index,
+      "quantity": product.quantity,
       "barcode": product.barcode,
       "price": product.price,
       "meta": product.meta,
@@ -62,8 +62,10 @@ class Products extends Collection<Product> {
       "updated_at": product.updatedAt,
       "deleted_at": product.deletedAt,
       "validated_at": product.validatedAt,
-      "photos": product.photos.map((item) => item.toMap()).toList(),
-      "translations": product.translations.map((item) => item.toMap()).toList(),
+      "photos": [for (var item in product.photos ?? []) item.modelToMap()],
+      "translations": [
+        for (var item in product.translations ?? []) item.modelToMap()
+      ],
     };
   }
 
@@ -114,7 +116,8 @@ class Products extends Collection<Product> {
       required String storeId,
       String? sectionId,
       ProductType? type,
-      required int status,
+      required ProductStatus status,
+      required int quantity,
       String? barcode,
       double? price,
       Map<dynamic, dynamic>? meta,
@@ -133,8 +136,9 @@ class Products extends Collection<Product> {
           if (body != null) 'body': body,
           if (storeId != null) 'store_id': storeId,
           if (sectionId != null) 'section_id': sectionId,
-          if (type != null) 'type': type.name,
-          if (status != null) 'status': status,
+          if (type != null) 'type': type.index,
+          if (status != null) 'status': status.index,
+          if (quantity != null) 'quantity': quantity,
           if (barcode != null) 'barcode': barcode,
           if (price != null) 'price': price,
           if (meta != null) 'meta': meta,
@@ -162,7 +166,8 @@ class Products extends Collection<Product> {
       String? storeId,
       String? sectionId,
       ProductType? type,
-      int? status,
+      ProductStatus? status,
+      int? quantity,
       String? barcode,
       double? price,
       Map<dynamic, dynamic>? meta,
@@ -183,8 +188,9 @@ class Products extends Collection<Product> {
             if (body != null) 'body': body,
             if (storeId != null) 'store_id': storeId,
             if (sectionId != null) 'section_id': sectionId,
-            if (type != null) 'type': type.name,
-            if (status != null) 'status': status,
+            if (type != null) 'type': type.index,
+            if (status != null) 'status': status.index,
+            if (quantity != null) 'quantity': quantity,
             if (barcode != null) 'barcode': barcode,
             if (price != null) 'price': price,
             if (meta != null) 'meta': meta,
@@ -242,14 +248,6 @@ class Products extends Collection<Product> {
       }
     }
   }
-
-  Files photos({RequestOptions? options}) {
-    return Files(manager);
-  }
-
-  ProductTranslations translations({RequestOptions? options}) {
-    return ProductTranslations(manager);
-  }
 }
 
 // ProductRelations
@@ -266,6 +264,7 @@ enum ProductFilterables {
   sectionId,
   type,
   status,
+  quantity,
   barcode,
   price,
   meta,
@@ -286,6 +285,7 @@ enum ProductSortables {
   sectionId,
   type,
   status,
+  quantity,
   barcode,
   price,
   meta,
@@ -306,6 +306,7 @@ enum ProductSearchables {
   sectionId,
   type,
   status,
+  quantity,
   barcode,
   price,
   meta,
@@ -326,6 +327,7 @@ enum ProductFields {
   sectionId,
   type,
   status,
+  quantity,
   barcode,
   price,
   meta,

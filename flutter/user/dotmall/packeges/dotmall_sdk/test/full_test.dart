@@ -1,5 +1,6 @@
 import 'package:auto_sdk_core/auto_sdk_core.dart';
 import 'package:dotmall_sdk/dotmall_sdk.dart';
+import 'package:dotmall_sdk/src/order/model.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -7,7 +8,7 @@ void main() {
   var manager = Manager(configs);
   // user signup
   var userCredentials = const UserAuthCredentials(
-    username: "213657606340",
+    username: "213657606342",
     password: "password",
   );
   User? user;
@@ -29,8 +30,7 @@ void main() {
     });
     test('signin', () async {
       try {
-        var response =
-            await Users(manager).signin(credentials: userCredentials);
+        var response = await Users(manager).signin(userCredentials);
         user = response.model;
         token = response.token;
         manager.token = token;
@@ -678,6 +678,139 @@ void main() {
       try {
         await SectionTranslations(manager).delete(
           sectionTranslation!.id,
+        );
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+  });
+
+  // Addresses group
+  var addresses = <Address>[];
+  Address? address;
+  group('Address', () {
+    test('create', () async {
+      try {
+        address = await Addresses(manager).create(
+          userId: user!.id,
+          primary: "test",
+          secondary: "tests",
+          city: "test",
+          state: "tests",
+          zip: "test",
+          country: "test",
+          latitude: 1,
+          longitude: 1,
+        );
+        expect(address!.id, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('list', () async {
+      try {
+        var response = await Addresses(manager).list();
+        addresses = response.data;
+        expect(response.data, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('find', () async {
+      try {
+        address = await Addresses(manager).find(address!.id);
+        expect(address, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('update', () async {
+      try {
+        address = await Addresses(manager).update(
+          address!.id,
+          secondary: "updated",
+          city: "updated",
+          state: "updated",
+          zip: "updated",
+          country: "updated",
+          latitude: 35.64654,
+          longitude: 30.15367,
+        );
+        expect(address, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('delete', () async {
+      try {
+        await Addresses(manager).delete(
+          address!.id,
+        );
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+  });
+
+  // Order group
+  // order has customerProfileId(customerProfile.id) and addressId and status and of course timestamp(createdAt)
+  var orders = <Order>[];
+  Order? order;
+  group('Order', () {
+    test('create', () async {
+      try {
+        order = await Orders(manager).create(
+          customerProfileId: customerProfile!.id,
+          addressId: address!.id,
+          status: OrderStatus.pending,
+        );
+        expect(order!.id, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('list', () async {
+      try {
+        var response = await Orders(manager).list();
+        orders = response.data;
+        expect(response.data, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('find', () async {
+      try {
+        order = await Orders(manager).find(order!.id);
+        expect(order, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('update', () async {
+      try {
+        order = await Orders(manager).update(
+          order!.id,
+          status: OrderStatus.pending,
+        );
+        expect(order, isNotNull);
+      } on ValidationException catch (e) {
+        expect(e.errors, isNotNull);
+        rethrow;
+      }
+    });
+    test('delete', () async {
+      try {
+        await Orders(manager).delete(
+          order!.id,
         );
       } on ValidationException catch (e) {
         expect(e.errors, isNotNull);

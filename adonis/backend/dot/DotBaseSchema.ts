@@ -1,6 +1,8 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 import { Knex } from 'knex';
 import { string } from '@ioc:Adonis/Core/Helpers'
+import { LucidModel } from "@ioc:Adonis/Lucid/Orm";
+
 /**
  * Dot base schema
  * a class with extra methods for defining tables
@@ -17,9 +19,10 @@ export default abstract class DotBaseSchema extends BaseSchema {
   public useStatus: boolean = false;
   public useUUID: boolean = true;
   public useUserRelation: boolean = false;
-  public useRelatedTo: boolean = true;
+  public useRelatedTo: boolean = false;
   public useTranslation: string | null = null;
   public usePivotTable: boolean = false
+  public useRelations: Array<LucidModel> = []
   // endHooks
 
   // List of relations
@@ -66,6 +69,16 @@ export default abstract class DotBaseSchema extends BaseSchema {
       /*
        * Relations
        */
+      if (this.useRelations.length) {
+        this.useRelations.forEach(relation => {
+          var tableName = relation.table
+          var modelName = string.singularize(tableName)
+          var reference = `${tableName}.id`
+          var columnName = `${modelName}_id`
+          table.uuid(columnName).references(reference).onDelete('CASCADE')
+        })
+      }
+
       if (this.useRelatedTo) {
         table.string('related_id').nullable()
         table.string('related_type').nullable()
@@ -89,6 +102,8 @@ export default abstract class DotBaseSchema extends BaseSchema {
         }
 
         table.string('tag').nullable()
+        // fields for meta data
+        table.json('meta').nullable()
         table.unique([this.modelName + '_id', 'related_id'])
       }
       )

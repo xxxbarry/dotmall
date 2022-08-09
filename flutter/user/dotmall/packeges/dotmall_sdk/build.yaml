@@ -1,7 +1,7 @@
 targets:
   $default:
     builders:
-      generators|collectionGeneratorBuilder:
+      auto_sdk_generator|collectionGeneratorBuilder:
         enabled: True
         generate_for:
           - lib/**/*

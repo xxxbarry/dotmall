@@ -16,9 +16,8 @@ class Users extends AuthCollection<User, UserAuthCredentials> {
 
   final String scope = "users";
 
-  Future<AuthResponse<User>> signin(
-      {required UserAuthCredentials credentials,
-      RequestOptions? options}) async {
+  Future<AuthResponse<User>> signin(UserAuthCredentials credentials,
+      {RequestOptions? options}) async {
     options = options ?? RequestOptions();
     var response = await signinR(
       options: options.copyWithAdded(data: credentials.toMap()),
@@ -64,17 +63,13 @@ class Users extends AuthCollection<User, UserAuthCredentials> {
     return User(
       id: map["id"],
       password: map["password"],
-      createdAt: DateTime.tryParse(map["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(map["updated_at"] ?? ""),
+      createdAt: DateTime.tryParse(map["created_at"].toString()),
+      updatedAt: DateTime.tryParse(map["updated_at"].toString()),
       accounts: [
-        for (var item in map["accounts"] ?? []) Accounts.modelFromMap(item),
+        for (var item in map["accounts"] ?? []) Accounts.modelFromMap(item)
       ],
-      emails: [
-        for (var item in map["emails"] ?? []) Emails.modelFromMap(item),
-      ],
-      phones: [
-        for (var item in map["phones"] ?? []) Phones.modelFromMap(item),
-      ],
+      emails: [for (var item in map["emails"] ?? []) Emails.modelFromMap(item)],
+      phones: [for (var item in map["phones"] ?? []) Phones.modelFromMap(item)],
     );
   }
 
@@ -84,9 +79,9 @@ class Users extends AuthCollection<User, UserAuthCredentials> {
       "password": user.password,
       "created_at": user.createdAt,
       "updated_at": user.updatedAt,
-      "accounts": user.accounts.map((item) => item.toMap()).toList(),
-      "emails": user.emails.map((item) => item.toMap()).toList(),
-      "phones": user.phones.map((item) => item.toMap()).toList(),
+      "accounts": [for (var item in user.accounts ?? []) item.modelToMap()],
+      "emails": [for (var item in user.emails ?? []) item.modelToMap()],
+      "phones": [for (var item in user.phones ?? []) item.modelToMap()],
     };
   }
 
@@ -211,18 +206,6 @@ class Users extends AuthCollection<User, UserAuthCredentials> {
         rethrow;
       }
     }
-  }
-
-  Accounts accounts({RequestOptions? options}) {
-    return Accounts(manager);
-  }
-
-  Emails emails({RequestOptions? options}) {
-    return Emails(manager);
-  }
-
-  Phones phones({RequestOptions? options}) {
-    return Phones(manager);
   }
 }
 

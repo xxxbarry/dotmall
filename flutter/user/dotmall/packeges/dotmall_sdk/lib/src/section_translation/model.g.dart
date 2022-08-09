@@ -31,6 +31,7 @@ class SectionTranslations extends Collection<SectionTranslation> {
     return {
       "id": sectiontranslation.id,
       "locale": sectiontranslation.locale.name,
+      "locale": sectiontranslation.locale.index,
       "name": sectiontranslation.name,
       "description": sectiontranslation.description,
       "section_id": sectiontranslation.sectionId,

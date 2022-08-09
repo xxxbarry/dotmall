@@ -27,7 +27,9 @@ class Product extends Model {
   @Column()
   final ProductType? type;
   @Column()
-  final int status;
+  final ProductStatus status;
+  @Column()
+  final int quantity;
   @Column()
   final String? barcode;
   @Column()
@@ -49,6 +51,7 @@ class Product extends Model {
   Product({
     required this.id,
     required this.name,
+    required this.quantity,
     this.description,
     this.slug,
     this.body,
@@ -75,4 +78,11 @@ class Product extends Model {
 enum ProductType {
   product,
   // service,
+}
+
+enum ProductStatus {
+  draft,
+  published,
+  archived,
+  suspended,
 }

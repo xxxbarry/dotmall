@@ -8,7 +8,7 @@ part 'model.g.dart';
 class CategoryTranslation extends Model implements ModelTranslation {
   @Column.primary()
   final String id;
-  @Column.required()
+  @Column.required(useEnumValue: true)
   final Languages locale;
   @Column()
   final String name;

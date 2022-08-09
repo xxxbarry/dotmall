@@ -23,12 +23,10 @@ class Sections extends Collection<Section> {
       description: map["description"],
       slug: map["slug"],
       storeId: map["store_id"],
-      photos: [
-        for (var item in map["photos"] ?? []) Files.modelFromMap(item),
-      ],
+      photos: [for (var item in map["photos"] ?? []) Files.modelFromMap(item)],
       translations: [
         for (var item in map["translations"] ?? [])
-          SectionTranslations.modelFromMap(item),
+          SectionTranslations.modelFromMap(item)
       ],
     );
   }
@@ -40,8 +38,10 @@ class Sections extends Collection<Section> {
       "description": section.description,
       "slug": section.slug,
       "store_id": section.storeId,
-      "photos": section.photos.map((item) => item.toMap()).toList(),
-      "translations": section.translations.map((item) => item.toMap()).toList(),
+      "photos": [for (var item in section.photos ?? []) item.modelToMap()],
+      "translations": [
+        for (var item in section.translations ?? []) item.modelToMap()
+      ],
     };
   }
 
@@ -175,14 +175,6 @@ class Sections extends Collection<Section> {
         rethrow;
       }
     }
-  }
-
-  Files photos({RequestOptions? options}) {
-    return Files(manager);
-  }
-
-  SectionTranslations translations({RequestOptions? options}) {
-    return SectionTranslations(manager);
   }
 }
 

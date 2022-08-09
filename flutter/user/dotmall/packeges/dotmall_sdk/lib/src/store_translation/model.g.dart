@@ -30,6 +30,7 @@ class StoreTranslations extends Collection<StoreTranslation> {
     return {
       "id": storetranslation.id,
       "locale": storetranslation.locale.name,
+      "locale": storetranslation.locale.index,
       "name": storetranslation.name,
       "description": storetranslation.description,
       "store_id": storetranslation.storeId,

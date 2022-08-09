@@ -31,6 +31,7 @@ class ProductTranslations extends Collection<ProductTranslation> {
     return {
       "id": producttranslation.id,
       "locale": producttranslation.locale.name,
+      "locale": producttranslation.locale.index,
       "name": producttranslation.name,
       "description": producttranslation.description,
       "product_id": producttranslation.productId,

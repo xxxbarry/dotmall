@@ -15,16 +15,16 @@ void main() {
   });
 
   // Test the `Manager` class.
-  test('should initialize the manager', () async {
+  test('test', () async {
     var configs = Configs();
     var manager = Manager(configs);
 
     // signup
-    var user = await Users(manager).signin(
-      credentials: UserAuthCredentials(
-        username: 'admin',
-        password: 'admin',
-      ),
+    var credentials = const UserAuthCredentials(
+      username: '213375656915',
+      password: 'admin',
     );
+    var response = await Users(manager).signin(credentials);
+    expect(response.model.phones.first.value, credentials.username);
   });
 }

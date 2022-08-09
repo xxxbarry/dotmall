@@ -24,6 +24,12 @@ export default class Product extends DotBaseModel {
   public slug: string
 
   @column()
+  public status: ProductStatus
+
+  @column()
+  public quantity: number
+
+  @column()
   public barcode: string
 
 
@@ -101,6 +107,13 @@ export default class Product extends DotBaseModel {
 }
 
 export enum ProductType {
-  product="product",
+  product=0,
   // service="service",
+}
+
+export enum ProductStatus {
+  draft=0,
+  published=1,
+  archived=2,
+  suspended=3,
 }

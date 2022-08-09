@@ -22,8 +22,8 @@
             "type": "dart"
         },
         {
-            "name": "generators",
-            "cwd": "generators",
+            "name": "auto_sdk_generator",
+            "cwd": "auto_sdk_generator",
             "request": "launch",
             "type": "dart"
         },

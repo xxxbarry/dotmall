@@ -23,9 +23,9 @@ class Files extends Collection<File> {
       description: map["description"],
       path: map["path"],
       mime: map["mime"],
-      createdAt: DateTime.tryParse(map["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(map["updated_at"] ?? ""),
-      deletedAt: DateTime.tryParse(map["deleted_at"] ?? ""),
+      createdAt: DateTime.tryParse(map["created_at"].toString()),
+      updatedAt: DateTime.tryParse(map["updated_at"].toString()),
+      deletedAt: DateTime.tryParse(map["deleted_at"].toString()),
     );
   }
 

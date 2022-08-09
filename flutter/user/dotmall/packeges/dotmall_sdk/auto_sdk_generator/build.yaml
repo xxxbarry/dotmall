@@ -1,6 +1,6 @@
 builders:
   collectionGeneratorBuilder:
-    import: 'package:generators/generators.dart'
+    import: 'package:auto_sdk_generator/auto_sdk_generator.dart'
     builder_factories: [
       'tableGeneratorBuilder',
     ]

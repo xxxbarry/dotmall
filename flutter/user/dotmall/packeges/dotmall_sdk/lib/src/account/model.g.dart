@@ -22,15 +22,13 @@ class Accounts extends Collection<Account> {
       name: map["name"],
       description: map["description"],
       userId: map["user_id"],
-      type: AccountType.values.firstWhere((e) => e.name == map["type"]),
+      type: AccountType.values[map["type"]],
       data: map["data"],
-      createdAt: DateTime.tryParse(map["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(map["updated_at"] ?? ""),
-      validatedAt: DateTime.tryParse(map["validated_at"] ?? ""),
-      deletedAt: DateTime.tryParse(map["deleted_at"] ?? ""),
-      photos: [
-        for (var item in map["photos"] ?? []) Files.modelFromMap(item),
-      ],
+      createdAt: DateTime.tryParse(map["created_at"].toString()),
+      updatedAt: DateTime.tryParse(map["updated_at"].toString()),
+      validatedAt: DateTime.tryParse(map["validated_at"].toString()),
+      deletedAt: DateTime.tryParse(map["deleted_at"].toString()),
+      photos: [for (var item in map["photos"] ?? []) Files.modelFromMap(item)],
     );
   }
 
@@ -40,13 +38,13 @@ class Accounts extends Collection<Account> {
       "name": account.name,
       "description": account.description,
       "user_id": account.userId,
-      "type": account.type.name,
+      "type": account.type.index,
       "data": account.data,
       "created_at": account.createdAt,
       "updated_at": account.updatedAt,
       "validated_at": account.validatedAt,
       "deleted_at": account.deletedAt,
-      "photos": account.photos.map((item) => item.toMap()).toList(),
+      "photos": [for (var item in account.photos ?? []) item.modelToMap()],
     };
   }
 
@@ -105,7 +103,7 @@ class Accounts extends Collection<Account> {
           if (name != null) 'name': name,
           if (description != null) 'description': description,
           if (userId != null) 'user_id': userId,
-          if (type != null) 'type': type.name,
+          if (type != null) 'type': type.index,
           if (data != null) 'data': data,
           if (validatedAt != null) 'validated_at': validatedAt,
           if (deletedAt != null) 'deleted_at': deletedAt,
@@ -141,7 +139,7 @@ class Accounts extends Collection<Account> {
             if (name != null) 'name': name,
             if (description != null) 'description': description,
             if (userId != null) 'user_id': userId,
-            if (type != null) 'type': type.name,
+            if (type != null) 'type': type.index,
             if (data != null) 'data': data,
             if (createdAt != null) 'created_at': createdAt,
             if (updatedAt != null) 'updated_at': updatedAt,
@@ -196,10 +194,6 @@ class Accounts extends Collection<Account> {
         rethrow;
       }
     }
-  }
-
-  Files photos({RequestOptions? options}) {
-    return Files(manager);
   }
 }
 

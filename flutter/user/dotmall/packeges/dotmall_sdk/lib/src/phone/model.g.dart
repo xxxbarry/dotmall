@@ -20,8 +20,8 @@ class Phones extends Collection<Phone> {
     return Phone(
       id: map["id"],
       value: map["value"],
-      createdAt: DateTime.tryParse(map["created_at"] ?? ""),
-      updatedAt: DateTime.tryParse(map["updated_at"] ?? ""),
+      createdAt: DateTime.tryParse(map["created_at"].toString()),
+      updatedAt: DateTime.tryParse(map["updated_at"].toString()),
     );
   }
 

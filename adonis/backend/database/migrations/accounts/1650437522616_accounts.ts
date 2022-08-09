@@ -11,7 +11,7 @@ export default class Accounts extends SubAccountSchema {
     table.string('name').notNullable()
     table.string('description').nullable()
     table.json('data').nullable()
-    table.string('type').notNullable()
+    table.integer('type').notNullable()
   }
 
 }

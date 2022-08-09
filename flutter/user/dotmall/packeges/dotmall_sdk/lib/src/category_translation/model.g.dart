@@ -31,6 +31,7 @@ class CategoryTranslations extends Collection<CategoryTranslation> {
     return {
       "id": categorytranslation.id,
       "locale": categorytranslation.locale.name,
+      "locale": categorytranslation.locale.index,
       "name": categorytranslation.name,
       "description": categorytranslation.description,
       "category_id": categorytranslation.categoryId,
