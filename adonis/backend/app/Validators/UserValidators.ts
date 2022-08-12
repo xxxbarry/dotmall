@@ -45,6 +45,7 @@ export class SigninUserValidator implements DotValidator {
   public schema = schema.create({
     username: schema.string({}, [
       rules.mobile(),
+      rules.exists({ table: 'phones', column: 'value' }),
       rules.authUserPhoneExists(),
     ]),
     password: schema.string({}, [

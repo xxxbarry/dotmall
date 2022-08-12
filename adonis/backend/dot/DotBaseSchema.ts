@@ -57,14 +57,14 @@ export default abstract class DotBaseSchema extends BaseSchema {
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */
       if (this.useTimestamps) {
-        table.timestamp('created_at', { useTz: true })
-        table.timestamp('updated_at', { useTz: true })
+        table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(this.now())
+        table.timestamp('updated_at', { useTz: true }).notNullable().defaultTo(this.now())
       }
       /*
        * Soft delete
        */
       if (this.useSoftDeletes) {
-        table.timestamp('deleted_at', { useTz: true })
+        table.timestamp('deleted_at', { useTz: true }).nullable()
       }
       /*
        * Relations

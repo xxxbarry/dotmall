@@ -37,6 +37,6 @@
             "program": "packeges/dotmall_sdk/.dart_tool/build/entrypoint/build.dart",
             "type": "dart",
             "args": ["watch","--delete-conflicting-outputs"]
-        } 
+        }
     ]
 }

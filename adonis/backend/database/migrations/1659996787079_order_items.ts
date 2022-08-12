@@ -1,7 +1,6 @@
 
 import DotBaseSchema from '../../dot/DotBaseSchema';
 import { Knex } from 'knex'
-import User from 'App/Models/User';
 import Product from 'App/Models/accounts/business/stores/Product';
 import Order from 'App/Models/Order';
 
