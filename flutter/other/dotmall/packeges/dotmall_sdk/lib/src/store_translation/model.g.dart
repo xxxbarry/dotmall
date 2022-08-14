@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// StoreTranslations
+/// StoreTranslations
 class StoreTranslations extends Collection<StoreTranslation> {
   StoreTranslations(this.manager);
 
@@ -15,6 +15,20 @@ class StoreTranslations extends Collection<StoreTranslation> {
   final String table = "store_translations";
 
   final String scope = "store_translations";
+
+  SemanticCardMetaData semanticsOf(StoreTranslation model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<StoreTranslation> paginatedModelFromMap(
+      Map<String, dynamic> map) {
+    return PaginatedStoreTranslation.fromMap(map);
+  }
 
   StoreTranslations copyWith({Manager? manager}) {
     return StoreTranslations(manager ?? this.manager);
@@ -172,26 +186,69 @@ class StoreTranslations extends Collection<StoreTranslation> {
   }
 }
 
-// StoreTranslationRelations
+/// StoreTranslationListOptions
+class StoreTranslationListOptions extends RequestOptions {
+  StoreTranslationListOptions(
+      {int? page = 1,
+      int? limit = 24,
+      StoreTranslationSortables? sort,
+      SortOrder? order,
+      String? search,
+      StoreTranslationSearchables? searchIn,
+      Map<StoreTranslationFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [StoreTranslationFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+        });
+}
+
+/// StoreTranslationFindOptions
+class StoreTranslationFindOptions extends RequestOptions {
+  StoreTranslationFindOptions(
+      {Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+        });
+}
+
+/// StoreTranslationRelations
 // no relations
-// StoreTranslationFilterables
+/// StoreTranslationFilterables
 enum StoreTranslationFilterables { id, locale, name, description, storeId }
 
-// StoreTranslationSortables
+/// StoreTranslationSortables
 enum StoreTranslationSortables { id, locale, name, description, storeId }
 
-// StoreTranslationSearchables
+/// StoreTranslationSearchables
 enum StoreTranslationSearchables { id, locale, name, description, storeId }
 
-// StoreTranslationFields
+/// StoreTranslationFields
 enum StoreTranslationFields { id, locale, name, description, storeId }
 
-// StoreTranslationTranslatables
+/// StoreTranslationTranslatables
 // no fields
-// StoreTranslationAuthCredentials
+/// StoreTranslationAuthCredentials
 // no fields
-// PaginatedStoreTranslation
-class PaginatedStoreTranslation extends PaginatedModel {
+/// PaginatedStoreTranslation
+class PaginatedStoreTranslation extends PaginatedModel<StoreTranslation> {
   PaginatedStoreTranslation({required this.data, required this.meta});
 
   final List<StoreTranslation> data;
@@ -206,3 +263,6 @@ class PaginatedStoreTranslation extends PaginatedModel {
     );
   }
 }
+
+/// StoreTranslationExtentions
+extension StoreTranslationExtensions on StoreTranslation {}

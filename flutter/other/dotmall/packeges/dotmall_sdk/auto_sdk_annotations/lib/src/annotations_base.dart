@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 // Table
 import 'package:auto_sdk_core/auto_sdk_core.dart';
 
@@ -6,8 +7,20 @@ class Table {
   final String? name;
   final String? scope;
   final bool? auth;
+  final SemanticCardMetaData? semantics;
   const Table(
-      {this.auth = false, this.name, this.scope, this.useTranslations = false});
+      {this.auth = false,
+      this.name,
+      this.scope,
+      this.useTranslations = false,
+      this.semantics});
+}
+
+class SemanticCard<TI, ST, IM> {
+  final TI? title;
+  final ST? subtitle;
+  final IM? image;
+  const SemanticCard({this.title, this.subtitle, this.image});
 }
 
 // ModelField

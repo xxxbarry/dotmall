@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// SectionTranslations
+/// SectionTranslations
 class SectionTranslations extends Collection<SectionTranslation> {
   SectionTranslations(this.manager);
 
@@ -15,6 +15,20 @@ class SectionTranslations extends Collection<SectionTranslation> {
   final String table = "section_translations";
 
   final String scope = "section_translations";
+
+  SemanticCardMetaData semanticsOf(SectionTranslation model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<SectionTranslation> paginatedModelFromMap(
+      Map<String, dynamic> map) {
+    return PaginatedSectionTranslation.fromMap(map);
+  }
 
   SectionTranslations copyWith({Manager? manager}) {
     return SectionTranslations(manager ?? this.manager);
@@ -173,26 +187,69 @@ class SectionTranslations extends Collection<SectionTranslation> {
   }
 }
 
-// SectionTranslationRelations
+/// SectionTranslationListOptions
+class SectionTranslationListOptions extends RequestOptions {
+  SectionTranslationListOptions(
+      {int? page = 1,
+      int? limit = 24,
+      SectionTranslationSortables? sort,
+      SortOrder? order,
+      String? search,
+      SectionTranslationSearchables? searchIn,
+      Map<SectionTranslationFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [SectionTranslationFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+        });
+}
+
+/// SectionTranslationFindOptions
+class SectionTranslationFindOptions extends RequestOptions {
+  SectionTranslationFindOptions(
+      {Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+        });
+}
+
+/// SectionTranslationRelations
 // no relations
-// SectionTranslationFilterables
+/// SectionTranslationFilterables
 enum SectionTranslationFilterables { id, locale, name, description, sectionId }
 
-// SectionTranslationSortables
+/// SectionTranslationSortables
 enum SectionTranslationSortables { id, locale, name, description, sectionId }
 
-// SectionTranslationSearchables
+/// SectionTranslationSearchables
 enum SectionTranslationSearchables { id, locale, name, description, sectionId }
 
-// SectionTranslationFields
+/// SectionTranslationFields
 enum SectionTranslationFields { id, locale, name, description, sectionId }
 
-// SectionTranslationTranslatables
+/// SectionTranslationTranslatables
 // no fields
-// SectionTranslationAuthCredentials
+/// SectionTranslationAuthCredentials
 // no fields
-// PaginatedSectionTranslation
-class PaginatedSectionTranslation extends PaginatedModel {
+/// PaginatedSectionTranslation
+class PaginatedSectionTranslation extends PaginatedModel<SectionTranslation> {
   PaginatedSectionTranslation({required this.data, required this.meta});
 
   final List<SectionTranslation> data;
@@ -207,3 +264,6 @@ class PaginatedSectionTranslation extends PaginatedModel {
     );
   }
 }
+
+/// SectionTranslationExtentions
+extension SectionTranslationExtensions on SectionTranslation {}

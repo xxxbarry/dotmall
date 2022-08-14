@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 /// [AppLogo] is a widget that displays the app logo.
@@ -33,7 +35,7 @@ class SquareProgressIndicator extends StatelessWidget {
   const SquareProgressIndicator({
     this.value,
     this.size = 50,
-    this.angle = 50,
+    this.angle = -30,
     this.transform,
     super.key,
   });
@@ -46,18 +48,20 @@ class SquareProgressIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Transform.rotate(
-      angle: 50,
-      child: SizedBox.square(
-        dimension: 50,
+      angle: angle * (pi / 180),
+      child: SizedBox(
+        width: size,
+        height: size / 2,
         child: Stack(
           children: [
             Positioned(
               child: Transform(
-                transform: transform ?? Matrix4.skewX(-0.2),
+                transform: transform ?? Matrix4.skewX(-0.5),
                 child: SizedBox(
-                  width: 150 / 3,
+                  width: size,
                   child: LinearProgressIndicator(
-                    minHeight: 100 / 3,
+                    value: value,
+                    minHeight: size / 4,
                     color: Theme.of(context).primaryColor,
                     backgroundColor: Colors.transparent,
                   ),
@@ -67,14 +71,15 @@ class SquareProgressIndicator extends StatelessWidget {
             Positioned(
               bottom: 0,
               child: Transform(
-                transform: transform ?? Matrix4.skewX(-0.2),
+                transform: transform ?? Matrix4.skewX(-0.5),
                 child: Transform.scale(
                   scale: -1,
                   // reverse the progress indicator
                   child: SizedBox(
-                    width: 150 / 3,
+                    width: size,
                     child: LinearProgressIndicator(
-                      minHeight: 100 / 3,
+                      value: value,
+                      minHeight: size / 4,
                       color: Theme.of(context).primaryColor.withOpacity(0.3),
                       backgroundColor: Colors.transparent,
                     ),

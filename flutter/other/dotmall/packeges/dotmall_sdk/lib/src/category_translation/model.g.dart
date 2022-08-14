@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// CategoryTranslations
+/// CategoryTranslations
 class CategoryTranslations extends Collection<CategoryTranslation> {
   CategoryTranslations(this.manager);
 
@@ -15,6 +15,20 @@ class CategoryTranslations extends Collection<CategoryTranslation> {
   final String table = "category_translations";
 
   final String scope = "category_translations";
+
+  SemanticCardMetaData semanticsOf(CategoryTranslation model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<CategoryTranslation> paginatedModelFromMap(
+      Map<String, dynamic> map) {
+    return PaginatedCategoryTranslation.fromMap(map);
+  }
 
   CategoryTranslations copyWith({Manager? manager}) {
     return CategoryTranslations(manager ?? this.manager);
@@ -173,9 +187,52 @@ class CategoryTranslations extends Collection<CategoryTranslation> {
   }
 }
 
-// CategoryTranslationRelations
+/// CategoryTranslationListOptions
+class CategoryTranslationListOptions extends RequestOptions {
+  CategoryTranslationListOptions(
+      {int? page = 1,
+      int? limit = 24,
+      CategoryTranslationSortables? sort,
+      SortOrder? order,
+      String? search,
+      CategoryTranslationSearchables? searchIn,
+      Map<CategoryTranslationFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [CategoryTranslationFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+        });
+}
+
+/// CategoryTranslationFindOptions
+class CategoryTranslationFindOptions extends RequestOptions {
+  CategoryTranslationFindOptions(
+      {Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+        });
+}
+
+/// CategoryTranslationRelations
 // no relations
-// CategoryTranslationFilterables
+/// CategoryTranslationFilterables
 enum CategoryTranslationFilterables {
   id,
   locale,
@@ -184,10 +241,10 @@ enum CategoryTranslationFilterables {
   categoryId
 }
 
-// CategoryTranslationSortables
+/// CategoryTranslationSortables
 enum CategoryTranslationSortables { id, locale, name, description, categoryId }
 
-// CategoryTranslationSearchables
+/// CategoryTranslationSearchables
 enum CategoryTranslationSearchables {
   id,
   locale,
@@ -196,15 +253,15 @@ enum CategoryTranslationSearchables {
   categoryId
 }
 
-// CategoryTranslationFields
+/// CategoryTranslationFields
 enum CategoryTranslationFields { id, locale, name, description, categoryId }
 
-// CategoryTranslationTranslatables
+/// CategoryTranslationTranslatables
 // no fields
-// CategoryTranslationAuthCredentials
+/// CategoryTranslationAuthCredentials
 // no fields
-// PaginatedCategoryTranslation
-class PaginatedCategoryTranslation extends PaginatedModel {
+/// PaginatedCategoryTranslation
+class PaginatedCategoryTranslation extends PaginatedModel<CategoryTranslation> {
   PaginatedCategoryTranslation({required this.data, required this.meta});
 
   final List<CategoryTranslation> data;
@@ -219,3 +276,6 @@ class PaginatedCategoryTranslation extends PaginatedModel {
     );
   }
 }
+
+/// CategoryTranslationExtentions
+extension CategoryTranslationExtensions on CategoryTranslation {}

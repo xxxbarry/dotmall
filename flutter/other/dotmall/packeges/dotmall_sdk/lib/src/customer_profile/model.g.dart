@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// CustomerProfiles
+/// CustomerProfiles
 class CustomerProfiles extends Collection<CustomerProfile> {
   CustomerProfiles(this.manager);
 
@@ -15,6 +15,20 @@ class CustomerProfiles extends Collection<CustomerProfile> {
   final String table = "customer_profiles";
 
   final String scope = "customer_profiles";
+
+  SemanticCardMetaData semanticsOf(CustomerProfile model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<CustomerProfile> paginatedModelFromMap(
+      Map<String, dynamic> map) {
+    return PaginatedCustomerProfile.fromMap(map);
+  }
 
   CustomerProfiles copyWith({Manager? manager}) {
     return CustomerProfiles(manager ?? this.manager);
@@ -165,26 +179,69 @@ class CustomerProfiles extends Collection<CustomerProfile> {
   }
 }
 
-// CustomerProfileRelations
+/// CustomerProfileListOptions
+class CustomerProfileListOptions extends RequestOptions {
+  CustomerProfileListOptions(
+      {int? page = 1,
+      int? limit = 24,
+      CustomerProfileSortables? sort,
+      SortOrder? order,
+      String? search,
+      CustomerProfileSearchables? searchIn,
+      Map<CustomerProfileFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [CustomerProfileFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+        });
+}
+
+/// CustomerProfileFindOptions
+class CustomerProfileFindOptions extends RequestOptions {
+  CustomerProfileFindOptions(
+      {Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+        });
+}
+
+/// CustomerProfileRelations
 // no relations
-// CustomerProfileFilterables
+/// CustomerProfileFilterables
 enum CustomerProfileFilterables { id, accountId, deletedAt, validatedAt }
 
-// CustomerProfileSortables
+/// CustomerProfileSortables
 enum CustomerProfileSortables { id, accountId, deletedAt, validatedAt }
 
-// CustomerProfileSearchables
+/// CustomerProfileSearchables
 enum CustomerProfileSearchables { id, accountId, deletedAt, validatedAt }
 
-// CustomerProfileFields
+/// CustomerProfileFields
 enum CustomerProfileFields { id, accountId, deletedAt, validatedAt }
 
-// CustomerProfileTranslatables
+/// CustomerProfileTranslatables
 // no fields
-// CustomerProfileAuthCredentials
+/// CustomerProfileAuthCredentials
 // no fields
-// PaginatedCustomerProfile
-class PaginatedCustomerProfile extends PaginatedModel {
+/// PaginatedCustomerProfile
+class PaginatedCustomerProfile extends PaginatedModel<CustomerProfile> {
   PaginatedCustomerProfile({required this.data, required this.meta});
 
   final List<CustomerProfile> data;
@@ -199,3 +256,6 @@ class PaginatedCustomerProfile extends PaginatedModel {
     );
   }
 }
+
+/// CustomerProfileExtentions
+extension CustomerProfileExtensions on CustomerProfile {}

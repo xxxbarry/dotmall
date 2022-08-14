@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// Addresses
+/// Addresses
 class Addresses extends Collection<Address> {
   Addresses(this.manager);
 
@@ -15,6 +15,19 @@ class Addresses extends Collection<Address> {
   final String table = "addresses";
 
   final String scope = "addresses";
+
+  SemanticCardMetaData semanticsOf(Address model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<Address> paginatedModelFromMap(Map<String, dynamic> map) {
+    return PaginatedAddress.fromMap(map);
+  }
 
   Addresses copyWith({Manager? manager}) {
     return Addresses(manager ?? this.manager);
@@ -225,9 +238,52 @@ class Addresses extends Collection<Address> {
   }
 }
 
-// AddressRelations
+/// AddressListOptions
+class AddressListOptions extends RequestOptions {
+  AddressListOptions(
+      {int? page = 1,
+      int? limit = 24,
+      AddressSortables? sort,
+      SortOrder? order,
+      String? search,
+      AddressSearchables? searchIn,
+      Map<AddressFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [AddressFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+        });
+}
+
+/// AddressFindOptions
+class AddressFindOptions extends RequestOptions {
+  AddressFindOptions(
+      {Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+        });
+}
+
+/// AddressRelations
 // no relations
-// AddressFilterables
+/// AddressFilterables
 enum AddressFilterables {
   userId,
   id,
@@ -245,7 +301,7 @@ enum AddressFilterables {
   deletedAt
 }
 
-// AddressSortables
+/// AddressSortables
 enum AddressSortables {
   userId,
   id,
@@ -263,7 +319,7 @@ enum AddressSortables {
   deletedAt
 }
 
-// AddressSearchables
+/// AddressSearchables
 enum AddressSearchables {
   userId,
   id,
@@ -281,7 +337,7 @@ enum AddressSearchables {
   deletedAt
 }
 
-// AddressFields
+/// AddressFields
 enum AddressFields {
   userId,
   id,
@@ -299,12 +355,12 @@ enum AddressFields {
   deletedAt
 }
 
-// AddressTranslatables
+/// AddressTranslatables
 // no fields
-// AddressAuthCredentials
+/// AddressAuthCredentials
 // no fields
-// PaginatedAddress
-class PaginatedAddress extends PaginatedModel {
+/// PaginatedAddress
+class PaginatedAddress extends PaginatedModel<Address> {
   PaginatedAddress({required this.data, required this.meta});
 
   final List<Address> data;
@@ -318,3 +374,6 @@ class PaginatedAddress extends PaginatedModel {
     );
   }
 }
+
+/// AddressExtentions
+extension AddressExtensions on Address {}

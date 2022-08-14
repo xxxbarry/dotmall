@@ -1,10 +1,7 @@
 import 'package:dotmall_sdk/dotmall_sdk.dart';
 import 'package:hive/hive.dart';
 
-/// [CachRepository]
-abstract class CachRepository {
-  Future<void> clear();
-}
+import '../../core/repositories/repositories.dart';
 
 /// [AuthCacheRepository]
 class AuthCacheRepository implements CachRepository {

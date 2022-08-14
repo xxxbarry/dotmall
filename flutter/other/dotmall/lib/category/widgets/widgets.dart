@@ -1,14 +1,19 @@
 import 'package:dotmall_sdk/dotmall_sdk.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/helpers/heplers.dart';
+import '../../core/widgets/collection_widgets.dart';
 import '../../core/widgets/widgets.dart';
+import '../../start/bloc/start_bloc.dart';
 
 class CategoryCard extends ModelCard<Category> {
-  CategoryCard(super.model, {super.key});
+  CategoryCard({super.key, super.model});
 
   @override
   Widget build(BuildContext context) {
+    var configs = context.read<StartBloc>().configs;
     return Container(
       width: 60,
       child: Column(
@@ -17,31 +22,57 @@ class CategoryCard extends ModelCard<Category> {
           AspectRatio(
             aspectRatio: 1,
             child: Container(
-              margin: const EdgeInsets.all(4),
+              margin: const EdgeInsets.all(5),
+              padding: const EdgeInsets.all(1.3),
               decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(100),
+                color: model != null ? null : Colors.grey.withOpacity(0.2),
+                gradient: model == null ? null : CGradientBox.gradient,
               ),
-              child: Center(
-                child: Icon(
-                  FluentIcons.image_20_regular,
-                  size: 30,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(100),
+                  border:
+                      Border.all(color: Theme.of(context).cardColor, width: 2),
+                  // image
+                  image: model?.photos.isNotEmpty ?? false
+                      ? DecorationImage(
+                          image: NetworkImage(
+                              configs.makeUrl(model!.photos.first.path)),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
                 ),
+                child: model?.photos.isEmpty ?? true
+                    ? Opacity(
+                        opacity: model == null ? 0.2 : 0.5,
+                        child: (Center(
+                          child: Icon(
+                            FluentIcons.circle_image_20_filled,
+                            size: 30,
+                          ),
+                        )),
+                      )
+                    : null,
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  model.name,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.caption!.copyWith(
-                        height: 1.3,
-                      ),
+                TextPlaceholder(
+                  width: 40,
+                  enabled: model == null,
+                  child: Text(
+                    model?.name.clipAt(8) ?? '',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.caption!.copyWith(
+                          height: 1.3,
+                        ),
+                  ),
                 ),
               ],
             ),
@@ -51,81 +82,3 @@ class CategoryCard extends ModelCard<Category> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// class CategoryCard extends ModelCard<Category> {
-//   CategoryCard(super.model, {super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       padding: const EdgeInsets.all(4),
-//       decoration: BoxDecoration(
-//         color: Colors.white,
-//         borderRadius: BorderRadius.circular(14),
-//         border: Border.all(color: Colors.grey.withOpacity(0.3), width: 1),
-//       ),
-//       child: Row(
-//         mainAxisAlignment: MainAxisAlignment.start,
-//         children: [
-//           AspectRatio(
-//             aspectRatio: 1,
-//             child: Container(
-//               margin: const EdgeInsets.all(4),
-//               decoration: BoxDecoration(
-//                 color: Colors.grey.withOpacity(0.2),
-//                 borderRadius: BorderRadius.circular(8),
-//               ),
-//               child: Center(
-//                 child: Icon(
-//                   FluentIcons.image_20_regular,
-//                   size: 30,
-//                 ),
-//               ),
-//             ),
-//           ),
-//           Padding(
-//             padding: const EdgeInsets.all(4),
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   model.name,
-//                   textAlign: TextAlign.center,
-//                   style: Theme.of(context).textTheme.subtitle1!.copyWith(
-//                         height: 1.3,
-//                       ),
-//                 ),
-//                 Text(
-//                   model.description ?? "No description",
-//                   style: Theme.of(context).textTheme.caption,
-//                 ),
-//               ],
-//             ),
-//           )
-//         ],
-//       ),
-//     );
-//   }
-// }

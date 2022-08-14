@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// Accounts
+/// Accounts
 class Accounts extends Collection<Account> {
   Accounts(this.manager);
 
@@ -15,6 +15,19 @@ class Accounts extends Collection<Account> {
   final String table = "accounts";
 
   final String scope = "accounts";
+
+  SemanticCardMetaData semanticsOf(Account model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<Account> paginatedModelFromMap(Map<String, dynamic> map) {
+    return PaginatedAccount.fromMap(map);
+  }
 
   Accounts copyWith({Manager? manager}) {
     return Accounts(manager ?? this.manager);
@@ -52,7 +65,7 @@ class Accounts extends Collection<Account> {
       "updated_at": account.updatedAt,
       "validated_at": account.validatedAt,
       "deleted_at": account.deletedAt,
-      "photos": [for (var item in account.photos ?? []) item.modelToMap()],
+      "photos": [for (var item in account.photos ?? []) item.toMap()],
     };
   }
 
@@ -205,10 +218,57 @@ class Accounts extends Collection<Account> {
   }
 }
 
-// AccountRelations
+/// AccountListOptions
+class AccountListOptions extends RequestOptions {
+  AccountListOptions(
+      {List<AccountRelations>? load,
+      int? page = 1,
+      int? limit = 24,
+      AccountSortables? sort,
+      SortOrder? order,
+      String? search,
+      AccountSearchables? searchIn,
+      Map<AccountFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [AccountFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+          if (load != null) 'load': load.map((e) => e.name).toList()
+        });
+}
+
+/// AccountFindOptions
+class AccountFindOptions extends RequestOptions {
+  AccountFindOptions(
+      {List<AccountRelations>? load,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (load != null) 'load': load.map((e) => e.name).toList()
+        });
+}
+
+/// AccountRelations
 enum AccountRelations { photos }
 
-// AccountFilterables
+/// AccountFilterables
 enum AccountFilterables {
   id,
   name,
@@ -222,7 +282,7 @@ enum AccountFilterables {
   deletedAt
 }
 
-// AccountSortables
+/// AccountSortables
 enum AccountSortables {
   id,
   name,
@@ -236,7 +296,7 @@ enum AccountSortables {
   deletedAt
 }
 
-// AccountSearchables
+/// AccountSearchables
 enum AccountSearchables {
   id,
   name,
@@ -250,7 +310,7 @@ enum AccountSearchables {
   deletedAt
 }
 
-// AccountFields
+/// AccountFields
 enum AccountFields {
   id,
   name,
@@ -264,12 +324,12 @@ enum AccountFields {
   deletedAt
 }
 
-// AccountTranslatables
+/// AccountTranslatables
 // no fields
-// AccountAuthCredentials
+/// AccountAuthCredentials
 // no fields
-// PaginatedAccount
-class PaginatedAccount extends PaginatedModel {
+/// PaginatedAccount
+class PaginatedAccount extends PaginatedModel<Account> {
   PaginatedAccount({required this.data, required this.meta});
 
   final List<Account> data;
@@ -283,3 +343,6 @@ class PaginatedAccount extends PaginatedModel {
     );
   }
 }
+
+/// AccountExtentions
+extension AccountExtensions on Account {}

@@ -259,12 +259,14 @@ class Configs {
       mode == RunMode.production ? prodEndpoint : devEndpoint;
   final String prodEndpoint;
   final String devEndpoint;
+  final String assetsServer;
   final RunMode mode;
   final Languages? language;
   final AuthCollection Function(Manager)? auth;
   const Configs({
-    this.prodEndpoint = "http://127.0.0.1:3333/api/v1/",
-    this.devEndpoint = "http://127.0.0.1:3333/api/v1/",
+    this.prodEndpoint = "http://127.0.0.1:3333/api/v1",
+    this.devEndpoint = "http://127.0.0.1:3333/api/v1",
+    this.assetsServer = "http://127.0.0.1:3333",
     this.mode = RunMode.development,
     this.language,
     this.auth,
@@ -329,6 +331,10 @@ class Configs {
         devEndpoint.hashCode ^
         mode.hashCode ^
         language.hashCode;
+  }
+
+  String makeUrl(String path) {
+    return assetsServer + path;
   }
 }
 
@@ -396,8 +402,22 @@ mixin RelatedMixin {
 
 /// [Collection] all collections should extend this class.
 abstract class Collection<T extends Model> {
+  /// must be implemented in the child class.
+  PaginatedModel<T> paginatedModelFromMap(Map<String, dynamic> map);
+
+  SemanticCardMetaData semanticsOf(T model) {
+    var values = model.toMap().values.toList().whereType<String>();
+    return SemanticCardMetaData(
+      title: values.firstOrNull,
+      subtitle: values.length > 1 ? values.elementAt(1) : null,
+    );
+  }
+
   /// [manager] is the api Manager.
   Manager get manager;
+
+  /// [table] is the scope of the collection.
+  String get table;
 
   /// [scope] is the scope of the collection.
   String get scope;
@@ -415,7 +435,7 @@ abstract class Collection<T extends Model> {
       {RequestOptions? options}) async {
     try {
       return await manager.client.get<Map<String, dynamic>>(
-        '$scope/$id',
+        '/$scope/$id',
         onReceiveProgress: options?.onReceiveProgress,
         queryParameters: options?.queryParameters,
         cancelToken: options?.cancelToken,
@@ -435,7 +455,7 @@ abstract class Collection<T extends Model> {
       {RequestOptions? options}) async {
     try {
       return await manager.client.get(
-        scope,
+        "/$scope",
         onReceiveProgress: options?.onReceiveProgress,
         queryParameters: options?.queryParameters,
         cancelToken: options?.cancelToken,
@@ -455,7 +475,7 @@ abstract class Collection<T extends Model> {
       {RequestOptions? options}) async {
     try {
       return await manager.client.post<Map<String, dynamic>>(
-        scope,
+        "/$scope",
         data: options?.data,
         onReceiveProgress: options?.onReceiveProgress,
         cancelToken: options?.cancelToken,
@@ -477,7 +497,7 @@ abstract class Collection<T extends Model> {
       {RequestOptions? options}) async {
     try {
       return await manager.client.put(
-        '$scope/$id',
+        '/$scope/$id',
         data: options?.data,
         onReceiveProgress: options?.onReceiveProgress,
         cancelToken: options?.cancelToken,
@@ -498,7 +518,7 @@ abstract class Collection<T extends Model> {
   Future<Response> deleteR(String id, {RequestOptions? options}) async {
     try {
       return await manager.client.delete(
-        '$scope/$id',
+        '/$scope/$id',
         cancelToken: options?.cancelToken,
         options: options?.options,
         data: options?.data,
@@ -528,7 +548,7 @@ class RequestOptions {
   final Options? options;
   final Map<String, dynamic>? queryParameters;
   final Map<String, dynamic>? data;
-  RequestOptions({
+  const RequestOptions({
     this.onSendProgress,
     this.onReceiveProgress,
     this.cancelToken,
@@ -566,10 +586,75 @@ class RequestOptions {
   }
 }
 
+/// [ListRequestOptions]
+class ListRequestOptions extends RequestOptions {
+  ListRequestOptions(
+      {List<String>? load,
+      int? page = 1,
+      int? limit = 24,
+      String? sort,
+      SortOrder? order,
+      String? search,
+      String? searchIn,
+      Map<String, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn,
+          if (where != null) 'where': where,
+          if (load != null) 'load': load
+        });
+
+  /// copyWith
+  ListRequestOptions copyWith({
+    List<String>? load,
+    int? page,
+    int? limit,
+    String? sort,
+    SortOrder? order,
+    String? search,
+    String? searchIn,
+    Map<String, String>? where,
+    Map<String, dynamic>? queryParameters,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? data,
+    void Function(int, int)? onReceiveProgress,
+    void Function(int, int)? onSendProgress,
+    Options? options,
+  }) {
+    return ListRequestOptions(
+      load: load ?? this.queryParameters?["load"],
+      page: page ?? int.tryParse((this.queryParameters?["page"]).toString()),
+      limit: limit ?? int.tryParse((this.queryParameters?["limit"]).toString()),
+      sort: sort ?? this.queryParameters?["sort"],
+      order: order ?? this.queryParameters?["order"],
+      search: search ?? this.queryParameters?["search"],
+      searchIn: searchIn ?? this.queryParameters?["searchIn"],
+      where: where ?? this.queryParameters?["where"],
+      queryParameters: queryParameters,
+      cancelToken: cancelToken ?? this.cancelToken,
+      data: data ?? this.data,
+      onReceiveProgress: onReceiveProgress ?? this.onReceiveProgress,
+      onSendProgress: onSendProgress ?? this.onSendProgress,
+      options: options ?? this.options,
+    );
+  }
+}
+
 /// [PaginatedModel]
-abstract class PaginatedModel {
+abstract class PaginatedModel<T extends Model> {
   PaginationMeta get meta;
-  List<Model> get data;
+  List<T> get data;
 }
 
 class PaginationMeta {
@@ -711,7 +796,7 @@ abstract class AuthCollection<M extends Model, T extends AuthCredentials>
       {RequestOptions? options}) async {
     try {
       return await manager.client.post<Map<String, dynamic>>(
-        '$scope/auth/signin',
+        '/$scope/auth/signin',
         data: options?.data,
         onReceiveProgress: options?.onReceiveProgress,
         queryParameters: options?.queryParameters,
@@ -747,7 +832,7 @@ abstract class AuthCollection<M extends Model, T extends AuthCredentials>
       {RequestOptions? options}) async {
     try {
       var r = await manager.client.post<Map<String, dynamic>>(
-        '$scope/auth/signup',
+        '/$scope/auth/signup',
         data: options?.data,
         onReceiveProgress: options?.onReceiveProgress,
         queryParameters: options?.queryParameters,
@@ -769,7 +854,7 @@ abstract class AuthCollection<M extends Model, T extends AuthCredentials>
       {RequestOptions? options}) async {
     try {
       var response = await manager.client.get<Map<String, dynamic>>(
-        '$scope/auth',
+        '/$scope/auth',
         onReceiveProgress: options?.onReceiveProgress,
         queryParameters: options?.queryParameters,
         cancelToken: options?.cancelToken,
@@ -789,7 +874,7 @@ abstract class AuthCollection<M extends Model, T extends AuthCredentials>
   Future<void> signoutR({RequestOptions? options}) async {
     try {
       await manager.client.post(
-        '$scope/auth/signout',
+        '/$scope/auth/signout',
         data: options?.data,
         onReceiveProgress: options?.onReceiveProgress,
         queryParameters: options?.queryParameters,
@@ -932,4 +1017,15 @@ class Token {
 
   @override
   int get hashCode => token.hashCode ^ type.hashCode;
+}
+
+class SemanticCardMetaData<TI, ST, IM> {
+  final String? title;
+  final String? subtitle;
+  final IM? image;
+  const SemanticCardMetaData({
+    this.title,
+    this.subtitle,
+    this.image,
+  });
 }

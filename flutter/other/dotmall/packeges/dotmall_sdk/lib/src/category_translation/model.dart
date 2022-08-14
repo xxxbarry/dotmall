@@ -2,6 +2,8 @@ import 'package:auto_sdk_annotations/auto_sdk_annotations.dart';
 import 'package:dio/dio.dart' hide RequestOptions;
 import 'package:auto_sdk_core/auto_sdk_core.dart';
 
+import '../file/model.dart';
+
 part 'model.g.dart';
 
 @Table()

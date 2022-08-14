@@ -113,7 +113,7 @@ class App extends StatelessWidget {
                   buttonColor: Colors.purple,
                   textTheme: ButtonTextTheme.primary,
                 ),
-                textTheme: GoogleFonts.notoSansArabicTextTheme(
+                textTheme: GoogleFonts.readexProTextTheme(
                   Theme.of(context).textTheme.copyWith(
                         caption: Theme.of(context)
                             .textTheme
@@ -128,7 +128,7 @@ class App extends StatelessWidget {
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
               ],
-              locale: AppLocalizations.supportedLocales[0],
+              locale: AppLocalizations.supportedLocales[1],
               supportedLocales: AppLocalizations.supportedLocales,
               routerDelegate: router,
               routeInformationParser: RoutemasterParser(),

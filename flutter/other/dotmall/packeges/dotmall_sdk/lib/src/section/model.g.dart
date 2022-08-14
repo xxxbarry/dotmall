@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// Sections
+/// Sections
 class Sections extends Collection<Section> {
   Sections(this.manager);
 
@@ -15,6 +15,19 @@ class Sections extends Collection<Section> {
   final String table = "sections";
 
   final String scope = "sections";
+
+  SemanticCardMetaData semanticsOf(Section model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<Section> paginatedModelFromMap(Map<String, dynamic> map) {
+    return PaginatedSection.fromMap(map);
+  }
 
   Sections copyWith({Manager? manager}) {
     return Sections(manager ?? this.manager);
@@ -46,9 +59,9 @@ class Sections extends Collection<Section> {
       "description": section.description,
       "slug": section.slug,
       "store_id": section.storeId,
-      "photos": [for (var item in section.photos ?? []) item.modelToMap()],
+      "photos": [for (var item in section.photos ?? []) item.toMap()],
       "translations": [
-        for (var item in section.translations ?? []) item.modelToMap()
+        for (var item in section.translations ?? []) item.toMap()
       ],
     };
   }
@@ -186,27 +199,74 @@ class Sections extends Collection<Section> {
   }
 }
 
-// SectionRelations
+/// SectionListOptions
+class SectionListOptions extends RequestOptions {
+  SectionListOptions(
+      {List<SectionRelations>? load,
+      int? page = 1,
+      int? limit = 24,
+      SectionSortables? sort,
+      SortOrder? order,
+      String? search,
+      SectionSearchables? searchIn,
+      Map<SectionFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [SectionFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+          if (load != null) 'load': load.map((e) => e.name).toList()
+        });
+}
+
+/// SectionFindOptions
+class SectionFindOptions extends RequestOptions {
+  SectionFindOptions(
+      {List<SectionRelations>? load,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (load != null) 'load': load.map((e) => e.name).toList()
+        });
+}
+
+/// SectionRelations
 enum SectionRelations { photos, translations }
 
-// SectionFilterables
+/// SectionFilterables
 enum SectionFilterables { id, name, description, slug, storeId }
 
-// SectionSortables
+/// SectionSortables
 enum SectionSortables { id, name, description, slug, storeId }
 
-// SectionSearchables
+/// SectionSearchables
 enum SectionSearchables { id, name, description, slug, storeId }
 
-// SectionFields
+/// SectionFields
 enum SectionFields { id, name, description, slug, storeId }
 
-// SectionTranslatables
+/// SectionTranslatables
 // no fields
-// SectionAuthCredentials
+/// SectionAuthCredentials
 // no fields
-// PaginatedSection
-class PaginatedSection extends PaginatedModel {
+/// PaginatedSection
+class PaginatedSection extends PaginatedModel<Section> {
   PaginatedSection({required this.data, required this.meta});
 
   final List<Section> data;
@@ -220,3 +280,6 @@ class PaginatedSection extends PaginatedModel {
     );
   }
 }
+
+/// SectionExtentions
+extension SectionExtensions on Section {}

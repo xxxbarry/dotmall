@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// Files
+/// Files
 class Files extends Collection<File> {
   Files(this.manager);
 
@@ -15,6 +15,19 @@ class Files extends Collection<File> {
   final String table = "files";
 
   final String scope = "files";
+
+  SemanticCardMetaData semanticsOf(File model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<File> paginatedModelFromMap(Map<String, dynamic> map) {
+    return PaginatedFile.fromMap(map);
+  }
 
   Files copyWith({Manager? manager}) {
     return Files(manager ?? this.manager);
@@ -191,9 +204,52 @@ class Files extends Collection<File> {
   }
 }
 
-// FileRelations
+/// FileListOptions
+class FileListOptions extends RequestOptions {
+  FileListOptions(
+      {int? page = 1,
+      int? limit = 24,
+      FileSortables? sort,
+      SortOrder? order,
+      String? search,
+      FileSearchables? searchIn,
+      Map<FileFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [FileFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+        });
+}
+
+/// FileFindOptions
+class FileFindOptions extends RequestOptions {
+  FileFindOptions(
+      {Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+        });
+}
+
+/// FileRelations
 // no relations
-// FileFilterables
+/// FileFilterables
 enum FileFilterables {
   name,
   description,
@@ -204,7 +260,7 @@ enum FileFilterables {
   deletedAt
 }
 
-// FileSortables
+/// FileSortables
 enum FileSortables {
   name,
   description,
@@ -215,7 +271,7 @@ enum FileSortables {
   deletedAt
 }
 
-// FileSearchables
+/// FileSearchables
 enum FileSearchables {
   name,
   description,
@@ -226,7 +282,7 @@ enum FileSearchables {
   deletedAt
 }
 
-// FileFields
+/// FileFields
 enum FileFields {
   id,
   name,
@@ -238,12 +294,12 @@ enum FileFields {
   deletedAt
 }
 
-// FileTranslatables
+/// FileTranslatables
 // no fields
-// FileAuthCredentials
+/// FileAuthCredentials
 // no fields
-// PaginatedFile
-class PaginatedFile extends PaginatedModel {
+/// PaginatedFile
+class PaginatedFile extends PaginatedModel<File> {
   PaginatedFile({required this.data, required this.meta});
 
   final List<File> data;
@@ -257,3 +313,6 @@ class PaginatedFile extends PaginatedModel {
     );
   }
 }
+
+/// FileExtentions
+extension FileExtensions on File {}

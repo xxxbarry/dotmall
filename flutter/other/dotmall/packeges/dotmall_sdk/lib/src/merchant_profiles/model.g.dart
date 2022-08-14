@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// MerchantProfiles
+/// MerchantProfiles
 class MerchantProfiles extends Collection<MerchantProfile> {
   MerchantProfiles(this.manager);
 
@@ -15,6 +15,20 @@ class MerchantProfiles extends Collection<MerchantProfile> {
   final String table = "merchant_profiles";
 
   final String scope = "merchant_profiles";
+
+  SemanticCardMetaData semanticsOf(MerchantProfile model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<MerchantProfile> paginatedModelFromMap(
+      Map<String, dynamic> map) {
+    return PaginatedMerchantProfile.fromMap(map);
+  }
 
   MerchantProfiles copyWith({Manager? manager}) {
     return MerchantProfiles(manager ?? this.manager);
@@ -165,26 +179,69 @@ class MerchantProfiles extends Collection<MerchantProfile> {
   }
 }
 
-// MerchantProfileRelations
+/// MerchantProfileListOptions
+class MerchantProfileListOptions extends RequestOptions {
+  MerchantProfileListOptions(
+      {int? page = 1,
+      int? limit = 24,
+      MerchantProfileSortables? sort,
+      SortOrder? order,
+      String? search,
+      MerchantProfileSearchables? searchIn,
+      Map<MerchantProfileFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [MerchantProfileFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+        });
+}
+
+/// MerchantProfileFindOptions
+class MerchantProfileFindOptions extends RequestOptions {
+  MerchantProfileFindOptions(
+      {Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+        });
+}
+
+/// MerchantProfileRelations
 // no relations
-// MerchantProfileFilterables
+/// MerchantProfileFilterables
 enum MerchantProfileFilterables { id, accountId, deletedAt, validatedAt }
 
-// MerchantProfileSortables
+/// MerchantProfileSortables
 enum MerchantProfileSortables { id, accountId, deletedAt, validatedAt }
 
-// MerchantProfileSearchables
+/// MerchantProfileSearchables
 enum MerchantProfileSearchables { id, accountId, deletedAt, validatedAt }
 
-// MerchantProfileFields
+/// MerchantProfileFields
 enum MerchantProfileFields { id, accountId, deletedAt, validatedAt }
 
-// MerchantProfileTranslatables
+/// MerchantProfileTranslatables
 // no fields
-// MerchantProfileAuthCredentials
+/// MerchantProfileAuthCredentials
 // no fields
-// PaginatedMerchantProfile
-class PaginatedMerchantProfile extends PaginatedModel {
+/// PaginatedMerchantProfile
+class PaginatedMerchantProfile extends PaginatedModel<MerchantProfile> {
   PaginatedMerchantProfile({required this.data, required this.meta});
 
   final List<MerchantProfile> data;
@@ -199,3 +256,6 @@ class PaginatedMerchantProfile extends PaginatedModel {
     );
   }
 }
+
+/// MerchantProfileExtentions
+extension MerchantProfileExtensions on MerchantProfile {}

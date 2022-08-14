@@ -12,9 +12,9 @@ class CategoryInitial extends CategoryState {}
 class CategoryLoadingState extends CategoryState {}
 
 class CategoryLoadedState extends CategoryState {
-  final PaginatedCategory categories;
-  CategoryLoadedState(this.categories);
+  final PaginatedCategory response;
+  CategoryLoadedState(this.response);
 
   @override
-  List<Object> get props => [categories];
+  List<Object> get props => [response];
 }

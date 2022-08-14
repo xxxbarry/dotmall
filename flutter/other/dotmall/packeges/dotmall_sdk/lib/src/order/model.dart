@@ -4,6 +4,7 @@ import 'package:dio/dio.dart' hide RequestOptions;
 
 import '../address/model.dart';
 import '../customer_profile/model.dart';
+import '../file/model.dart';
 import '../order_item/model.dart';
 
 part 'model.g.dart';

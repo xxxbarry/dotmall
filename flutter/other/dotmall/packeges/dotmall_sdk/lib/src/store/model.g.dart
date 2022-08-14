@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// Stores
+/// Stores
 class Stores extends Collection<Store> {
   Stores(this.manager);
 
@@ -15,6 +15,19 @@ class Stores extends Collection<Store> {
   final String table = "stores";
 
   final String scope = "stores";
+
+  SemanticCardMetaData semanticsOf(Store model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<Store> paginatedModelFromMap(Map<String, dynamic> map) {
+    return PaginatedStore.fromMap(map);
+  }
 
   Stores copyWith({Manager? manager}) {
     return Stores(manager ?? this.manager);
@@ -54,10 +67,8 @@ class Stores extends Collection<Store> {
       "updated_at": store.updatedAt,
       "validated_at": store.validatedAt,
       "deleted_at": store.deletedAt,
-      "photos": [for (var item in store.photos ?? []) item.modelToMap()],
-      "translations": [
-        for (var item in store.translations ?? []) item.modelToMap()
-      ],
+      "photos": [for (var item in store.photos ?? []) item.toMap()],
+      "translations": [for (var item in store.translations ?? []) item.toMap()],
     };
   }
 
@@ -210,10 +221,57 @@ class Stores extends Collection<Store> {
   }
 }
 
-// StoreRelations
+/// StoreListOptions
+class StoreListOptions extends RequestOptions {
+  StoreListOptions(
+      {List<StoreRelations>? load,
+      int? page = 1,
+      int? limit = 24,
+      StoreSortables? sort,
+      SortOrder? order,
+      String? search,
+      StoreSearchables? searchIn,
+      Map<StoreFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [StoreFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+          if (load != null) 'load': load.map((e) => e.name).toList()
+        });
+}
+
+/// StoreFindOptions
+class StoreFindOptions extends RequestOptions {
+  StoreFindOptions(
+      {List<StoreRelations>? load,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (load != null) 'load': load.map((e) => e.name).toList()
+        });
+}
+
+/// StoreRelations
 enum StoreRelations { photos, translations }
 
-// StoreFilterables
+/// StoreFilterables
 enum StoreFilterables {
   id,
   name,
@@ -226,7 +284,7 @@ enum StoreFilterables {
   deletedAt
 }
 
-// StoreSortables
+/// StoreSortables
 enum StoreSortables {
   id,
   name,
@@ -239,7 +297,7 @@ enum StoreSortables {
   deletedAt
 }
 
-// StoreSearchables
+/// StoreSearchables
 enum StoreSearchables {
   id,
   name,
@@ -252,7 +310,7 @@ enum StoreSearchables {
   deletedAt
 }
 
-// StoreFields
+/// StoreFields
 enum StoreFields {
   id,
   name,
@@ -265,12 +323,12 @@ enum StoreFields {
   deletedAt
 }
 
-// StoreTranslatables
+/// StoreTranslatables
 // no fields
-// StoreAuthCredentials
+/// StoreAuthCredentials
 // no fields
-// PaginatedStore
-class PaginatedStore extends PaginatedModel {
+/// PaginatedStore
+class PaginatedStore extends PaginatedModel<Store> {
   PaginatedStore({required this.data, required this.meta});
 
   final List<Store> data;
@@ -284,3 +342,6 @@ class PaginatedStore extends PaginatedModel {
     );
   }
 }
+
+/// StoreExtentions
+extension StoreExtensions on Store {}

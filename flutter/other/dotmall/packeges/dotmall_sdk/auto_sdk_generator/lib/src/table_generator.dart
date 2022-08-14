@@ -23,6 +23,7 @@ class TableAnnotationGenerator extends GeneratorForAnnotation<Table> {
     element.visitChildren(visitor);
     // table field from annotation and its optionald
     var table = annotation.objectValue.getField('table')?.toStringValue();
+    var semantics = annotation.objectValue.getField('semantics');
     var scope = annotation.objectValue.getField('scope')?.toStringValue();
     var auth = annotation.objectValue.getField('auth')?.toBoolValue() ?? false;
     var useTranslations =
@@ -168,6 +169,258 @@ class TableAnnotationGenerator extends GeneratorForAnnotation<Table> {
 
     // createTranslations()
 
+//     var listRequestFunctionType = '''
+// typedef ${className}ListRequestFunctionType =
+// ''';
+
+    var modelListOptions = Class((c) => c
+      ..name = '${className}ListOptions'
+      ..extend = refer('RequestOptions')
+      // copyWith()
+//       ..methods.add(Method((m) => m
+//         ..name = 'copyWith'
+//         ..returns = refer('${className}ListOptions')
+//         ..requiredParameters.addAll([
+//           if (modelRelations != null)
+//             Parameter((p) => p
+//               ..name = 'load'
+//               ..named = true
+//               ..type = refer('List<${className}Relations>?')),
+//           // page defaults to 1
+//           Parameter((p) => p
+//             ..name = 'page'
+//             ..named = true
+//             ..type = refer('int?')
+//             ..defaultTo = Code('1')),
+//           //limit defaults to 24
+//           Parameter((p) => p
+//             ..name = 'limit'
+//             ..named = true
+//             ..type = refer('int?')
+//             ..defaultTo = Code('24')),
+//           // sort is enum of ${className}Sortables
+//           if (modelSortables != null)
+//             Parameter((p) => p
+//               ..name = 'sort'
+//               ..named = true
+//               ..type = refer('${className}Sortables?')),
+//           // order is enum of Order
+//           if (modelSortables != null)
+//             Parameter((p) => p
+//               ..name = 'order'
+//               ..named = true
+//               ..type = refer('SortOrder?')),
+//           // search is a string
+//           if (modelSearchables != null)
+//             Parameter((p) => p
+//               ..name = 'search'
+//               ..named = true
+//               ..type = refer('String?')),
+//           // searchIn is enum of ${className}Searchables
+//           if (modelSearchables != null)
+//             Parameter((p) => p
+//               ..name = 'searchIn'
+//               ..named = true
+//               ..type = refer('${className}Searchables?')),
+//           // where is a map of ${className}Field enum to value
+//           if (modelFilterables != null)
+//             Parameter((p) => p
+//               ..name = 'where'
+//               ..named = true
+//               ..type = refer('Map<${className}Fields, String>?')),
+//           Parameter((p) => p
+//             ..name = 'queryParameters'
+//             ..named = true
+//             ..type = refer('Map<String, dynamic>?')),
+//           Parameter((p) => p
+//             ..name = 'cancelToken'
+//             ..named = true
+//             ..toSuper = true),
+//           Parameter((p) => p
+//             ..name = 'data'
+//             ..named = true
+//             ..toSuper = true),
+//           Parameter((p) => p
+//             ..name = 'onReceiveProgress'
+//             ..named = true
+//             ..toSuper = true),
+//           Parameter((p) => p
+//             ..name = 'onSendProgress'
+//             ..named = true
+//             ..toSuper = true),
+//           Parameter((p) => p
+//             ..name = 'options'
+//             ..named = true
+//             ..toSuper = true),
+//         ])
+//         ..body = Code('''
+// return ${className}ListOptions(
+//   search: search ?? this.search,
+//   sort: sort ?? this.sort,
+//   filter: filter ?? this.filter,
+//   translatable: translatable ?? this.translatable,
+//   page: page ?? this.page,
+//   perPage: perPage ?? this.perPage,
+// );
+// ''')))
+      ..constructors.add(Constructor((c) => c
+        ..initializers.add(Code('''
+super(queryParameters: {
+    ...?queryParameters,
+                if (page != null) 'page': page.toString(),
+                if (limit != null) 'limit': limit.toString(),
+                ${modelSearchables != null ? "if (sort != null) 'sort': sort.name," : ""}
+                ${modelSearchables != null ? "if (order != null) 'order': order.name," : ""}
+                ${modelSearchables != null ? "if (search != null) 'search': search," : ""}
+                ${modelSearchables != null ? "if (searchIn != null) 'searchIn': searchIn.name," : ""}
+                // [where] is a map of [${className}Fields] and [String], it should convert to a map of [String] and [String].
+                ${modelFilterables != null ? "if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v))," : ""}
+                ${modelRelations != null ? "if (load != null) 'load': load.map((e) => e.name).toList()" : ""}
+        })
+'''))
+        ..optionalParameters.addAll([
+          if (modelRelations != null)
+            Parameter((p) => p
+              ..name = 'load'
+              ..named = true
+              ..type = refer('List<${className}Relations>?')),
+          // page defaults to 1
+          Parameter((p) => p
+            ..name = 'page'
+            ..named = true
+            ..type = refer('int?')
+            ..defaultTo = Code('1')),
+          //limit defaults to 24
+          Parameter((p) => p
+            ..name = 'limit'
+            ..named = true
+            ..type = refer('int?')
+            ..defaultTo = Code('24')),
+          // sort is enum of ${className}Sortables
+          if (modelSortables != null)
+            Parameter((p) => p
+              ..name = 'sort'
+              ..named = true
+              ..type = refer('${className}Sortables?')),
+          // order is enum of Order
+          if (modelSortables != null)
+            Parameter((p) => p
+              ..name = 'order'
+              ..named = true
+              ..type = refer('SortOrder?')),
+          // search is a string
+          if (modelSearchables != null)
+            Parameter((p) => p
+              ..name = 'search'
+              ..named = true
+              ..type = refer('String?')),
+          // searchIn is enum of ${className}Searchables
+          if (modelSearchables != null)
+            Parameter((p) => p
+              ..name = 'searchIn'
+              ..named = true
+              ..type = refer('${className}Searchables?')),
+          // where is a map of ${className}Field enum to value
+          if (modelFilterables != null)
+            Parameter((p) => p
+              ..name = 'where'
+              ..named = true
+              ..type = refer('Map<${className}Fields, String>?')),
+          Parameter((p) => p
+            ..name = 'queryParameters'
+            ..named = true
+            ..type = refer('Map<String, dynamic>?')),
+          Parameter((p) => p
+            ..name = 'cancelToken'
+            ..named = true
+            ..toSuper = true),
+          Parameter((p) => p
+            ..name = 'data'
+            ..named = true
+            ..toSuper = true),
+          Parameter((p) => p
+            ..name = 'onReceiveProgress'
+            ..named = true
+            ..toSuper = true),
+          Parameter((p) => p
+            ..name = 'onSendProgress'
+            ..named = true
+            ..toSuper = true),
+          Parameter((p) => p
+            ..name = 'options'
+            ..named = true
+            ..toSuper = true),
+        ]))));
+
+    var modelFindOptions = Class((c) => c
+      ..name = '${className}FindOptions'
+      ..extend = refer('RequestOptions')
+      ..constructors.add(Constructor((c) => c
+        ..initializers.add(Code('''
+super(queryParameters: {
+    ...?queryParameters,
+                ${modelRelations != null ? "if (load != null) 'load': load.map((e) => e.name).toList()" : ""}
+        })
+'''))
+        ..optionalParameters.addAll([
+          if (modelRelations != null)
+            Parameter((p) => p
+              ..name = 'load'
+              ..named = true
+              ..type = refer('List<${className}Relations>?')),
+          Parameter((p) => p
+            ..name = 'queryParameters'
+            ..named = true
+            ..type = refer('Map<String, dynamic>?')),
+          Parameter((p) => p
+            ..name = 'cancelToken'
+            ..named = true
+            ..toSuper = true),
+          Parameter((p) => p
+            ..name = 'data'
+            ..named = true
+            ..toSuper = true),
+          Parameter((p) => p
+            ..name = 'onReceiveProgress'
+            ..named = true
+            ..toSuper = true),
+          Parameter((p) => p
+            ..name = 'onSendProgress'
+            ..named = true
+            ..toSuper = true),
+          Parameter((p) => p
+            ..name = 'options'
+            ..named = true
+            ..toSuper = true),
+        ]))));
+
+    var modelExtentions = Extension((e) => e
+      ..name = '${className}Extensions'
+      ..on = refer(className)
+      ..methods.addAll([
+//         Method((m) => m
+//           ..name = 'semantics'
+//           ..returns = refer('SemanticCardMetaData')
+//           ..body = Code('''
+// return SemanticCardMetaData<${semantics?.getField("title")?.toTypeValue() ?? 'String?'},${semantics?.getField("subtitle")?.toTypeValue() ?? 'String?'},File?>(
+//   title: ${semantics?.getField("title")?.toStringValue()},
+//   subtitle: ${semantics?.getField("subtitle")?.toStringValue()},
+//   image: ${(() {
+//             var imageField = semantics?.getField("image")?.toStringValue();
+//             if (imageField == null) {
+//               return 'null';
+//             }
+//             if (imageField.indexOf('[0]') == 1) {
+//               var field = imageField.replaceAll('[0]', '');
+//               return '$field != null && $field.isNotEmpty ? $imageField : null';
+//             } else {
+//               return imageField;
+//             }
+//           }())},
+//   );
+// ''')),
+      ]));
+
     var collectionClass = Class((c) => c
       ..name = pluralClassName
       ..extend = auth
@@ -198,10 +451,50 @@ class TableAnnotationGenerator extends GeneratorForAnnotation<Table> {
           ..type = refer('String')),
       ])
       ..methods.addAll([
+        Method((m) => m
+          ..name = 'semanticsOf'
+          ..requiredParameters.addAll([
+            Parameter((p) => p
+              ..name = 'model'
+              ..type = refer('${className}')),
+          ])
+          ..returns = refer('SemanticCardMetaData')
+          ..body = Code('''
+return SemanticCardMetaData<${semantics?.getField("title")?.toTypeValue() ?? 'String?'},${semantics?.getField("subtitle")?.toTypeValue() ?? 'String?'},File?>(
+  title: ${semantics?.getField("title")?.toStringValue() != null ? "model.${semantics?.getField("title")?.toStringValue()}" : null},
+  subtitle: ${semantics?.getField("subtitle")?.toStringValue() != null ? "model.${semantics?.getField("subtitle")?.toStringValue()}" : null},
+  image: ${(() {
+            var imageField = semantics?.getField("image")?.toStringValue();
+            if (imageField == null) {
+              return 'null';
+            }
+            if (imageField.indexOf('[0]') != -1) {
+              var field = imageField.replaceAll('[0]', '');
+              return 'model.$field != null && model.$field.isNotEmpty ? model.$imageField : null';
+            } else {
+              return "model.$imageField";
+            }
+          }())},
+  );
+''')),
+
+        // paginatedModelFromJson
+        Method((m) => m
+          ..annotations.add(refer('override'))
+          ..name = 'paginatedModelFromMap'
+          ..requiredParameters.addAll([
+            Parameter((p) => p
+              ..name = 'map'
+              ..type = refer('Map<String, dynamic>')),
+          ])
+          ..returns = refer('PaginatedModel<${className}>')
+          ..body = Code('''
+return Paginated$className.fromMap(map);
+''')),
         // copyWith
         Method((m) => m
           ..name = 'copyWith'
-          ..returns = refer('${pluralClassName}')
+          ..returns = refer(pluralClassName)
           ..optionalParameters.addAll([
             Parameter((p) => p
               ..name = 'manager'
@@ -217,7 +510,7 @@ return ${pluralClassName}(
 //withConfigs
         Method((m) => m
           ..name = 'copyWithConfigs'
-          ..returns = refer('${pluralClassName}')
+          ..returns = refer(pluralClassName)
           ..requiredParameters.addAll([
             Parameter((p) => p
               ..name = 'configs'
@@ -504,7 +797,7 @@ return ${pluralClassName}(this.manager.copyWith(configs:configs));
                   if (hasMany.length > 0) {
                     init += '''
                            "${key.snakeCase}": [for (var item in ${className.toLowerCase()}.${key.camelCase}  ?? [])
-                             item$nullableMark.modelToMap()],
+                             item$nullableMark.toMap()],
                         ''';
                   } else if (hasOne.length > 0) {
                     init += '''
@@ -933,7 +1226,7 @@ return ${pluralClassName}(this.manager.copyWith(configs:configs));
     var paginatedModel = Class(
       (c) => c
         ..name = 'Paginated$className'
-        ..extend = refer('PaginatedModel')
+        ..extend = refer('PaginatedModel<$className>')
         ..constructors.add(
           Constructor((c) => c
             ..optionalParameters.addAll([
@@ -987,24 +1280,30 @@ return ${pluralClassName}(this.manager.copyWith(configs:configs));
     );
     var buffer = StringBuffer();
     buffer.writeln('''
-      // ${pluralize(className).pascalCase}
+      /// ${pluralize(className).pascalCase}
       ${DartFormatter().format('${collectionClass.accept(DartEmitter())}')}
-      // ${className}Relations
+      /// ${className}ListOptions
+      ${DartFormatter().format('${modelListOptions.accept(DartEmitter())}')}
+      /// ${className}FindOptions
+      ${DartFormatter().format('${modelFindOptions.accept(DartEmitter())}')}
+      /// ${className}Relations
       ${modelRelations != null ? DartFormatter().format('${modelRelations.accept(DartEmitter())}') : "// no relations"}
-      // ${className}Filterables
+      /// ${className}Filterables
       ${modelFilterables != null ? DartFormatter().format('${modelFilterables.accept(DartEmitter())}') : "// no filterable fields"}
-      // ${className}Sortables
+      /// ${className}Sortables
       ${modelSortables != null ? DartFormatter().format('${modelSortables.accept(DartEmitter())}') : "// no sortable fields"}
-      // ${className}Searchables
+      /// ${className}Searchables
       ${modelSearchables != null ? DartFormatter().format('${modelSearchables.accept(DartEmitter())}') : "// no searchable fields"}
-      // ${className}Fields
+      /// ${className}Fields
       ${modelFields != null ? DartFormatter().format('${modelFields.accept(DartEmitter())}') : "// no fields"}
-      // ${className}Translatables
+      /// ${className}Translatables
       ${modelTranslatables != null ? DartFormatter().format('${modelTranslatables.accept(DartEmitter())}') : "// no fields"}
-      // ${className}AuthCredentials
+      /// ${className}AuthCredentials
       ${modelAuthCredentials != null ? DartFormatter().format('${modelAuthCredentials.accept(DartEmitter())}') : "// no fields"}
-      // Paginated${className}
+      /// Paginated${className}
       ${DartFormatter().format('${paginatedModel.accept(DartEmitter())}')}
+      /// ${className}Extentions
+      ${DartFormatter().format('${modelExtentions.accept(DartEmitter())}')}
       ''');
 
     return buffer.toString();

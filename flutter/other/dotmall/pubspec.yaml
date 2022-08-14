@@ -21,6 +21,7 @@ dependencies:
   shared_preferences: ^2.0.15
   animations: ^2.0.3
   dio: ^4.0.6
+  dio_cache_interceptor: ^3.3.0
   equatable: ^2.0.3
   routemaster: ^1.0.1
   hive: ^2.2.3

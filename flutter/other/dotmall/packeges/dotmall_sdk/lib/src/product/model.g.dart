@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// Products
+/// Products
 class Products extends Collection<Product> {
   Products(this.manager);
 
@@ -15,6 +15,19 @@ class Products extends Collection<Product> {
   final String table = "products";
 
   final String scope = "products";
+
+  SemanticCardMetaData semanticsOf(Product model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<Product> paginatedModelFromMap(Map<String, dynamic> map) {
+    return PaginatedProduct.fromMap(map);
+  }
 
   Products copyWith({Manager? manager}) {
     return Products(manager ?? this.manager);
@@ -70,9 +83,9 @@ class Products extends Collection<Product> {
       "updated_at": product.updatedAt,
       "deleted_at": product.deletedAt,
       "validated_at": product.validatedAt,
-      "photos": [for (var item in product.photos ?? []) item.modelToMap()],
+      "photos": [for (var item in product.photos ?? []) item.toMap()],
       "translations": [
-        for (var item in product.translations ?? []) item.modelToMap()
+        for (var item in product.translations ?? []) item.toMap()
       ],
     };
   }
@@ -258,10 +271,57 @@ class Products extends Collection<Product> {
   }
 }
 
-// ProductRelations
+/// ProductListOptions
+class ProductListOptions extends RequestOptions {
+  ProductListOptions(
+      {List<ProductRelations>? load,
+      int? page = 1,
+      int? limit = 24,
+      ProductSortables? sort,
+      SortOrder? order,
+      String? search,
+      ProductSearchables? searchIn,
+      Map<ProductFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [ProductFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+          if (load != null) 'load': load.map((e) => e.name).toList()
+        });
+}
+
+/// ProductFindOptions
+class ProductFindOptions extends RequestOptions {
+  ProductFindOptions(
+      {List<ProductRelations>? load,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (load != null) 'load': load.map((e) => e.name).toList()
+        });
+}
+
+/// ProductRelations
 enum ProductRelations { photos, translations }
 
-// ProductFilterables
+/// ProductFilterables
 enum ProductFilterables {
   id,
   name,
@@ -282,7 +342,7 @@ enum ProductFilterables {
   validatedAt
 }
 
-// ProductSortables
+/// ProductSortables
 enum ProductSortables {
   id,
   name,
@@ -303,7 +363,7 @@ enum ProductSortables {
   validatedAt
 }
 
-// ProductSearchables
+/// ProductSearchables
 enum ProductSearchables {
   id,
   name,
@@ -324,7 +384,7 @@ enum ProductSearchables {
   validatedAt
 }
 
-// ProductFields
+/// ProductFields
 enum ProductFields {
   id,
   name,
@@ -345,12 +405,12 @@ enum ProductFields {
   validatedAt
 }
 
-// ProductTranslatables
+/// ProductTranslatables
 // no fields
-// ProductAuthCredentials
+/// ProductAuthCredentials
 // no fields
-// PaginatedProduct
-class PaginatedProduct extends PaginatedModel {
+/// PaginatedProduct
+class PaginatedProduct extends PaginatedModel<Product> {
   PaginatedProduct({required this.data, required this.meta});
 
   final List<Product> data;
@@ -364,3 +424,6 @@ class PaginatedProduct extends PaginatedModel {
     );
   }
 }
+
+/// ProductExtentions
+extension ProductExtensions on Product {}

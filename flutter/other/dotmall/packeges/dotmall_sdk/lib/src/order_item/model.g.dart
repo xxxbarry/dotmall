@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// OrderItems
+/// OrderItems
 class OrderItems extends Collection<OrderItem> {
   OrderItems(this.manager);
 
@@ -15,6 +15,19 @@ class OrderItems extends Collection<OrderItem> {
   final String table = "order_items";
 
   final String scope = "order_items";
+
+  SemanticCardMetaData semanticsOf(OrderItem model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<OrderItem> paginatedModelFromMap(Map<String, dynamic> map) {
+    return PaginatedOrderItem.fromMap(map);
+  }
 
   OrderItems copyWith({Manager? manager}) {
     return OrderItems(manager ?? this.manager);
@@ -171,26 +184,69 @@ class OrderItems extends Collection<OrderItem> {
   }
 }
 
-// OrderItemRelations
+/// OrderItemListOptions
+class OrderItemListOptions extends RequestOptions {
+  OrderItemListOptions(
+      {int? page = 1,
+      int? limit = 24,
+      OrderItemSortables? sort,
+      SortOrder? order,
+      String? search,
+      OrderItemSearchables? searchIn,
+      Map<OrderItemFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [OrderItemFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+        });
+}
+
+/// OrderItemFindOptions
+class OrderItemFindOptions extends RequestOptions {
+  OrderItemFindOptions(
+      {Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+        });
+}
+
+/// OrderItemRelations
 // no relations
-// OrderItemFilterables
+/// OrderItemFilterables
 enum OrderItemFilterables { id, orderId, productId, quantity, price }
 
-// OrderItemSortables
+/// OrderItemSortables
 enum OrderItemSortables { id, orderId, productId, quantity, price }
 
-// OrderItemSearchables
+/// OrderItemSearchables
 enum OrderItemSearchables { id, orderId, productId, quantity, price }
 
-// OrderItemFields
+/// OrderItemFields
 enum OrderItemFields { id, orderId, productId, quantity, price }
 
-// OrderItemTranslatables
+/// OrderItemTranslatables
 // no fields
-// OrderItemAuthCredentials
+/// OrderItemAuthCredentials
 // no fields
-// PaginatedOrderItem
-class PaginatedOrderItem extends PaginatedModel {
+/// PaginatedOrderItem
+class PaginatedOrderItem extends PaginatedModel<OrderItem> {
   PaginatedOrderItem({required this.data, required this.meta});
 
   final List<OrderItem> data;
@@ -204,3 +260,6 @@ class PaginatedOrderItem extends PaginatedModel {
     );
   }
 }
+
+/// OrderItemExtentions
+extension OrderItemExtensions on OrderItem {}

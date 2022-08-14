@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// Phones
+/// Phones
 class Phones extends Collection<Phone> {
   Phones(this.manager);
 
@@ -15,6 +15,19 @@ class Phones extends Collection<Phone> {
   final String table = "phones";
 
   final String scope = "phones";
+
+  SemanticCardMetaData semanticsOf(Phone model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<Phone> paginatedModelFromMap(Map<String, dynamic> map) {
+    return PaginatedPhone.fromMap(map);
+  }
 
   Phones copyWith({Manager? manager}) {
     return Phones(manager ?? this.manager);
@@ -159,26 +172,69 @@ class Phones extends Collection<Phone> {
   }
 }
 
-// PhoneRelations
+/// PhoneListOptions
+class PhoneListOptions extends RequestOptions {
+  PhoneListOptions(
+      {int? page = 1,
+      int? limit = 24,
+      PhoneSortables? sort,
+      SortOrder? order,
+      String? search,
+      PhoneSearchables? searchIn,
+      Map<PhoneFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [PhoneFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+        });
+}
+
+/// PhoneFindOptions
+class PhoneFindOptions extends RequestOptions {
+  PhoneFindOptions(
+      {Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+        });
+}
+
+/// PhoneRelations
 // no relations
-// PhoneFilterables
+/// PhoneFilterables
 enum PhoneFilterables { id, value, createdAt, updatedAt }
 
-// PhoneSortables
+/// PhoneSortables
 enum PhoneSortables { id, value, createdAt, updatedAt }
 
-// PhoneSearchables
+/// PhoneSearchables
 enum PhoneSearchables { id, value, createdAt, updatedAt }
 
-// PhoneFields
+/// PhoneFields
 enum PhoneFields { id, value, createdAt, updatedAt }
 
-// PhoneTranslatables
+/// PhoneTranslatables
 // no fields
-// PhoneAuthCredentials
+/// PhoneAuthCredentials
 // no fields
-// PaginatedPhone
-class PaginatedPhone extends PaginatedModel {
+/// PaginatedPhone
+class PaginatedPhone extends PaginatedModel<Phone> {
   PaginatedPhone({required this.data, required this.meta});
 
   final List<Phone> data;
@@ -192,3 +248,6 @@ class PaginatedPhone extends PaginatedModel {
     );
   }
 }
+
+/// PhoneExtentions
+extension PhoneExtensions on Phone {}

@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// Orders
+/// Orders
 class Orders extends Collection<Order> {
   Orders(this.manager);
 
@@ -15,6 +15,19 @@ class Orders extends Collection<Order> {
   final String table = "orders";
 
   final String scope = "orders";
+
+  SemanticCardMetaData semanticsOf(Order model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<Order> paginatedModelFromMap(Map<String, dynamic> map) {
+    return PaginatedOrder.fromMap(map);
+  }
 
   Orders copyWith({Manager? manager}) {
     return Orders(manager ?? this.manager);
@@ -54,9 +67,7 @@ class Orders extends Collection<Order> {
       "validated_at": order.validatedAt,
       "deleted_at": order.deletedAt,
       "closed_at": order.closedAt,
-      "order_items": [
-        for (var item in order.orderItems ?? []) item?.modelToMap()
-      ],
+      "order_items": [for (var item in order.orderItems ?? []) item?.toMap()],
       "address": order.address?.toMap(),
       "customer_profile": order.customerProfile?.toMap(),
     };
@@ -213,10 +224,57 @@ class Orders extends Collection<Order> {
   }
 }
 
-// OrderRelations
+/// OrderListOptions
+class OrderListOptions extends RequestOptions {
+  OrderListOptions(
+      {List<OrderRelations>? load,
+      int? page = 1,
+      int? limit = 24,
+      OrderSortables? sort,
+      SortOrder? order,
+      String? search,
+      OrderSearchables? searchIn,
+      Map<OrderFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [OrderFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+          if (load != null) 'load': load.map((e) => e.name).toList()
+        });
+}
+
+/// OrderFindOptions
+class OrderFindOptions extends RequestOptions {
+  OrderFindOptions(
+      {List<OrderRelations>? load,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (load != null) 'load': load.map((e) => e.name).toList()
+        });
+}
+
+/// OrderRelations
 enum OrderRelations { orderItems, address, customerProfile }
 
-// OrderFilterables
+/// OrderFilterables
 enum OrderFilterables {
   id,
   addressId,
@@ -229,7 +287,7 @@ enum OrderFilterables {
   closedAt
 }
 
-// OrderSortables
+/// OrderSortables
 enum OrderSortables {
   id,
   addressId,
@@ -242,7 +300,7 @@ enum OrderSortables {
   closedAt
 }
 
-// OrderSearchables
+/// OrderSearchables
 enum OrderSearchables {
   id,
   addressId,
@@ -255,7 +313,7 @@ enum OrderSearchables {
   closedAt
 }
 
-// OrderFields
+/// OrderFields
 enum OrderFields {
   id,
   addressId,
@@ -268,12 +326,12 @@ enum OrderFields {
   closedAt
 }
 
-// OrderTranslatables
+/// OrderTranslatables
 // no fields
-// OrderAuthCredentials
+/// OrderAuthCredentials
 // no fields
-// PaginatedOrder
-class PaginatedOrder extends PaginatedModel {
+/// PaginatedOrder
+class PaginatedOrder extends PaginatedModel<Order> {
   PaginatedOrder({required this.data, required this.meta});
 
   final List<Order> data;
@@ -287,3 +345,6 @@ class PaginatedOrder extends PaginatedModel {
     );
   }
 }
+
+/// OrderExtentions
+extension OrderExtensions on Order {}

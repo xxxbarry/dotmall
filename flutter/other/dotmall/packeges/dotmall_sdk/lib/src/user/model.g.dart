@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// Users
+/// Users
 class Users extends AuthCollection<User, UserAuthCredentials> {
   Users(this.manager);
 
@@ -15,6 +15,20 @@ class Users extends AuthCollection<User, UserAuthCredentials> {
   final String table = "users";
 
   final String scope = "users";
+
+  @override
+  SemanticCardMetaData semanticsOf(Model model) {
+    return SemanticCardMetaData(
+      title: "null",
+      subtitle: "null",
+      image: "null",
+    );
+  }
+
+  @override
+  PaginatedModel<User> paginatedModelFromMap(Map<String, dynamic> map) {
+    return PaginatedUser.fromMap(map);
+  }
 
   Users copyWith({Manager? manager}) {
     return Users(manager ?? this.manager);
@@ -87,9 +101,9 @@ class Users extends AuthCollection<User, UserAuthCredentials> {
       "password": user.password,
       "created_at": user.createdAt,
       "updated_at": user.updatedAt,
-      "accounts": [for (var item in user.accounts ?? []) item.modelToMap()],
-      "emails": [for (var item in user.emails ?? []) item.modelToMap()],
-      "phones": [for (var item in user.phones ?? []) item.modelToMap()],
+      "accounts": [for (var item in user.accounts ?? []) item.toMap()],
+      "emails": [for (var item in user.emails ?? []) item.toMap()],
+      "phones": [for (var item in user.phones ?? []) item.toMap()],
     };
   }
 
@@ -217,30 +231,77 @@ class Users extends AuthCollection<User, UserAuthCredentials> {
   }
 }
 
-// UserRelations
+/// UserListOptions
+class UserListOptions extends RequestOptions {
+  UserListOptions(
+      {List<UserRelations>? load,
+      int? page = 1,
+      int? limit = 24,
+      UserSortables? sort,
+      SortOrder? order,
+      String? search,
+      UserSearchables? searchIn,
+      Map<UserFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [UserFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+          if (load != null) 'load': load.map((e) => e.name).toList()
+        });
+}
+
+/// UserFindOptions
+class UserFindOptions extends RequestOptions {
+  UserFindOptions(
+      {List<UserRelations>? load,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (load != null) 'load': load.map((e) => e.name).toList()
+        });
+}
+
+/// UserRelations
 enum UserRelations { accounts, emails, phones }
 
-// UserFilterables
+/// UserFilterables
 enum UserFilterables { id, password, createdAt, updatedAt }
 
-// UserSortables
+/// UserSortables
 enum UserSortables { id, password, createdAt, updatedAt }
 
-// UserSearchables
+/// UserSearchables
 enum UserSearchables { id, password, createdAt, updatedAt }
 
-// UserFields
+/// UserFields
 enum UserFields { id, password, createdAt, updatedAt }
 
-// UserTranslatables
+/// UserTranslatables
 // no fields
-// UserAuthCredentials
+/// UserAuthCredentials
 class UserAuthCredentials extends AuthCredentials<String, String> {
   const UserAuthCredentials({required super.username, required super.password});
 }
 
-// PaginatedUser
-class PaginatedUser extends PaginatedModel {
+/// PaginatedUser
+class PaginatedUser extends PaginatedModel<User> {
   PaginatedUser({required this.data, required this.meta});
 
   final List<User> data;
@@ -254,3 +315,6 @@ class PaginatedUser extends PaginatedModel {
     );
   }
 }
+
+/// UserExtentions
+extension UserExtensions on User {}

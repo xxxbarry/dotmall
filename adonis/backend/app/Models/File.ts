@@ -24,6 +24,9 @@ export default class File extends DotBaseModel {
   @column()
   public mime: string|null
 
+  @column()
+  public user_id: string
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
@@ -82,6 +85,7 @@ export default class File extends DotBaseModel {
       id: fileId,
       path: path,
       name: fileUploadData.name,
+      user_id: fileUploadData.user_id,
     }) as T
     await Database
       .table('files_pivot')
@@ -111,11 +115,13 @@ export default class File extends DotBaseModel {
     file: MultipartFileContract,
     deleteOld?: boolean,
     tag: string,
+    user_id: string,
   }): Promise<T> {
     var file = await File.uploadAndCreate<T>({
       multipartFile: options.file,
       tag: options.tag,
       relatedId: options.related_id,
+      user_id: options.user_id,
     })
     if (options.deleteOld && file) {
       var files_pivot = await Database
@@ -137,6 +143,7 @@ class _FileUploadData  {
   relatedId?: string
   relatedType?:typeof DotBaseModel|string
   tag?: string|null
+  user_id: string
 }
 export class Image extends File {
   public static table = 'files'

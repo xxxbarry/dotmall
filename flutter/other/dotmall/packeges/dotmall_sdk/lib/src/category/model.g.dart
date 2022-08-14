@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// Categories
+/// Categories
 class Categories extends Collection<Category> {
   Categories(this.manager);
 
@@ -15,6 +15,21 @@ class Categories extends Collection<Category> {
   final String table = "categories";
 
   final String scope = "categories";
+
+  SemanticCardMetaData semanticsOf(Category model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: model.name,
+      subtitle: model.description,
+      image: model.photos != null && model.photos.isNotEmpty
+          ? model.photos[0]
+          : null,
+    );
+  }
+
+  @override
+  PaginatedModel<Category> paginatedModelFromMap(Map<String, dynamic> map) {
+    return PaginatedCategory.fromMap(map);
+  }
 
   Categories copyWith({Manager? manager}) {
     return Categories(manager ?? this.manager);
@@ -44,9 +59,9 @@ class Categories extends Collection<Category> {
       "name": category.name,
       "description": category.description,
       "slug": category.slug,
-      "photos": [for (var item in category.photos ?? []) item.modelToMap()],
+      "photos": [for (var item in category.photos ?? []) item.toMap()],
       "translations": [
-        for (var item in category.translations ?? []) item.modelToMap()
+        for (var item in category.translations ?? []) item.toMap()
       ],
     };
   }
@@ -180,27 +195,74 @@ class Categories extends Collection<Category> {
   }
 }
 
-// CategoryRelations
+/// CategoryListOptions
+class CategoryListOptions extends RequestOptions {
+  CategoryListOptions(
+      {List<CategoryRelations>? load,
+      int? page = 1,
+      int? limit = 24,
+      CategorySortables? sort,
+      SortOrder? order,
+      String? search,
+      CategorySearchables? searchIn,
+      Map<CategoryFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [CategoryFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+          if (load != null) 'load': load.map((e) => e.name).toList()
+        });
+}
+
+/// CategoryFindOptions
+class CategoryFindOptions extends RequestOptions {
+  CategoryFindOptions(
+      {List<CategoryRelations>? load,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (load != null) 'load': load.map((e) => e.name).toList()
+        });
+}
+
+/// CategoryRelations
 enum CategoryRelations { photos, translations }
 
-// CategoryFilterables
+/// CategoryFilterables
 enum CategoryFilterables { id, name, description, slug }
 
-// CategorySortables
+/// CategorySortables
 enum CategorySortables { id, name, description, slug }
 
-// CategorySearchables
+/// CategorySearchables
 enum CategorySearchables { id, name, description, slug }
 
-// CategoryFields
+/// CategoryFields
 enum CategoryFields { id, name, description, slug }
 
-// CategoryTranslatables
+/// CategoryTranslatables
 // no fields
-// CategoryAuthCredentials
+/// CategoryAuthCredentials
 // no fields
-// PaginatedCategory
-class PaginatedCategory extends PaginatedModel {
+/// PaginatedCategory
+class PaginatedCategory extends PaginatedModel<Category> {
   PaginatedCategory({required this.data, required this.meta});
 
   final List<Category> data;
@@ -214,3 +276,6 @@ class PaginatedCategory extends PaginatedModel {
     );
   }
 }
+
+/// CategoryExtentions
+extension CategoryExtensions on Category {}

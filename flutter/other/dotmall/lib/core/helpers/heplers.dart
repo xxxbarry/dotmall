@@ -2,8 +2,6 @@
 // ValidationExceptionMixin
 import 'package:dotmall_sdk/dotmall_sdk.dart';
 
-import '../bloc/auth_bloc.dart';
-
 class Matcher {
   // read<Status>
   static T? read<T>(dynamic state) {
@@ -28,4 +26,7 @@ extension MatcherMixin on Object {
 // add extention to String to return null if empty
 extension StringExtension on String {
   String? get realValue => isEmpty ? null : this;
+  String? clipAt(int? max) => isNotEmpty && max != null && length > max
+      ? substring(0, max) + ".."
+      : this;
 }

@@ -8,7 +8,7 @@ import '../../app/app.dart';
 import '../../core/widgets/widgets.dart';
 import '../../start/bloc/start_bloc.dart';
 import '../bloc/auth_bloc.dart';
-import '../helpers/heplers.dart';
+import '../../core/helpers/heplers.dart';
 
 class AuthView extends StatefulWidget {
   const AuthView({Key? key}) : super(key: key);

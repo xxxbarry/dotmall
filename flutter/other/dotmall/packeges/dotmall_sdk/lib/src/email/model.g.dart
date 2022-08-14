@@ -6,7 +6,7 @@ part of 'model.dart';
 // TableAnnotationGenerator
 // **************************************************************************
 
-// Emails
+/// Emails
 class Emails extends Collection<Email> {
   Emails(this.manager);
 
@@ -15,6 +15,19 @@ class Emails extends Collection<Email> {
   final String table = "emails";
 
   final String scope = "emails";
+
+  SemanticCardMetaData semanticsOf(Email model) {
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
+    );
+  }
+
+  @override
+  PaginatedModel<Email> paginatedModelFromMap(Map<String, dynamic> map) {
+    return PaginatedEmail.fromMap(map);
+  }
 
   Emails copyWith({Manager? manager}) {
     return Emails(manager ?? this.manager);
@@ -167,26 +180,69 @@ class Emails extends Collection<Email> {
   }
 }
 
-// EmailRelations
+/// EmailListOptions
+class EmailListOptions extends RequestOptions {
+  EmailListOptions(
+      {int? page = 1,
+      int? limit = 24,
+      EmailSortables? sort,
+      SortOrder? order,
+      String? search,
+      EmailSearchables? searchIn,
+      Map<EmailFields, String>? where,
+      Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+          if (page != null) 'page': page.toString(),
+          if (limit != null) 'limit': limit.toString(),
+          if (sort != null) 'sort': sort.name,
+          if (order != null) 'order': order.name,
+          if (search != null) 'search': search,
+          if (searchIn != null) 'searchIn': searchIn.name,
+          // [where] is a map of [EmailFields] and [String], it should convert to a map of [String] and [String].
+          if (where != null) 'where': where.map((k, v) => MapEntry(k.name, v)),
+        });
+}
+
+/// EmailFindOptions
+class EmailFindOptions extends RequestOptions {
+  EmailFindOptions(
+      {Map<String, dynamic>? queryParameters,
+      super.cancelToken,
+      super.data,
+      super.onReceiveProgress,
+      super.onSendProgress,
+      super.options})
+      : super(queryParameters: {
+          ...?queryParameters,
+        });
+}
+
+/// EmailRelations
 // no relations
-// EmailFilterables
+/// EmailFilterables
 enum EmailFilterables { id, value, createdAt, updatedAt }
 
-// EmailSortables
+/// EmailSortables
 enum EmailSortables { id, value, createdAt, updatedAt }
 
-// EmailSearchables
+/// EmailSearchables
 enum EmailSearchables { id, value, createdAt, updatedAt }
 
-// EmailFields
+/// EmailFields
 enum EmailFields { id, value, createdAt, updatedAt }
 
-// EmailTranslatables
+/// EmailTranslatables
 // no fields
-// EmailAuthCredentials
+/// EmailAuthCredentials
 // no fields
-// PaginatedEmail
-class PaginatedEmail extends PaginatedModel {
+/// PaginatedEmail
+class PaginatedEmail extends PaginatedModel<Email> {
   PaginatedEmail({required this.data, required this.meta});
 
   final List<Email> data;
@@ -200,3 +256,6 @@ class PaginatedEmail extends PaginatedModel {
     );
   }
 }
+
+/// EmailExtentions
+extension EmailExtensions on Email {}

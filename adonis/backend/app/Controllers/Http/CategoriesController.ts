@@ -3,6 +3,7 @@ import { CreateCategoryValidator, DestroyCategoryValidator, ListCategoriesValida
 import File, { Image } from 'App/Models/File'
 import { ModelObject } from '@ioc:Adonis/Lucid/Orm';
 import Category from 'App/Models/Category';
+import authConfig from 'Config/auth';
 
 export default class CategoriesController {
   /**
@@ -20,9 +21,6 @@ export default class CategoriesController {
     const payload = await request.validate(ListCategoriesValidator)
     await bouncer.with('CategoryPolicy').authorize('viewList', payload)
     var categoriesQuery = Category.query()
-    var page = 1
-    var limit = 24
-
     if (payload.search) {
       for (let i = 0; i < payload.search_in!.length; i++) {
         const element = payload.search_in![i];
@@ -46,10 +44,10 @@ export default class CategoriesController {
         categoriesQuery = categoriesQuery.where(key, payload.where[key])
       }
     }
-    page = payload.page || page
-    limit = payload.limit || limit
+    var page = payload.page || 1
+    var limit =Math.min(payload.limit ?? 24, 24)
 
-    return (await categoriesQuery.paginate(page, Math.min(limit, 24))).toJSON()
+    return (await categoriesQuery.paginate(page,limit )).toJSON()
   }
 
   /**
@@ -60,8 +58,8 @@ export default class CategoriesController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Category", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/categories
    */
-  public async store({ request, bouncer }: HttpContextContract) {
-
+  public async store({ request, bouncer, auth }: HttpContextContract) {
+    await auth.authenticate()
     await bouncer.with('CategoryPolicy').authorize('create', null)
     const payload = await request.validate(CreateCategoryValidator)
     const category = await Category.create({
@@ -74,6 +72,7 @@ export default class CategoriesController {
         related_id: category.id,
         file: payload.photo,
         tag: 'categories:photo',
+        user_id: auth.user!.id,
       })
     }
     return {
@@ -115,8 +114,9 @@ export default class CategoriesController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Category", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/categories/1
    */
-  public async update({ request, bouncer }: HttpContextContract): Promise<any> {
+  public async update({ request, bouncer,auth }: HttpContextContract): Promise<any> {
     // validate also params.id
+    await auth.authenticate()
     const payload = await request.validate(UpdateCategoryValidator)
     const category = (await Category.find(payload.params.id))!
     await bouncer.with('CategoryPolicy').authorize('update', category)
@@ -130,6 +130,7 @@ export default class CategoriesController {
         file: payload.photo,
         deleteOld: true,
         tag: 'categories:photo',
+        user_id: auth.user!.id,
       })
     }
     return {

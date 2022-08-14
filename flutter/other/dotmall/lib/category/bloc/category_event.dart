@@ -10,11 +10,14 @@ abstract class CategoryEvent extends Equatable {
 // loading
 class CategoryLoadingEvent extends CategoryEvent {}
 
-class CategoryLoadEvent extends CategoryEvent {}
+class CategoryLoadEvent extends CategoryEvent {
+  final CategoryListOptions? options;
+  CategoryLoadEvent({this.options});
+}
 
 class CategoryLoadedEvent extends CategoryEvent {
-  final PaginatedCategory categories;
-  CategoryLoadedEvent(this.categories);
+  final PaginatedCategory response;
+  CategoryLoadedEvent(this.response);
   @override
-  List<Object> get props => [categories];
+  List<Object> get props => [response];
 }
