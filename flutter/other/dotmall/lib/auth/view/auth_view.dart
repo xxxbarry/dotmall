@@ -6,7 +6,6 @@ import 'package:routemaster/routemaster.dart';
 
 import '../../app/app.dart';
 import '../../core/widgets/widgets.dart';
-import '../../start/bloc/start_bloc.dart';
 import '../bloc/auth_bloc.dart';
 import '../../core/helpers/heplers.dart';
 
@@ -98,13 +97,11 @@ class _AuthViewState extends State<AuthView> with AuthMixin<AuthView> {
                                   ),
                                 ),
                                 FormElementBox(
-                                  child: BlocBuilder<StartBloc, StartState>(
+                                  child: BlocBuilder<AuthBloc, AuthState>(
                                     builder: (context, state) {
                                       return OutlinedButton.icon(
                                         onPressed: () async {
-                                          context
-                                              .read<StartBloc>()
-                                              .add(StartRequestEvent());
+                                          context.read<AuthBloc>();
                                           // var data = await manager.categories.create(
                                           //   options: CollectionPostOptions(
                                           //     data: FormData.fromMap(

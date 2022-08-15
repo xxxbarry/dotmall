@@ -7,7 +7,14 @@ import '../file/model.dart';
 
 part 'model.g.dart';
 
-@Table(useTranslations: true)
+@Table(
+  useTranslations: true,
+  semantics: SemanticCardMetaData(
+    title: 'name',
+    subtitle: 'description',
+    image: 'photos[0]',
+  ),
+)
 class Section extends Model {
   @Column.primary()
   final String id;

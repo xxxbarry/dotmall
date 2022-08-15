@@ -13,10 +13,11 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   // repository
-  final AuthRepository<Users> repository;
+  AuthRepository<Users> repository =
+      AuthRepository<Users>(collection: Users(Manager(Configs())));
   final AuthCacheRepository cachRepository = AuthCacheRepository();
 
-  AuthBloc(this.repository) : super(AuthEmptyState()) {
+  AuthBloc() : super(AuthEmptyState()) {
     on<AuthSigninEvent>(_onAuthSignin);
     on<AuthSignResponseEvent>(_onAuthSignResponse);
     on<AuthEmptyEvent>(_onAuthEmpty);

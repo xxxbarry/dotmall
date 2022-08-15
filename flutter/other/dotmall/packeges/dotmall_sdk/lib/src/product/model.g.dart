@@ -18,9 +18,11 @@ class Products extends Collection<Product> {
 
   SemanticCardMetaData semanticsOf(Product model) {
     return SemanticCardMetaData<String?, String?, File?>(
-      title: null,
-      subtitle: null,
-      image: null,
+      title: model.name,
+      subtitle: model.description,
+      image: model.photos != null && model.photos.isNotEmpty
+          ? model.photos[0]
+          : null,
     );
   }
 

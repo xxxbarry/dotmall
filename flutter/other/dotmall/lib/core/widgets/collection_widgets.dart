@@ -40,7 +40,6 @@ class CollectionPanel<C extends Collection, M extends Model>
 
   final double? mainAxisSizeItemSize;
   final double? crossAxisSizeItemSize;
-  final Axis cardDirection;
   final ListViewMode mode;
   final int gridCount;
 
@@ -49,8 +48,8 @@ class CollectionPanel<C extends Collection, M extends Model>
       bodyBuilder;
   final Widget Function(BuildContext context, CollectionPanel<C, M> panel)?
       headBuilder;
-  final Widget Function(
-      BuildContext context, CollectionPanel<C, M> panel, M? model)? itemBuilder;
+  final Widget Function(BuildContext context, CollectionPanel<C, M> panel,
+      M? model, _CollectionPanelState<C, M> state)? itemBuilder;
   final void Function(List<M> selections, M model)? onItemPressed;
 
   const CollectionPanel({
@@ -61,7 +60,6 @@ class CollectionPanel<C extends Collection, M extends Model>
     this.headBuilder,
     this.bodyBuilder,
     this.itemBuilder,
-    this.cardDirection = Axis.horizontal,
     this.scrollable = true,
     this.mode = ListViewMode.grid,
     this.gridCount = 2,
@@ -88,19 +86,47 @@ class _CollectionPanelState<C extends Collection, M extends Model>
     super.initState();
   }
 
-  Future<void> _showMessage(String message) async {
+  Future<void> _showMessage(String message, {Function? refresh}) async {
     await showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('حدثت مشكلة'),
-          content: Text(message),
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodyText2,
+          ),
           actions: <Widget>[
-            OutlinedButton(
-              child: Text('حسنا'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+            SizedBox(
+              width: double.infinity,
+              child: Column(
+                children: [
+                  if (refresh != null)
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        icon: Icon(FluentIcons.arrow_clockwise_12_regular),
+                        label: Text('أعد المحاولة'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          refresh?.call();
+                        },
+                      ),
+                    ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      child: Text('حسنا'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         );
@@ -109,10 +135,11 @@ class _CollectionPanelState<C extends Collection, M extends Model>
   }
 
   Future<void> _list() async {
-    if (_listLoading) {
+    if (_listLoading || !mounted) {
       return;
     }
     setState(() {
+      _listError = false;
       _listLoading = true;
     });
     try {
@@ -127,14 +154,20 @@ class _CollectionPanelState<C extends Collection, M extends Model>
       _responses.add(parsedRespose as PaginatedModel<M>);
       setState(() {});
     } on ValidationException catch (e) {
+      _listError = true;
       widget.handlers.onListValidationException(e);
-      _showMessage("حدثت مشكلة أثناء تحميل البيانات");
+      _showMessage("حدثت مشكلة أثناء تحميل البيانات", refresh: _list);
     } on DioError catch (e) {
+      _listError = true;
       widget.handlers.onListDioError(e);
-      _showMessage(e.toString());
+      var errorMessage = e.error.toString().contains(".message")
+          ? e.error.toString().split(".").first
+          : e.error.toString();
+      _showMessage(errorMessage, refresh: _list);
     } catch (e) {
+      _listError = true;
       widget.handlers.onListError(e);
-      _showMessage(e.toString());
+      _showMessage(e.toString(), refresh: _list);
     }
     setState(() {
       widget.handlers.onListSetState(context);
@@ -144,23 +177,32 @@ class _CollectionPanelState<C extends Collection, M extends Model>
 
   var _requestOptions = ListRequestOptions();
   var _listLoading = false;
+  var _listError = false;
+  bool get _listLoadMoreError => _listError || items.isEmpty;
   bool get _hasMore =>
       _responses.isNotEmpty &&
       _responses.last.meta.currentPage < _responses.last.meta.lastPage;
-  List<M> _selections = [];
-  Widget _itemBuilder(
-      BuildContext context, CollectionPanel<C, M> panel, M? model) {
+  List<M> selections = [];
+  Widget _itemBuilder(BuildContext context, CollectionPanel<C, M> panel,
+      M? model, _CollectionPanelState<C, M> state) {
     if (panel.itemBuilder != null) {
-      return panel.itemBuilder!(context, panel, model);
+      return panel.itemBuilder!(context, panel, model, this);
     }
     return SemanticCard(
+      selected: selections.contains(model),
       model == null ? null : widget.collection.semanticsOf(model),
       onPressed: () {
-        if (model != null) widget.onItemPressed?.call(_selections, model);
+        if (model != null)
+          setState(() {
+            widget.onItemPressed?.call(selections, model);
+          });
       },
       style: SemanticCardStyle(direction: panel.scrollDirection),
     );
   }
+
+  bool get _showPlaceholder =>
+      (items.isEmpty && _listLoading) || _listLoading || _hasMore;
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +239,7 @@ class _CollectionPanelState<C extends Collection, M extends Model>
                     height: 30,
                     child: TextButton(
                       onPressed: () {},
-                      child: Text("المزيد"),
+                      child: Icon(FluentIcons.arrow_clockwise_12_regular),
                     ),
                   ),
                 ),
@@ -219,35 +261,54 @@ class _CollectionPanelState<C extends Collection, M extends Model>
           },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: FlexGrid(
-              direction: widget.scrollDirection,
-              mode: widget.mode,
-              childern: <Widget>[
-                for (var item in items) _itemBuilder(context, widget, item),
-                if ((items.isEmpty && _listLoading) || _listLoading || _hasMore)
-                  for (var i in List.generate(
-                      _hasMore ? widget.gridCount : 24, (index) => null))
-                    _itemBuilder(context, widget, null),
-              ],
-              margin: const EdgeInsets.all(4),
-              count: widget.gridCount,
-            ),
+            child: _listError && items.isEmpty
+                ? Container(
+                    constraints: BoxConstraints(minHeight: 80),
+                    padding: EdgeInsets.all(12),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'حدثت مشكلة أثناء تحميل البيانات',
+                          style:
+                              Theme.of(context).textTheme.bodyText2!.copyWith(
+                                    color: Colors.grey,
+                                  ),
+                        ),
+                        SizedBox(height: 8),
+                        OutlinedButton(
+                          child: Text('أعد المحاولة'),
+                          onPressed: _list,
+                        ),
+                      ],
+                    ),
+                  )
+                : FlexGrid(
+                    direction: widget.scrollDirection,
+                    mode: widget.mode,
+                    childern: <Widget>[
+                      for (var item in items)
+                        _itemBuilder(context, widget, item, this),
+                      if (_showPlaceholder)
+                        for (var i in List.generate(
+                            _hasMore ? widget.gridCount : 24, (index) => null))
+                          _itemBuilder(context, widget, null, this),
+
+                      // TODO: implement refresh load more
+                      if (_listLoadMoreError)
+                        OutlinedButton(
+                          child: Text('أعد المحاولة'),
+                          onPressed: _list,
+                        ),
+                    ],
+                    margin: const EdgeInsets.all(4),
+                    count: widget.gridCount,
+                  ),
           ),
         )
       ],
     );
-  }
-
-  double? _widthSize() {
-    return (widget.cardDirection ?? widget.scrollDirection) == Axis.vertical
-        ? widget.crossAxisSizeItemSize
-        : widget.mainAxisSizeItemSize;
-  }
-
-  double? _heightSize() {
-    return (widget.cardDirection ?? widget.scrollDirection) == Axis.horizontal
-        ? widget.crossAxisSizeItemSize
-        : widget.mainAxisSizeItemSize;
   }
 }
 
@@ -368,116 +429,152 @@ class SemanticCard<T extends Model> extends StatelessWidget {
   final SemanticCardMetaData? semantic;
   final SemanticCardStyle? style;
   final VoidCallback? onPressed;
+  final bool selected;
+  final bool disabled;
   const SemanticCard(
     this.semantic, {
     super.key,
     this.style,
     this.onPressed,
+    this.selected = false,
+    this.disabled = false,
   });
 
   @override
   Widget build(BuildContext context) {
     var image = semantic?.image as File?;
     var _direction = style?.direction ?? Axis.horizontal;
-    return Container(
-      padding: const EdgeInsets.all(4),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 100),
       decoration: style?.decoration ??
           BoxDecoration(
-            color: Colors.white,
+            color: selected
+                ? Theme.of(context).primaryColor.withOpacity(0.2)
+                : Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
                 color: semantic == null
                     ? Colors.transparent
-                    : Colors.grey.withOpacity(0.3),
+                    : (selected
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey.withOpacity(0.3)),
                 width: 1),
           ),
-      child: Flex(
-        direction: style?.direction ?? Axis.horizontal,
-        mainAxisAlignment: style?.mainAxisAlignment ?? MainAxisAlignment.center,
-        crossAxisAlignment: style?.crossAxisAlignment ??
-            (_direction == Axis.horizontal
-                ? CrossAxisAlignment.center
-                : CrossAxisAlignment.start),
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (style?.showLeading ?? true)
-            SizedBox(
-              width: style?.leadingWidth ?? 45,
-              height: style?.leadingHeight ?? 45,
-              child: AspectRatio(
-                aspectRatio: style?.leadingAspectRatio ?? 1,
-                child: Container(
-                  margin: const EdgeInsets.all(4),
-                  decoration:
-                      ((semantic == null ? null : style?.leadingDecoration) ??
-                              BoxDecoration(
-                                color: Colors.grey.withOpacity(0.2),
-                                borderRadius:
-                                    style?.leadingDecoration?.borderRadius ??
-                                        BorderRadius.circular(8),
-                              ))
-                          .copyWith(
-                    image: image != null
-                        ? DecorationImage(
-                            image: NetworkImage(Configs().makeUrl(image.path)),
-                            fit: BoxFit.cover,
+      child: TextButton(
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.all(0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        onPressed: onPressed,
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Flex(
+            direction: style?.direction ?? Axis.horizontal,
+            mainAxisAlignment:
+                style?.mainAxisAlignment ?? MainAxisAlignment.center,
+            crossAxisAlignment: style?.crossAxisAlignment ??
+                (_direction == Axis.horizontal
+                    ? CrossAxisAlignment.center
+                    : CrossAxisAlignment.start),
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (style?.showLeading ?? true)
+                Builder(builder: (context) {
+                  Widget _child = Container(
+                    margin: const EdgeInsets.all(4),
+                    decoration:
+                        ((semantic == null ? null : style?.leadingDecoration) ??
+                                BoxDecoration(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  borderRadius:
+                                      style?.leadingDecoration?.borderRadius ??
+                                          BorderRadius.circular(8),
+                                ))
+                            .copyWith(
+                      image: image != null
+                          ? DecorationImage(
+                              image:
+                                  NetworkImage(Configs().makeUrl(image.path)),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                    child: image == null
+                        ? Opacity(
+                            opacity: semantic == null ? 0.2 : 0.5,
+                            child: (style?.icon ??
+                                Center(
+                                  child: Icon(
+                                    FluentIcons.circle_image_20_filled,
+                                    size: 30,
+                                  ),
+                                )),
                           )
                         : null,
-                  ),
-                  child: image == null
-                      ? Opacity(
-                          opacity: semantic == null ? 0.2 : 0.5,
-                          child: (style?.icon ??
-                              Center(
-                                child: Icon(
-                                  FluentIcons.circle_image_20_filled,
-                                  size: 30,
-                                ),
-                              )),
-                        )
-                      : null,
+                  );
+                  if (style?.leadingAspectRatio != null) {
+                    return AspectRatio(
+                      aspectRatio: style!.leadingAspectRatio!,
+                      child: SizedBox(
+                        width: style?.leadingWidth ?? 45,
+                        height: style?.leadingHeight ?? 45,
+                        child: AspectRatio(
+                          aspectRatio: style?.leadingAspectRatio ?? 1,
+                          child: _child,
+                        ),
+                      ),
+                    );
+                  } else {
+                    return SizedBox(
+                      width: style?.leadingWidth ?? 45,
+                      height: style?.leadingHeight ?? 45,
+                      child: _child,
+                    );
+                  }
+                }),
+              Padding(
+                padding: const EdgeInsets.all(4),
+                child: Column(
+                  crossAxisAlignment:
+                      style?.textAlignment ?? CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (style?.showTitle ?? true)
+                      TextPlaceholder(
+                        enabled: semantic == null,
+                        child: Text(
+                          semantic?.title?.clipAt(style?.maxTitleLetters) ?? "",
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context)
+                              .textTheme
+                              .subtitle2!
+                              .copyWith(height: 1.3),
+                          overflow: TextOverflow.fade,
+                          maxLines: 1,
+                          softWrap: false,
+                        ),
+                      ),
+                    if (style?.showSubtitle ?? true)
+                      TextPlaceholder(
+                        width: 50,
+                        enabled: semantic == null,
+                        child: Text(
+                          (semantic?.subtitle?.clipAt(style?.maxTitleLetters) ??
+                              ""),
+                          style: Theme.of(context).textTheme.caption,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          softWrap: true,
+                        ),
+                      ),
+                  ],
                 ),
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(4),
-            child: Column(
-              crossAxisAlignment:
-                  style?.textAlignment ?? CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (style?.showTitle ?? true)
-                  TextPlaceholder(
-                    enabled: semantic == null,
-                    child: Text(
-                      semantic?.title?.clipAt(style?.maxTitleLetters) ?? "",
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context)
-                          .textTheme
-                          .subtitle2!
-                          .copyWith(height: 1.3),
-                      overflow: TextOverflow.fade,
-                      maxLines: 1,
-                      softWrap: false,
-                    ),
-                  ),
-                if (style?.showSubtitle ?? true)
-                  TextPlaceholder(
-                    width: 50,
-                    enabled: semantic == null,
-                    child: Text(
-                      (semantic?.subtitle?.clipAt(style?.maxTitleLetters) ??
-                          ""),
-                      style: Theme.of(context).textTheme.caption,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      softWrap: true,
-                    ),
-                  ),
-              ],
-            ),
-          )
-        ],
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -609,11 +706,11 @@ class _ScrollableAreaState extends State<ScrollableArea> {
   late ScrollController _controller;
   @override
   void initState() {
-    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.onInit?.call();
     });
     _controller = widget.controller ?? ScrollController();
+    super.initState();
   }
 
   @override

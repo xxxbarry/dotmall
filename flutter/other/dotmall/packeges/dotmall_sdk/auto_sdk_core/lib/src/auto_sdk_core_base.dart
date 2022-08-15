@@ -262,6 +262,7 @@ class Configs {
   final String assetsServer;
   final RunMode mode;
   final Languages? language;
+  final Token? token;
   final AuthCollection Function(Manager)? auth;
   const Configs({
     this.prodEndpoint = "http://127.0.0.1:3333/api/v1",
@@ -270,18 +271,21 @@ class Configs {
     this.mode = RunMode.development,
     this.language,
     this.auth,
+    this.token,
   });
 
   Configs copyWith({
     String? prodEndpoint,
     String? devEndpoint,
     RunMode? mode,
+    Token? token,
     Languages? language,
   }) {
     return Configs(
       prodEndpoint: prodEndpoint ?? this.prodEndpoint,
       devEndpoint: devEndpoint ?? this.devEndpoint,
       mode: mode ?? this.mode,
+      token: token ?? this.token,
       language: language ?? this.language,
     );
   }
@@ -291,6 +295,7 @@ class Configs {
       'prodEndpoint': prodEndpoint,
       'devEndpoint': devEndpoint,
       'mode': mode.name,
+      'token': token?.toJson(),
       'language': language?.name,
     };
   }
@@ -300,6 +305,7 @@ class Configs {
       prodEndpoint: map['prodEndpoint'],
       devEndpoint: map['devEndpoint'],
       mode: RunMode.values[map['mode']],
+      token: map['token'] == null ? null : Token.fromMap(map['token']),
       language: Languages.values[map['language']],
     );
   }
@@ -311,7 +317,7 @@ class Configs {
 
   @override
   String toString() {
-    return 'Configs(prodEndpoint: $prodEndpoint, devEndpoint: $devEndpoint, mode: $mode, language: $language)';
+    return 'Configs(prodEndpoint: $prodEndpoint, devEndpoint: $devEndpoint, token: $token, mode: $mode, language: $language)';
   }
 
   @override
@@ -322,6 +328,7 @@ class Configs {
         other.prodEndpoint == prodEndpoint &&
         other.devEndpoint == devEndpoint &&
         other.mode == mode &&
+        other.token == token &&
         other.language == language;
   }
 
@@ -330,6 +337,7 @@ class Configs {
     return prodEndpoint.hashCode ^
         devEndpoint.hashCode ^
         mode.hashCode ^
+        token.hashCode ^
         language.hashCode;
   }
 

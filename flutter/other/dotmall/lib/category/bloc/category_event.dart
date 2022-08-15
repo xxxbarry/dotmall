@@ -15,9 +15,9 @@ class CategoryLoadEvent extends CategoryEvent {
   CategoryLoadEvent({this.options});
 }
 
-class CategoryLoadedEvent extends CategoryEvent {
-  final PaginatedCategory response;
-  CategoryLoadedEvent(this.response);
+class CategoryUpdateConfigsEvent extends CategoryEvent {
+  final Configs configs;
+  CategoryUpdateConfigsEvent(this.configs);
   @override
-  List<Object> get props => [response];
+  List<Object> get props => [configs];
 }

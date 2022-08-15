@@ -1,5 +1,14 @@
-import 'package:dotmall_sdk/dotmall_sdk.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:hive/hive.dart';
+
+import 'package:dotmall_sdk/dotmall_sdk.dart';
+
+class AppRepository {
+  Configs configs;
+  AppRepository(this.configs);
+
+  Manager get manager => Manager(configs);
+}
 
 /// [CachRepository]
 abstract class CachRepository {

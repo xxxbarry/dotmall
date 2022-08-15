@@ -65,7 +65,7 @@ abstract class ModelCard<T extends Model> extends StatelessWidget {
 
   const ModelCard({super.key, this.model});
 }
-
+/*
 class CategoryCollectionBox extends StatefulWidget {
   const CategoryCollectionBox({super.key});
 
@@ -372,3 +372,4 @@ class _CollectionBoxBodyState<T extends Model>
     );
   }
 }
+*/

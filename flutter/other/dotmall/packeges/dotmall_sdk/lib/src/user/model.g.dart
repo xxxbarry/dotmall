@@ -10,18 +10,21 @@ part of 'model.dart';
 class Users extends AuthCollection<User, UserAuthCredentials> {
   Users(this.manager);
 
+  @override
   final Manager manager;
 
+  @override
   final String table = "users";
 
+  @override
   final String scope = "users";
 
   @override
   SemanticCardMetaData semanticsOf(Model model) {
-    return SemanticCardMetaData(
-      title: "null",
-      subtitle: "null",
-      image: "null",
+    return SemanticCardMetaData<String?, String?, File?>(
+      title: null,
+      subtitle: null,
+      image: null,
     );
   }
 
@@ -30,6 +33,7 @@ class Users extends AuthCollection<User, UserAuthCredentials> {
     return PaginatedUser.fromMap(map);
   }
 
+  @override
   Users copyWith({Manager? manager}) {
     return Users(manager ?? this.manager);
   }
@@ -304,8 +308,10 @@ class UserAuthCredentials extends AuthCredentials<String, String> {
 class PaginatedUser extends PaginatedModel<User> {
   PaginatedUser({required this.data, required this.meta});
 
+  @override
   final List<User> data;
 
+  @override
   final PaginationMeta meta;
 
   static PaginatedUser fromMap(Map<String, dynamic> map) {

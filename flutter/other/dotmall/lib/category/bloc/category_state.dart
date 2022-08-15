@@ -9,12 +9,9 @@ abstract class CategoryState extends Equatable {
 
 class CategoryInitial extends CategoryState {}
 
-class CategoryLoadingState extends CategoryState {}
-
-class CategoryLoadedState extends CategoryState {
-  final PaginatedCategory response;
-  CategoryLoadedState(this.response);
-
+class CategoryUpdateConfigsState extends CategoryState {
+  final Configs configs;
+  CategoryUpdateConfigsState(this.configs);
   @override
-  List<Object> get props => [response];
+  List<Object> get props => [configs];
 }

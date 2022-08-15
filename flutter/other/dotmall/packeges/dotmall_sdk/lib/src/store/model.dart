@@ -8,7 +8,14 @@ import '../store_translation/model.dart';
 
 part 'model.g.dart';
 
-@Table(useTranslations: true)
+@Table(
+  useTranslations: true,
+  semantics: SemanticCardMetaData(
+    title: 'name',
+    subtitle: 'description',
+    image: 'photos[0]',
+  ),
+)
 class Store extends Model {
   @Column.primary()
   final String id;

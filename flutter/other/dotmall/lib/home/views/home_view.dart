@@ -36,15 +36,9 @@ class HomeView extends StatelessWidget {
             onPressed: () {},
           ),
         ],
-        // bottom: PreferredSize(
-        //   preferredSize: const Size.fromHeight(40),
-        //   child: CGradientBox(
-        //     enabled: false,
-        //     child:
-        //   ),
-        // ),
       ),
       body: ListView(
+        addAutomaticKeepAlives: true,
         children: [
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -69,41 +63,61 @@ class HomeView extends StatelessWidget {
             ),
           ),
           CollectionPanel<Categories, Category>(
-            collection: context.read<CategoryBloc>().repository,
+            collection: Categories(Manager(context.read<HomeBloc>().configs)),
             handlers: CollectionEventHandlers(),
             scrollDirection: Axis.horizontal,
             scrollable: true,
             gridCount: 1,
             onItemPressed: (List<Model> selections, model) {
+              selections.clear();
               selections.add(model);
             },
-            itemBuilder: (context, panel, model) {
-              return CategoryCard(model: model);
+            itemBuilder: (context, panel, model, state) {
+              return CategoryCard(
+                  selected: false, onPressed: () {}, model: model);
+            },
+          ),
+          CollectionPanel<Stores, Store>(
+            collection: Stores(Manager(context.read<HomeBloc>().configs)),
+            handlers: CollectionEventHandlers(),
+            scrollDirection: Axis.horizontal,
+            scrollable: true,
+            gridCount: 2,
+            onItemPressed: (List<Model> selections, model) {
+              selections.clear();
+              selections.add(model);
             },
           ),
           CollectionPanel<Categories, Category>(
-            collection: context.read<CategoryBloc>().repository,
+            collection: Categories(Manager(context.read<HomeBloc>().configs)),
             handlers: CollectionEventHandlers(),
-            scrollDirection: Axis.horizontal,
-            scrollable: true,
+            scrollDirection: Axis.vertical,
+            scrollable: false,
+            gridCount: 2,
+            itemBuilder: (context, panel, model, state) {
+              return SemanticCard(
+                model == null ? null : panel.collection.semanticsOf(model),
+                onPressed: () {},
+                style: SemanticCardStyle(
+                  leadingAspectRatio: 1,
+                  leadingWidth: double.infinity,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  textAlignment: CrossAxisAlignment.center,
+                  direction: Axis.vertical,
+                ),
+              );
+            },
+          ),
+          CollectionPanel<Categories, Category>(
+            collection: Categories(Manager(context.read<HomeBloc>().configs)),
+            handlers: CollectionEventHandlers(),
+            scrollDirection: Axis.vertical,
+            scrollable: false,
             gridCount: 1,
           ),
           CollectionPanel<Categories, Category>(
-            collection: context.read<CategoryBloc>().repository,
-            handlers: CollectionEventHandlers(),
-            scrollDirection: Axis.horizontal,
-            scrollable: true,
-            gridCount: 1,
-          ),
-          CollectionPanel<Categories, Category>(
-            collection: context.read<CategoryBloc>().repository,
-            handlers: CollectionEventHandlers(),
-            scrollDirection: Axis.horizontal,
-            scrollable: true,
-            gridCount: 1,
-          ),
-          CollectionPanel<Categories, Category>(
-            collection: context.read<CategoryBloc>().repository,
+            collection: Categories(Manager(context.read<HomeBloc>().configs)),
             handlers: CollectionEventHandlers(),
             scrollDirection: Axis.horizontal,
             scrollable: true,
