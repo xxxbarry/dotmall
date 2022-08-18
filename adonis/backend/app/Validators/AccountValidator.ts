@@ -14,7 +14,7 @@ export class CreateAccountValidator extends DotValidator {
     ]),
     name: schema.string.optional(),
     description: schema.string.optional(),
-    type: schema.enum.optional<AccountType[]>(Object.values(AccountType) as AccountType[]),
+    type: schema.enum<AccountType[]>(Object.values(AccountType) as AccountType[]),
     // photo is optional, but if it is provided, it must be a valid image
     photo: schema.file.optional({
       extnames: ['jpg', 'jpeg', 'png', 'gif', 'webp',  'bmp'],

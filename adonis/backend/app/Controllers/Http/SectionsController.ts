@@ -21,7 +21,7 @@ export default class SectionsController {
     await bouncer.with('SectionPolicy').authorize('viewList', payload)
     var sectionsQuery = Section.query()
     var page = 1
-    var limit = 24
+    var limit = 12
 
 
     if (payload.search) {

@@ -73,7 +73,19 @@ class App extends StatelessWidget {
               toolbarTextStyle: TextStyle(),
               iconTheme: IconThemeData(),
             ),
-            primarySwatch: Colors.purple,
+            primarySwatch:
+                MaterialColor(Color.fromARGB(255, 41, 234, 134).value, {
+              50: Color.fromARGB(255, 255, 255, 255),
+              100: Color.fromARGB(255, 255, 255, 255),
+              200: Color.fromARGB(255, 255, 255, 255),
+              300: Color.fromARGB(255, 255, 255, 255),
+              400: Color.fromARGB(255, 255, 255, 255),
+              500: Color.fromARGB(255, 255, 255, 255),
+              600: Color.fromARGB(255, 255, 255, 255),
+              700: Color.fromARGB(255, 255, 255, 255),
+              800: Color.fromARGB(255, 255, 255, 255),
+              900: Color.fromARGB(255, 255, 255, 255),
+            }),
             outlinedButtonTheme: OutlinedButtonThemeData(
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(0, 45),
@@ -92,6 +104,9 @@ class App extends StatelessWidget {
             ),
             elevatedButtonTheme: ElevatedButtonThemeData(
               style: ElevatedButton.styleFrom(
+                shadowColor: Color.fromARGB(255, 58, 229, 158).withOpacity(0.4),
+                elevation: 3,
+                onPrimary: Colors.white,
                 minimumSize: const Size(0, 45),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -109,7 +124,7 @@ class App extends StatelessWidget {
             ),
             buttonTheme: const ButtonThemeData(
               height: 45,
-              buttonColor: Colors.purple,
+              buttonColor: Colors.green,
               textTheme: ButtonTextTheme.primary,
             ),
             textTheme: GoogleFonts.readexProTextTheme(

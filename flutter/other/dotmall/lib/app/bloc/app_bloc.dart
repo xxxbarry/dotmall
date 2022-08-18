@@ -8,8 +8,10 @@ part 'app_event.dart';
 part 'app_state.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
+  final bool authRequired;
   Configs configs;
-  AppBloc({required this.configs}) : super(AppInitial()) {
+  AppBloc({required this.configs, this.authRequired = false})
+      : super(AppInitial()) {
     on<AppConfigsUpdatedEvent>(_onAppConfigsUpdated);
   }
 

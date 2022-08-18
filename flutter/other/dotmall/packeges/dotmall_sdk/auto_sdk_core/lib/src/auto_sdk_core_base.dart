@@ -599,7 +599,7 @@ class ListRequestOptions extends RequestOptions {
   ListRequestOptions(
       {List<String>? load,
       int? page = 1,
-      int? limit = 24,
+      int? limit = 12,
       String? sort,
       SortOrder? order,
       String? search,
@@ -798,7 +798,7 @@ abstract class CollectionTemplate {}
 
 /// [Auth]
 abstract class AuthCollection<M extends Model, T extends AuthCredentials>
-    extends Collection {
+    extends Collection<M> {
   /// [signinR]
   Future<Response<Map<String, dynamic>>> signinR(
       {RequestOptions? options}) async {

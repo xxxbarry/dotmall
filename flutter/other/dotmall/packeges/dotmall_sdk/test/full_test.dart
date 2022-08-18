@@ -16,8 +16,7 @@ void main() {
   group('User', () {
     test('signup', () async {
       try {
-        var response =
-            await Users(manager).signup(credentials: userCredentials);
+        var response = await Users(manager).signup(userCredentials);
         user = response.model;
         token = response.token;
         manager.token = token;

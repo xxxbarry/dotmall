@@ -48,6 +48,12 @@ class AuthSigninEvent<T extends AuthCredentials> extends AuthSignEvent {
   const AuthSigninEvent(this.credentials);
 }
 
+/// [AuthSignupEvent] is the event that is fired when the user signs up.
+class AuthSigupEvent<T extends AuthCredentials> extends AuthSignEvent {
+  final T credentials;
+  const AuthSigupEvent(this.credentials);
+}
+
 /// [AuthSignResponseEvent] is the event that is fired when the user signs in.
 class AuthSignResponseEvent extends AuthSignEvent {
   final AuthResponse response;

@@ -62,8 +62,10 @@ class CategoryCard extends ModelCard<Category> {
                     image: model?.photos.isNotEmpty ?? false
                         ? DecorationImage(
                             image: NetworkImage(
-                                Configs().makeUrl(model!.photos.first.path)),
-                            fit: BoxFit.cover,
+                              Configs().makeUrl(model!.photos.first.path),
+                            ),
+                            fit: BoxFit.fill,
+                            filterQuality: FilterQuality.high,
                           )
                         : null,
                   ),

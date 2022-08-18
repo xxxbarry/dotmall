@@ -19,9 +19,9 @@ export default class StoresController {
   }> {
     const payload = await request.validate(ListStoresValidator)
     await bouncer.with('StorePolicy').authorize('viewList', payload)
-    var storesQuery = Store.query().preload('photo')
+    var storesQuery = Store.query().preload('photos')
     var page = 1
-    var limit = 24
+    var limit = 12
 
 
     if (payload.search) {
@@ -61,7 +61,7 @@ export default class StoresController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Store", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/stores
    */
-  public async store({ request, bouncer }: HttpContextContract) {
+  public async store({ request,auth, bouncer }: HttpContextContract) {
     const payload = await request.validate(CreateStoreValidator)
     await bouncer.with('StorePolicy').authorize('create', payload)
     const store = await Store.create({
@@ -76,6 +76,7 @@ export default class StoresController {
         related_id: store.id,
         file: payload.photo,
         tag: 'stores:photo',
+        user_id: auth.user!.id,
       })
     }
     return {
@@ -103,8 +104,8 @@ export default class StoresController {
         await store!.load(load)
       }
     }
-    if (!payload.load?.includes('photo')) {
-      await store!.load('photo')
+    if (!payload.load?.includes('photos')) {
+      await store!.load('photos')
     }
     return {
       store: store.toJSON(),
@@ -119,7 +120,7 @@ export default class StoresController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Store", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/stores/1
    */
-  public async update({ request, bouncer }: HttpContextContract): Promise<any> {
+  public async update({ request, auth,bouncer }: HttpContextContract): Promise<any> {
     // validate also params.id
     const payload = await request.validate(UpdateStoreValidator)
     const store = (await Store.find(payload.params.id))!
@@ -134,6 +135,7 @@ export default class StoresController {
         file: payload.photo,
         deleteOld: true,
         tag: 'stores:photo',
+        user_id: auth.user!.id,
       })
     }
     return {

@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import Hash from '@ioc:Adonis/Core/Hash'
-import { column, beforeSave, ManyToMany, manyToMany, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+import { column, beforeSave, ManyToMany, manyToMany, hasMany, HasMany, beforeFetch, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
 import Email from './ContactOptions/Email'
 import Phone from './ContactOptions/Phone'
 import DotBaseModel from '../../dot/models/DotBaseModel'
@@ -60,6 +60,11 @@ export default class User extends DotBaseModel {
     }
   }
 
+  // beforeFetch preloads the user's accounts
+  @beforeFetch()
+  public static async preloadAccounts(query: ModelQueryBuilderContract<typeof User>) {
+    await query.preload('accounts')
+  }
 
   // has many through relationship with merchants
   // @hasManyThrough([() => MerchantProfile, () => Account],

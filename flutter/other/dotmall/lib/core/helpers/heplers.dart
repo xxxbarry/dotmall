@@ -18,7 +18,7 @@ class ValidationExceptionState {
 
 // add extention to dynamic variable to find type
 extension MatcherMixin on Object {
-  T? returnAs<T>(dynamic state) {
+  T? asOrNull<T>(dynamic state) {
     return state is T ? state : null;
   }
 }

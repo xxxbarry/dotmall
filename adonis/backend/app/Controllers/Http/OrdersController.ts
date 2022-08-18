@@ -22,7 +22,7 @@ export default class OrdersController {
     await bouncer.with('OrderPolicy').authorize('viewList', payload)
     var ordersQuery = Order.query()
     var page = 1
-    var limit = 24
+    var limit = 12
 
     if (payload.search) {
       for (let i = 0; i < payload.search_in!.length; i++) {

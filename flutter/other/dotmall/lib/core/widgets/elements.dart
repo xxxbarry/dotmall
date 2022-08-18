@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 /// [AppLogo] is a widget that displays the app logo.
 
@@ -19,11 +20,12 @@ class AppLogo extends StatelessWidget {
         height: size,
         width: size,
       );
+  // E:\projects\dotmall\flutter\other\dotmall\assets\images\SVG\logo.svg
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      'assets/images/200w/logo_black.png',
+    return SvgPicture.asset(
+      "assets/images/SVG/logo.svg",
       width: double.infinity,
       height: height,
       fit: BoxFit.contain,
@@ -37,9 +39,11 @@ class SquareProgressIndicator extends StatelessWidget {
     this.size = 50,
     this.angle = -30,
     this.transform,
+    this.color,
     super.key,
   });
 
+  final Color? color;
   final double? value;
   final double size;
   final double angle;
@@ -62,7 +66,7 @@ class SquareProgressIndicator extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: value,
                     minHeight: size / 4,
-                    color: Theme.of(context).primaryColor,
+                    color: color ?? Theme.of(context).primaryColor,
                     backgroundColor: Colors.transparent,
                   ),
                 ),
@@ -80,7 +84,8 @@ class SquareProgressIndicator extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: value,
                       minHeight: size / 4,
-                      color: Theme.of(context).primaryColor.withOpacity(0.3),
+                      color: (color ?? Theme.of(context).primaryColor)
+                          .withOpacity(0.3),
                       backgroundColor: Colors.transparent,
                     ),
                   ),

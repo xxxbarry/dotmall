@@ -43,8 +43,8 @@ class CGradientBox extends StatelessWidget {
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [
-      Color.fromARGB(255, 121, 39, 176),
-      Color.fromARGB(255, 226, 11, 137),
+      Color.fromARGB(255, 171, 255, 103),
+      Color.fromARGB(255, 41, 234, 134),
     ],
   );
   static Color color = Colors.orange;

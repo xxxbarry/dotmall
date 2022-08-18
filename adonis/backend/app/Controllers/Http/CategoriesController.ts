@@ -45,7 +45,7 @@ export default class CategoriesController {
       }
     }
     var page = payload.page || 1
-    var limit =Math.min(payload.limit ?? 24, 24)
+    var limit =Math.min(payload.limit ?? 12, 24)
 
     return (await categoriesQuery.paginate(page,limit )).toJSON()
   }

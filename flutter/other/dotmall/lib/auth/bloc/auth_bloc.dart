@@ -5,6 +5,7 @@ import 'package:dotmall_sdk/dotmall_sdk.dart';
 import 'package:hive/hive.dart';
 import 'package:meta/meta.dart';
 
+import '../../app/app.dart';
 import '../repositories/repositories.dart';
 import 'auth_repository.dart';
 
@@ -19,6 +20,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthBloc() : super(AuthEmptyState()) {
     on<AuthSigninEvent>(_onAuthSignin);
+    on<AuthSigupEvent>(_onAuthSignup);
     on<AuthSignResponseEvent>(_onAuthSignResponse);
     on<AuthEmptyEvent>(_onAuthEmpty);
     on<AuthLoadingCacheEvent>(_onAuthLoadingCache);
@@ -31,6 +33,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   FutureOr<void> _onAuthError(
       AutErrorEvent event, Emitter<AuthState> emit) async {
     emit(AuthErrorState(event.error));
+  }
+
+  /// [_onAuthSignin] is the event that is fired when the user signs in.
+  FutureOr<void> _onAuthSignup(
+      AuthSigupEvent event, Emitter<AuthState> emit) async {
+    emit(AuthLoadingState());
+    try {
+      var response = await repository.collection
+          .signup(event.credentials as UserAuthCredentials);
+      add(AuthResponseEvent(response));
+    } on ValidationException catch (e) {
+      emit(AuthValidationExceptionState(e));
+    } catch (e) {
+      add(AutErrorEvent(e));
+    }
   }
 
   /// [_onAuthSignin] is the event that is fired when the user signs in.

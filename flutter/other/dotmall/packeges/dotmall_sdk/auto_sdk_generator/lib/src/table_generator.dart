@@ -612,12 +612,12 @@ return ${pluralClassName}(this.manager.copyWith(configs:configs));
             ..name = 'signup'
             ..modifier = MethodModifier.async
             ..returns = refer('Future<AuthResponse<$className>>')
-            ..optionalParameters.addAll([
+            ..requiredParameters.addAll([
               Parameter((p) => p
                 ..name = 'credentials'
-                ..required = true
-                ..named = true
                 ..type = refer('${className}AuthCredentials')),
+            ])
+            ..optionalParameters.addAll([
               Parameter((p) => p
                 ..name = 'options'
                 ..named = true

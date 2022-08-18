@@ -21,7 +21,7 @@ export default class MerchantProfilesController {
         await bouncer.with('MerchantPolicy').authorize('viewList', payload)
         var merchantsQuery = MerchantProfile.query()
         var page = 1
-        var limit = 24
+        var limit = 12
 
 
         if (payload.search) {

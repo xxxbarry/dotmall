@@ -18,7 +18,7 @@ export default class SectionTranslationsController {
     await bouncer.with('SectionTranslationPolicy').authorize('viewList', payload)
     var sectionTranslationsQuery = SectionTranslation.query()
     var page = 1
-    var limit = 24
+    var limit = 12
 
     if (payload.search) {
       for (let i = 0; i < payload.search_in!.length; i++) {

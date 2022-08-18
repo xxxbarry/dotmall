@@ -104,7 +104,7 @@ export class ShowProductValidator extends DotValidator {
       ]),
     }),
     load: schema.array.optional().members(
-      schema.enum.optional(["section", "store", "translations", "photo"] as const)
+      schema.enum.optional(["section", "store", "translations", "photos"] as const)
     ),
   })
   public messages = {}
@@ -144,7 +144,6 @@ export class ListProductsValidator extends DotValidator {
     super()
   }
   public schema = schema.create({
-    // query: schema.object().members({
     page: schema.number.optional(),
     limit: schema.number.optional([
       rules.range(1, 24),
@@ -175,7 +174,7 @@ export class ListProductsValidator extends DotValidator {
       ] as const)
     ),
     load: schema.array.optional().members(
-      schema.enum.optional(["section", "store", "translations", "photo"] as const)
+      schema.enum.optional(["section", "store", "translations", "photos"] as const)
     ),
     where: schema.object.optional().members({
       name: schema.string.optional(),

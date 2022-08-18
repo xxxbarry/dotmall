@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:dotmall_sdk/dotmall_sdk.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +7,7 @@ import '../../category/bloc/category_bloc.dart';
 import '../../category/widgets/widgets.dart';
 import '../../core/repositories/repositories.dart';
 import '../../core/widgets/collection_widgets.dart';
+import '../../core/widgets/elements.dart';
 import '../../core/widgets/widgets.dart';
 import '../../l10n/l10n.dart';
 import '../bloc/home_bloc.dart';
@@ -18,8 +17,8 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final prooductsPanelController =
-        StreamController<CollectionPanelEvent>.broadcast();
+    final ScrollController _scrollController = ScrollController();
+    var read = BlocProvider.of<HomeBloc>(context).state;
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
@@ -39,10 +38,8 @@ class HomeView extends StatelessWidget {
           ),
         ],
       ),
-      body: ScrollableArea(
-        onEnd: (metrics) async {
-          prooductsPanelController.add(CollectionPanelLoadMoreEvent());
-        },
+      body: SingleChildScrollView(
+        controller: _scrollController,
         child: Column(
           children: [
             Container(
@@ -94,9 +91,9 @@ class HomeView extends StatelessWidget {
                 selections.add(model);
               },
             ),
-            CollectionPanel<Products, Product>(
-              controller: prooductsPanelController,
-              collection: Products(Manager(context.read<HomeBloc>().configs)),
+            CollectionPanel<Categories, Category>(
+              scrollController: _scrollController,
+              collection: Categories(Manager(context.read<HomeBloc>().configs)),
               handlers: CollectionEventHandlers(),
               scrollDirection: Axis.vertical,
               scrollable: false,
@@ -116,7 +113,39 @@ class HomeView extends StatelessWidget {
                 );
               },
             ),
-            const SizedBox(height: 50),
+            CollectionPanel<Categories, Category>(
+              collection: Categories(Manager(context.read<HomeBloc>().configs)),
+              handlers: CollectionEventHandlers(),
+              scrollDirection: Axis.vertical,
+              scrollable: false,
+              gridCount: 1,
+              itemBuilder: (context, panel, model, state) {
+                return SemanticCard(
+                  model == null ? null : panel.collection.semanticsOf(model),
+                  onPressed: () {},
+                  style: SemanticCardStyle(
+                    leadingWidth: 50,
+                    leadingHeight: 50,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    textAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
+                    direction: Axis.horizontal,
+                  ),
+                );
+              },
+            ),
+            CollectionPanel<Categories, Category>(
+              collection: Categories(Manager(context.read<HomeBloc>().configs)),
+              handlers: CollectionEventHandlers(),
+              scrollDirection: Axis.horizontal,
+              scrollable: true,
+              gridCount: 1,
+            ),
+            const SizedBox(height: 250),
+            // Lineire progress indicator
+            SizedBox(
+                height: 40, child: Center(child: SquareProgressIndicator())),
           ],
         ),
       ),

@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { beforeFetch, BelongsTo, belongsTo, column, hasMany, HasMany, hasOne, HasOne, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
+import { beforeFetch, BelongsTo, belongsTo, column, hasMany, HasMany, hasOne, HasOne, ManyToMany, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
 import DotBaseModel from '../../../../../dot/models/DotBaseModel'
 import ProductTranslation from '../../../translations/ProductTranslation'
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
@@ -8,6 +8,8 @@ import { Image } from 'App/Models/File'
 import Store from './Store'
 import Section from './Section'
 import Price from 'App/Models/Price'
+import Account from 'App/Models/Account'
+import { usePivot } from 'Dot/hooks/orm'
 
 export default class Product extends DotBaseModel {
 
@@ -74,35 +76,14 @@ export default class Product extends DotBaseModel {
   @belongsTo(() => Section)
   public section: BelongsTo<typeof Section>
 
-  @hasOne(() => Image, { foreignKey: "relatedId",
-    onQuery: (builder) => {
-      builder.where('related_type', 'categories:photo')
-    }
-  })
-  public photo: HasOne<typeof Image>
+
+  @usePivot(() => Image)
+  public photos: ManyToMany<typeof Image>
+
   // load photo after fetch
   @beforeFetch()
-  public static async loadPhoto(query: ModelQueryBuilderContract<typeof Category>) {
+  public static async loadPhoto(query: ModelQueryBuilderContract<typeof Account>) {
     query.preload('photos')
-  }
-
-  /**
-   * set photo from MultipartFile
-   * @param {MultipartFileContract} image
-   * @param {boolean} [deleteOld=false]
-   * @returns {Promise<Image>}
-   */
-  public async setPhoto(image: MultipartFileContract, deleteOld: boolean = true): Promise<Image> {
-    var currentPhoto = await Image.query().where('related_type', 'products:photo').where('related_id', this.id).first()
-    var photo = await Image.uploadAndCreate<Image>({
-      multipartFile: image,
-      relatedId: this.id,
-      relatedType: Category,
-    })
-    if (deleteOld && photo && currentPhoto) {
-      await currentPhoto.delete()
-    }
-    return photo
   }
 }
 

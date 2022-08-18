@@ -21,7 +21,7 @@ export default class AddressesController {
     await bouncer.with('AddressPolicy').authorize('viewList', payload)
     var addressesQuery = Address.query()
     var page = 1
-    var limit = 24
+    var limit = 12
 
     if (payload.search) {
       for (let i = 0; i < payload.search_in!.length; i++) {

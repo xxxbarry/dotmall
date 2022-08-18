@@ -74,7 +74,7 @@ export class ShowStoreValidator extends DotValidator {
         "address",
         "email",
         "phone",
-        "photo",
+        "photos",
         "merchant",
         "translations",] as const)
     ),
@@ -136,7 +136,7 @@ export class ListStoresValidator extends DotValidator {
           "address",
           "email",
           "phone",
-          "photo",
+          "photos",
           "merchant",
         "translations"] as const)
       ),

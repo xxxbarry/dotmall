@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import {  afterDelete, beforeFetch, belongsTo, BelongsTo, column, hasMany, HasMany, hasOne, HasOne, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
+import {  afterDelete, beforeFetch, belongsTo, BelongsTo, column, hasMany, HasMany, hasOne, HasOne, ManyToMany, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
 import Product from './Product'
 import Section from './Section'
 import Order from './Order'
@@ -11,6 +11,7 @@ import MerchantProfile from '../../profiles/MerchantProfile'
 import DotBaseModel from '../../../../../dot/models/DotBaseModel'
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
 import StoreTranslation from 'App/Models/translations/StoreTranslation'
+import { usePivot } from 'Dot/hooks/orm'
 export enum StoreStatus {
   panding = 0,
   active = 1,
@@ -81,14 +82,16 @@ export default class Store extends DotBaseModel {
   public phone: HasOne<typeof Phone>
 
 
-  @hasOne(() => Image, {
-    foreignKey: "relatedId",
-    onQuery: (builder) => {
-      builder.where('related_type', 'stores:photo')
-    }
-  })
-  public photo: HasOne<typeof Image>
+  // @hasOne(() => Image, {
+  //   foreignKey: "relatedId",
+  //   onQuery: (builder) => {
+  //     builder.where('related_type', 'stores:photo')
+  //   }
+  // })
+  // public photo: HasOne<typeof Image>
 
+  @usePivot(() => Image)
+  public photos: ManyToMany<typeof Image>
   // belongs to
 
   @belongsTo(() => MerchantProfile)
@@ -100,10 +103,10 @@ export default class Store extends DotBaseModel {
 
 
   // load photo after fetch
-  // @beforeFetch()
-  // public static async loadPhoto(query: ModelQueryBuilderContract<typeof Store>) {
-  //   query.preload('photo')
-  // }
+  @beforeFetch()
+  public static async loadPhoto(query: ModelQueryBuilderContract<typeof Store>) {
+    query.preload('photos')
+  }
 
 
   // before delete, delete photo
@@ -114,23 +117,4 @@ export default class Store extends DotBaseModel {
       await photo.delete()
     }
   }
-  /**
-   * set photo from MultipartFile
-   * @param {MultipartFileContract} image
-   * @param {boolean} [deleteOld=false]
-   * @returns {Promise<Image>}
-   */
-  public async setPhoto(image: MultipartFileContract, deleteOld: boolean = true): Promise<Image> {
-    var currentPhoto = await Image.query().where('related_type', 'stores:photo').where('related_id', this.id).first()
-    var photo = await Image.uploadAndCreate<Image>({
-      multipartFile: image,
-      relatedId: this.id,
-      relatedType: `${Store.table}:photo`,
-    })
-    if (deleteOld && photo && currentPhoto) {
-      await currentPhoto.delete()
-    }
-    return photo
-  }
-
 }

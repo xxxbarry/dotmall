@@ -11,7 +11,6 @@ import 'package:flutter/widgets.dart';
 
 import 'package:dotmall_sdk/dotmall_sdk.dart';
 
-import '../../category/widgets/widgets.dart';
 import '../../core/helpers/heplers.dart';
 import 'gradient_box.dart';
 import 'widgets.dart';
@@ -20,6 +19,31 @@ enum ListViewMode {
   list,
   grid,
   slides,
+}
+
+class CollectionPanelEvent {}
+
+/// CollectionPanelListEventsq
+class CollectionPanelLoadListEvent extends CollectionPanelEvent {
+  final ListRequestOptions? options;
+  CollectionPanelLoadListEvent([this.options]);
+}
+
+///CollectionPanelLoadMoreEvent
+class CollectionPanelLoadMoreEvent extends CollectionPanelEvent {
+  final ListRequestOptions? options;
+  CollectionPanelLoadMoreEvent([this.options]);
+}
+
+/// CollectionPanelCancelEvent
+class CollectionPanelCancelEvent extends CollectionPanelEvent {
+  CollectionPanelCancelEvent();
+}
+
+/// [CollectionPanelController] is a controller for [CollectionPanel] widget.
+/// It is used to control the [CollectionPanel] widget.
+class CollectionPanelController extends ValueNotifier<CollectionPanelEvent?> {
+  CollectionPanelController(super.value);
 }
 
 /// [CollectionPanel] is a [StatefulWidget] designed to display a list of items from the
@@ -51,7 +75,8 @@ class CollectionPanel<C extends Collection, M extends Model>
   final Widget Function(BuildContext context, CollectionPanel<C, M> panel,
       M? model, _CollectionPanelState<C, M> state)? itemBuilder;
   final void Function(List<M> selections, M model)? onItemPressed;
-
+  final ScrollController? scrollController;
+  final StreamController<CollectionPanelEvent>? controller;
   const CollectionPanel({
     super.key,
     required this.collection,
@@ -67,6 +92,8 @@ class CollectionPanel<C extends Collection, M extends Model>
     this.mainAxisSizeItemSize,
     this.crossAxisSizeItemSize,
     this.onItemPressed,
+    this.scrollController,
+    this.controller,
   });
 
   @override
@@ -75,6 +102,8 @@ class CollectionPanel<C extends Collection, M extends Model>
 
 class _CollectionPanelState<C extends Collection, M extends Model>
     extends State<CollectionPanel<C, M>> {
+  late final StreamController<CollectionPanelEvent> controller;
+  final CancelToken cancelToken = CancelToken();
   final _responses = <PaginatedModel<M>>[];
 
   List<M> get items => _responses.isEmpty
@@ -82,8 +111,32 @@ class _CollectionPanelState<C extends Collection, M extends Model>
       : _responses.fold(<M>[], (items, response) => items + response.data);
 
   @override
+  void dispose() {
+    controller.close();
+    super.dispose();
+  }
+
+  @override
   void initState() {
+    controller =
+        widget.controller ?? StreamController<CollectionPanelEvent>.broadcast();
+    controller.stream.listen((event) {
+      if (event is CollectionPanelLoadListEvent) {
+        _listLoad(event.options);
+      } else if (event is CollectionPanelLoadMoreEvent) {
+        _listLoadMore(event.options);
+      } else if (event is CollectionPanelCancelEvent) {
+        _cancel();
+      }
+    });
     super.initState();
+  }
+
+  // _cancel
+  void _cancel() {
+    setState(() {
+      cancelToken.cancel();
+    });
   }
 
   Future<void> _showMessage(String message, {Function? refresh}) async {
@@ -134,7 +187,8 @@ class _CollectionPanelState<C extends Collection, M extends Model>
     );
   }
 
-  Future<void> _list() async {
+  Future<void> _listLoad([ListRequestOptions? requestOptions]) async {
+    requestOptions = requestOptions ?? _requestOptions;
     if (_listLoading || !mounted) {
       return;
     }
@@ -147,7 +201,7 @@ class _CollectionPanelState<C extends Collection, M extends Model>
       widget.handlers.onListLoading(cancelToken);
       await Future.delayed(Duration(milliseconds: 1500));
       var response = await widget.collection
-          .listR(options: _requestOptions.copyWith(cancelToken: cancelToken));
+          .listR(options: requestOptions.copyWith(cancelToken: cancelToken));
       var parsedRespose =
           widget.collection.paginatedModelFromMap(response.data!);
       widget.handlers.onListLoaded(parsedRespose);
@@ -156,23 +210,33 @@ class _CollectionPanelState<C extends Collection, M extends Model>
     } on ValidationException catch (e) {
       _listError = true;
       widget.handlers.onListValidationException(e);
-      _showMessage("حدثت مشكلة أثناء تحميل البيانات", refresh: _list);
+      _showMessage("حدثت مشكلة أثناء تحميل البيانات", refresh: _listLoad);
     } on DioError catch (e) {
       _listError = true;
       widget.handlers.onListDioError(e);
       var errorMessage = e.error.toString().contains(".message")
           ? e.error.toString().split(".").first
           : e.error.toString();
-      _showMessage(errorMessage, refresh: _list);
+      _showMessage(errorMessage, refresh: _listLoad);
     } catch (e) {
       _listError = true;
       widget.handlers.onListError(e);
-      _showMessage(e.toString(), refresh: _list);
+      _showMessage(e.toString(), refresh: _listLoad);
     }
     setState(() {
       widget.handlers.onListSetState(context);
       _listLoading = false;
     });
+  }
+
+  Future<void> _listLoadMore([ListRequestOptions? requestOptions]) async {
+    requestOptions = requestOptions ?? _requestOptions;
+    if (_hasMore) {
+      _requestOptions = _requestOptions.copyWith(
+        page: _responses.last.meta.currentPage + 1,
+      );
+      await _listLoad();
+    }
   }
 
   var _requestOptions = ListRequestOptions();
@@ -246,19 +310,13 @@ class _CollectionPanelState<C extends Collection, M extends Model>
               ],
             ),
         ScrollableArea(
+          controller: widget.scrollController,
           scrollable: widget.scrollable,
           direction: widget.scrollDirection,
           onInit: () {
-            _list();
+            _listLoad();
           },
-          onEnd: (_) async {
-            if (_hasMore) {
-              _requestOptions = _requestOptions.copyWith(
-                page: _responses.last.meta.currentPage + 1,
-              );
-              await _list();
-            }
-          },
+          onEnd: (m) => _listLoadMore(),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: _listError && items.isEmpty
@@ -279,7 +337,7 @@ class _CollectionPanelState<C extends Collection, M extends Model>
                         SizedBox(height: 8),
                         OutlinedButton(
                           child: Text('أعد المحاولة'),
-                          onPressed: _list,
+                          onPressed: _listLoad,
                         ),
                       ],
                     ),
@@ -299,7 +357,7 @@ class _CollectionPanelState<C extends Collection, M extends Model>
                       if (_listLoadMoreError)
                         OutlinedButton(
                           child: Text('أعد المحاولة'),
-                          onPressed: _list,
+                          onPressed: _listLoad,
                         ),
                     ],
                     margin: const EdgeInsets.all(4),
@@ -395,6 +453,7 @@ class SemanticCardStyle {
 
   final MainAxisAlignment? mainAxisAlignment;
   final CrossAxisAlignment? crossAxisAlignment;
+  final MainAxisSize? mainAxisSize;
 
   final CrossAxisAlignment? textAlignment;
 
@@ -420,6 +479,7 @@ class SemanticCardStyle {
     this.textAlignment,
     this.mainAxisAlignment,
     this.crossAxisAlignment,
+    this.mainAxisSize,
     this.maxTitleLetters,
     this.maxSubtitleLetters,
   });
@@ -478,7 +538,7 @@ class SemanticCard<T extends Model> extends StatelessWidget {
                 (_direction == Axis.horizontal
                     ? CrossAxisAlignment.center
                     : CrossAxisAlignment.start),
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: style?.mainAxisSize ?? MainAxisSize.min,
             children: [
               if (style?.showLeading ?? true)
                 Builder(builder: (context) {
@@ -632,27 +692,27 @@ class CollectionEventHandlers<C extends Collection, M extends Model> {
   void onListSetState(BuildContext context) {}
 }
 
-class ArrowsVisibility {
+class ScrollableAreaArrows {
   final bool top;
   final bool bottom;
   final bool start;
   final bool end;
-  const ArrowsVisibility({
+  const ScrollableAreaArrows({
     this.top = true,
     this.bottom = true,
     this.start = true,
     this.end = true,
   });
   // all
-  factory ArrowsVisibility.all(bool visibility) => ArrowsVisibility(
+  factory ScrollableAreaArrows.all(bool visibility) => ScrollableAreaArrows(
         top: visibility,
         bottom: visibility,
         start: visibility,
         end: visibility,
       );
   // symmetric visible [vertical, horizontal]
-  factory ArrowsVisibility.symmetric({bool? vertical, bool? horizontal}) =>
-      ArrowsVisibility(
+  factory ScrollableAreaArrows.symmetric({bool? vertical, bool? horizontal}) =>
+      ScrollableAreaArrows(
         top: vertical ?? true,
         bottom: vertical ?? true,
         start: horizontal ?? true,
@@ -664,7 +724,7 @@ class ScrollableArea extends StatefulWidget {
   final bool scrollable;
   final bool refreshable;
   final bool paginable;
-  final ArrowsVisibility arrows;
+  final ScrollableAreaArrows arrows;
   final bool showIndicator;
   final Axis direction;
   final void Function(ScrollMetrics metrics)? onRefresh;
@@ -685,7 +745,7 @@ class ScrollableArea extends StatefulWidget {
       this.scrollable = true,
       this.refreshable = true,
       this.paginable = true,
-      this.arrows = const ArrowsVisibility(),
+      this.arrows = const ScrollableAreaArrows(),
       this.showIndicator = true,
       this.direction = Axis.vertical,
       this.onRefresh,
@@ -703,13 +763,14 @@ class ScrollableArea extends StatefulWidget {
 
 class _ScrollableAreaState extends State<ScrollableArea> {
   ValueNotifier<ScrollNotification?> _notifier = ValueNotifier(null);
-  late ScrollController _controller;
+  late ScrollController? _controller;
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.onInit?.call();
     });
-    _controller = widget.controller ?? ScrollController();
+    _controller =
+        widget.controller ?? (widget.scrollable ? ScrollController() : null);
     super.initState();
   }
 
@@ -738,12 +799,12 @@ class _ScrollableAreaState extends State<ScrollableArea> {
             metrics: notification.metrics,
           ));
         }
-        return false;
+        return true;
       },
       child: Stack(
         children: [
           Positioned(child: _builder(context, widget.child, _notifier)),
-          if (widget.scrollable) ...[
+          if (widget.scrollable || _controller != null) ...[
             if (widget.direction == Axis.horizontal) ...[
               Positioned(
                 // textDirection: Directionality.of(context),
@@ -752,7 +813,7 @@ class _ScrollableAreaState extends State<ScrollableArea> {
                 top: 0,
                 child: ScrollableAreaArrow(
                   show: widget.arrows.end,
-                  controller: _controller,
+                  controller: _controller!,
                   notifier: _notifier,
                   direction: ArrowDirection.right,
                 ),
@@ -765,7 +826,7 @@ class _ScrollableAreaState extends State<ScrollableArea> {
                 top: 0,
                 child: ScrollableAreaArrow(
                   show: widget.arrows.start,
-                  controller: _controller,
+                  controller: _controller!,
                   notifier: _notifier,
                   direction: ArrowDirection.left,
                 ),
@@ -778,7 +839,7 @@ class _ScrollableAreaState extends State<ScrollableArea> {
                 top: 10,
                 child: ScrollableAreaArrow(
                   show: widget.arrows.top,
-                  controller: _controller,
+                  controller: _controller!,
                   notifier: _notifier,
                   direction: ArrowDirection.top,
                 ),
@@ -790,7 +851,7 @@ class _ScrollableAreaState extends State<ScrollableArea> {
                 start: 0,
                 child: ScrollableAreaArrow(
                   show: widget.arrows.bottom,
-                  controller: _controller,
+                  controller: _controller!,
                   notifier: _notifier,
                   direction: ArrowDirection.bottom,
                 ),

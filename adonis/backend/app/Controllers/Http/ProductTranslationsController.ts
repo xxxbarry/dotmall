@@ -18,7 +18,7 @@ export default class ProductTranslationsController {
     await bouncer.with('ProductTranslationPolicy').authorize('viewList', payload)
     var productTranslationsQuery = ProductTranslation.query()
     var page = 1
-    var limit = 24
+    var limit = 12
 
     if (payload.search) {
       for (let i = 0; i < payload.search_in!.length; i++) {

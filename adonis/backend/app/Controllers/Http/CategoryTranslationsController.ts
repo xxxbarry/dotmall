@@ -18,7 +18,7 @@ export default class CategoryTranslationsController {
     await bouncer.with('CategoryTranslationPolicy').authorize('viewList', payload)
     var categoryTranslationsQuery = CategoryTranslation.query()
     var page = 1
-    var limit = 24
+    var limit = 12
 
     if (payload.search) {
       for (let i = 0; i < payload.search_in!.length; i++) {

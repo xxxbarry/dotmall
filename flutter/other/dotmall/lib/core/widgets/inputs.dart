@@ -278,26 +278,29 @@ class FormValidators {
 
 class CustomFormInput extends StatelessWidget {
   final String? errorText;
-  const CustomFormInput({
-    super.key,
-    this.formKey,
-    this.autoValidate = true,
-    this.obscureText = false,
-    this.height = 40,
-    this.borderRadius,
-    this.prefix,
-    this.suffix,
-    this.prefixIcon,
-    this.suffixIcon,
-    this.keyboardType,
-    this.validator,
-    this.controller,
-    this.onChanged,
-    this.labelText,
-    this.hintText,
-    this.errorText,
-  });
+  const CustomFormInput(
+      {super.key,
+      this.formKey,
+      this.autoValidate = true,
+      this.obscureText = false,
+      this.height = 40,
+      this.borderRadius,
+      this.prefix,
+      this.suffix,
+      this.prefixIcon,
+      this.suffixIcon,
+      this.keyboardType,
+      this.validator,
+      this.controller,
+      this.onChanged,
+      this.labelText,
+      this.hintText,
+      this.errorText,
+      this.enabled = true,
+      this.focusNode});
+  final FocusNode? focusNode;
   final bool autoValidate;
+  final bool enabled;
   final bool obscureText;
   final GlobalKey<FormState>? formKey;
   final double height;
@@ -321,6 +324,8 @@ class CustomFormInput extends StatelessWidget {
     return ClipRRect(
       borderRadius: borderRadius ?? _defaultBorderRadius,
       child: TextFormField(
+        focusNode: focusNode,
+        enabled: enabled,
         enableSuggestions: true,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         obscureText: obscureText,

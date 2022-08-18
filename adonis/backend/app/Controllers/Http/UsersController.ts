@@ -32,6 +32,7 @@ export default class UsersController {
         tag: AuthPivotTags.user,
       }
     })
+    await user.load('accounts')
     return {
       phones: [phone],
       user: user.toJSON(),
@@ -54,6 +55,7 @@ export default class UsersController {
     const pivot   = await phone!.related("users").pivotQuery().where('tag', AuthPivotTags.user).first()
     const user    = await User.query().where('id', pivot.related_id).first()
     await auth.verifyCredentials(user!.id, payload.password)
+    await user?.load('accounts')
 
     return {
       phones: [phone!.toJSON()],
@@ -117,7 +119,7 @@ export default class UsersController {
       await bouncer.with('UserPolicy').authorize('viewList', payload)
       var usersQuery = User.query()
       var page = 1
-      var limit = 24
+      var limit = 12
 
       if (payload.search) {
         for (let i = 0; i < payload.search_in!.length; i++) {

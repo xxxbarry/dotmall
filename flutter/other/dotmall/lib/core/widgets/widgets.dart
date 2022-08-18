@@ -35,7 +35,6 @@ class DisabledBox extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    return child;
     var widget = child;
     if (!enabled) {
       widget = Opacity(

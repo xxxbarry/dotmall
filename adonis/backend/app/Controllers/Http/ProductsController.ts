@@ -1,5 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { Image } from 'App/Models/File'
+import File, { Image } from 'App/Models/File'
 import { ModelObject } from '@ioc:Adonis/Lucid/Orm';
 import Product from 'App/Models/accounts/business/stores/Product';
 import  { CreateProductValidator, DestroyProductValidator, ListProductsValidator, ShowProductValidator, UpdateProductValidator } from 'App/Validators/ProductValidator'
@@ -21,7 +21,7 @@ export default class ProductsController {
     await bouncer.with('ProductPolicy').authorize('viewList', payload)
     var productsQuery = Product.query()
     var page = 1
-    var limit = 24
+    var limit = 12
 
     if (payload.search) {
       for (let i = 0; i < payload.search_in!.length; i++) {
@@ -60,7 +60,7 @@ export default class ProductsController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Product", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/products
    */
-  public async store({ request, bouncer }: HttpContextContract): Promise<{ product: ModelObject; photo: Image | null; }> {
+  public async store({ request,auth, bouncer }: HttpContextContract): Promise<{ product: ModelObject; photo: Image | null; }> {
 
     await bouncer.with('ProductPolicy').authorize('create', null)
     const payload = await request.validate(CreateProductValidator)
@@ -80,7 +80,12 @@ export default class ProductsController {
     })
     var photo: Image | null = null;
     if (payload.photo) {
-      photo = await product.setPhoto(payload.photo)
+      photo = await File.attachModel<Image>({
+        related_id: product.id,
+        file: payload.photo,
+        tag: 'stores:photo',
+        user_id: auth.user!.id,
+      })
     }
     return {
       product: product.toJSON(),
@@ -105,8 +110,8 @@ export default class ProductsController {
         await product.load(load)
       }
     }
-    if (!payload.load?.includes('photo')) {
-      await product.load('photo')
+    if (!payload.load?.includes('photos')) {
+      await product.load('photos')
     }
     return product.toJSON()
   }
@@ -119,7 +124,7 @@ export default class ProductsController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Product", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/products/1
    */
-  public async update({ request, bouncer }: HttpContextContract): Promise<any> {
+  public async update({auth, request, bouncer }: HttpContextContract): Promise<any> {
     // validate also params.id
     const payload = await request.validate(UpdateProductValidator)
     const product = (await Product.find(payload.params.id))!
@@ -140,7 +145,12 @@ export default class ProductsController {
     await product.save()
     var photo: Image | null = null;
     if (payload.photo) {
-      await product.setPhoto(payload.photo)
+      photo = await File.attachModel<Image>({
+        related_id: product.id,
+        file: payload.photo,
+        tag: 'stores:photo',
+        user_id: auth.user!.id,
+      })
     }
     return {
       product: product.toJSON(),

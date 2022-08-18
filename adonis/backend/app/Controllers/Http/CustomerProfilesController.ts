@@ -20,7 +20,7 @@ export default class CustomerProfilesController {
         await bouncer.with('CustomerPolicy').authorize('viewList', payload)
         var customersQuery = CustomerProfile.query()
         var page = 1
-        var limit = 24
+        var limit = 12
 
 
         if (payload.search) {

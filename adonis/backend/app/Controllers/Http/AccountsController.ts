@@ -21,7 +21,7 @@ export default class AccountsController {
     await bouncer.with('AccountPolicy').authorize('viewList', payload)
     var accountsQuery = Account.query()
     var page = 1
-    var limit = 24
+    var limit = 12
 
 
     if (payload.search) {
@@ -67,10 +67,9 @@ export default class AccountsController {
     const account = await Account.create({
       name: payload.name,
       description: payload.description,
-      type: payload.type as AccountType,
+      type: payload.type ,
       userId: payload.user_id,
     })
-    var jsons = account.toJSON();
     var photo: Image | null = null;
     if (payload.photo) {
       photo = await File.attachModel<Image>({
@@ -78,6 +77,7 @@ export default class AccountsController {
         file: payload.photo,
         deleteOld: true,
         tag: 'accounts:avatar',
+        user_id: auth.user!.id,
       })
     }
     return {
@@ -119,7 +119,7 @@ export default class AccountsController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Account", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/accounts/1
    */
-  public async update({ request, bouncer }: HttpContextContract): Promise<any> {
+  public async update({ request,auth, bouncer }: HttpContextContract): Promise<any> {
     // validate also params.id
     const payload = await request.validate(UpdateAccountValidator)
     const account = (await Account.find(payload.params.id))!
@@ -135,6 +135,7 @@ export default class AccountsController {
         file: payload.photo,
         deleteOld: true,
         tag: 'accounts:avatar',
+        user_id: auth.user!.id,
       })
     }
     var jsons = account.toJSON();
