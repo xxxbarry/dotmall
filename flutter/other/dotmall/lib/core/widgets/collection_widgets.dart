@@ -162,7 +162,7 @@ class _CollectionPanelState<C extends Collection, M extends Model>
                         label: Text('أعد المحاولة'),
                         onPressed: () {
                           Navigator.of(context).pop();
-                          refresh?.call();
+                          refresh.call();
                         },
                       ),
                     ),
@@ -196,6 +196,7 @@ class _CollectionPanelState<C extends Collection, M extends Model>
       _listError = false;
       _listLoading = true;
     });
+    await Future.delayed(Duration(milliseconds: 5000));
     try {
       CancelToken cancelToken = CancelToken();
       widget.handlers.onListLoading(cancelToken);
@@ -242,7 +243,7 @@ class _CollectionPanelState<C extends Collection, M extends Model>
   var _requestOptions = ListRequestOptions();
   var _listLoading = false;
   var _listError = false;
-  bool get _listLoadMoreError => _listError || items.isEmpty;
+  bool get _listLoadMoreError => _listError || _responses.isEmpty;
   bool get _hasMore =>
       _responses.isNotEmpty &&
       _responses.last.meta.currentPage < _responses.last.meta.lastPage;
@@ -255,12 +256,13 @@ class _CollectionPanelState<C extends Collection, M extends Model>
     return SemanticCard(
       selected: selections.contains(model),
       model == null ? null : widget.collection.semanticsOf(model),
-      onPressed: () {
-        if (model != null)
-          setState(() {
-            widget.onItemPressed?.call(selections, model);
-          });
-      },
+      onPressed: model == null
+          ? null
+          : () {
+              setState(() {
+                widget.onItemPressed?.call(selections, model);
+              });
+            },
       style: SemanticCardStyle(direction: panel.scrollDirection),
     );
   }
@@ -319,21 +321,44 @@ class _CollectionPanelState<C extends Collection, M extends Model>
           onEnd: (m) => _listLoadMore(),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: _listError && items.isEmpty
+            child: !_listLoading && items.isEmpty
                 ? Container(
                     constraints: BoxConstraints(minHeight: 80),
-                    padding: EdgeInsets.all(12),
+                    padding: EdgeInsets.all(24),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          'حدثت مشكلة أثناء تحميل البيانات',
-                          style:
-                              Theme.of(context).textTheme.bodyText2!.copyWith(
-                                    color: Colors.grey,
-                                  ),
+                        Icon(
+                          FluentIcons.window_apps_48_regular,
+                          size: 35,
+                          color: Theme.of(context)
+                              .textTheme
+                              .button!
+                              .color!
+                              .withOpacity(0.4),
                         ),
+                        if (_listError && _responses.isEmpty)
+                          Text(
+                            'حدثت مشكلة أثناء تحميل البيانات',
+                            style:
+                                Theme.of(context).textTheme.bodyText2!.copyWith(
+                                      color: Colors.grey,
+                                    ),
+                          ),
+                        if (_responses.isNotEmpty && items.isEmpty)
+                          Text(
+                            'لا توجد بيانات',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2!
+                                .copyWith(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .button!
+                                        .color!
+                                        .withOpacity(0.3)),
+                          ),
                         SizedBox(height: 8),
                         OutlinedButton(
                           child: Text('أعد المحاولة'),
@@ -527,7 +552,7 @@ class SemanticCard<T extends Model> extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
           ),
         ),
-        onPressed: onPressed,
+        onPressed: semantic == null ? null : onPressed,
         child: Padding(
           padding: const EdgeInsets.all(4),
           child: Flex(

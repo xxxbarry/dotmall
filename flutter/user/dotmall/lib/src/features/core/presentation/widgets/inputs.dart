@@ -10,6 +10,7 @@ class CTextFormField extends TextFormField {
   });
 }
 
+/*
 class COutlineInputBorder extends InputBorder {
   const COutlineInputBorder({
     super.borderSide = const BorderSide(),
@@ -218,7 +219,7 @@ class COutlineInputBorder extends InputBorder {
   @override
   int get hashCode => Object.hash(borderSide, borderRadius, gapPadding);
 }
-
+*/
 class FormElementBox extends StatelessWidget {
   final Widget child;
   final double padding;

@@ -5,9 +5,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../category/bloc/category_bloc.dart';
 import '../../category/widgets/widgets.dart';
-import '../../core/repositories/repositories.dart';
 import '../../core/widgets/collection_widgets.dart';
 import '../../core/widgets/widgets.dart';
 import '../../l10n/l10n.dart';
