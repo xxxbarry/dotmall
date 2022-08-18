@@ -329,16 +329,17 @@ class _CollectionPanelState<C extends Collection, M extends Model>
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(
-                          FluentIcons.window_apps_48_regular,
-                          size: 35,
-                          color: Theme.of(context)
-                              .textTheme
-                              .button!
-                              .color!
-                              .withOpacity(0.4),
-                        ),
-                        if (_listError && _responses.isEmpty)
+                        if (_listError && _responses.isEmpty) ...[
+                          Icon(
+                            FluentIcons.window_apps_48_regular,
+                            size: 35,
+                            color: Theme.of(context)
+                                .textTheme
+                                .button!
+                                .color!
+                                .withOpacity(0.4),
+                          ),
+                          SizedBox(height: 8),
                           Text(
                             'حدثت مشكلة أثناء تحميل البيانات',
                             style:
@@ -346,7 +347,18 @@ class _CollectionPanelState<C extends Collection, M extends Model>
                                       color: Colors.grey,
                                     ),
                           ),
-                        if (_responses.isNotEmpty && items.isEmpty)
+                        ],
+                        if (_responses.isNotEmpty && items.isEmpty) ...[
+                          Icon(
+                            FluentIcons.tv_usb_16_regular,
+                            size: 35,
+                            color: Theme.of(context)
+                                .textTheme
+                                .button!
+                                .color!
+                                .withOpacity(0.4),
+                          ),
+                          SizedBox(height: 8),
                           Text(
                             'لا توجد بيانات',
                             style: Theme.of(context)
@@ -358,7 +370,8 @@ class _CollectionPanelState<C extends Collection, M extends Model>
                                         .button!
                                         .color!
                                         .withOpacity(0.3)),
-                          ),
+                          )
+                        ],
                         SizedBox(height: 8),
                         OutlinedButton(
                           child: Text('أعد المحاولة'),
@@ -379,11 +392,11 @@ class _CollectionPanelState<C extends Collection, M extends Model>
                           _itemBuilder(context, widget, null, this),
 
                       // TODO: implement refresh load more
-                      if (_listLoadMoreError)
-                        OutlinedButton(
-                          child: Text('أعد المحاولة'),
-                          onPressed: _listLoad,
-                        ),
+                      // if (_listLoadMoreError)
+                      //   OutlinedButton(
+                      //     child: Text('أعد المحاولة'),
+                      //     onPressed: _listLoad,
+                      //   ),
                     ],
                     margin: const EdgeInsets.all(4),
                     count: widget.gridCount,

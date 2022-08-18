@@ -1,9 +1,8 @@
-import {  column } from '@ioc:Adonis/Lucid/Orm'
+import { column } from '@ioc:Adonis/Lucid/Orm'
 import { DateTime } from 'luxon'
 import DotBaseModel from '../../../dot/models/DotBaseModel'
 
 export default class Email extends DotBaseModel {
-
   @column({ isPrimary: true })
   public type: string
 
@@ -26,4 +25,6 @@ export default class Email extends DotBaseModel {
   @column({ serializeAs: null })
   public relatedType: string
 
+  @column()
+  public userId: string
 }

@@ -1,6 +1,15 @@
 import { DateTime } from 'luxon'
 import Hash from '@ioc:Adonis/Core/Hash'
-import { column, beforeSave, ManyToMany, manyToMany, hasMany, HasMany, beforeFetch, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
+import {
+  column,
+  beforeSave,
+  ManyToMany,
+  manyToMany,
+  hasMany,
+  HasMany,
+  beforeFetch,
+  ModelQueryBuilderContract,
+} from '@ioc:Adonis/Lucid/Orm'
 import Email from './ContactOptions/Email'
 import Phone from './ContactOptions/Phone'
 import DotBaseModel from '../../dot/models/DotBaseModel'
@@ -9,7 +18,7 @@ import Account from './Account'
 import File from './File'
 
 export enum AuthPivotTags {
-  user = "auth:users"
+  user = 'auth:users',
 }
 export default class User extends DotBaseModel {
   public table = 'users'
@@ -18,24 +27,22 @@ export default class User extends DotBaseModel {
   @hasMany(() => Account)
   public accounts: HasMany<typeof Account>
 
-
   @usePivot(() => Email)
   public emails: ManyToMany<typeof Email>
 
   @usePivot(() => File)
   public files: ManyToMany<typeof File>
 
-
-  @manyToMany(()=>Phone, {
+  @manyToMany(() => Phone, {
     pivotForeignKey: 'related_id',
     pivotRelatedForeignKey: 'phone_id',
-    pivotTable: "phones_pivot",
+    pivotTable: 'phones_pivot',
     pivotColumns: ['tag'],
     onQuery: (builder) => {
       // if (tag) {
       //   builder.wherePivot('tag', tag);
       // }
-    }
+    },
   })
   public phones: ManyToMany<typeof Phone>
 
@@ -50,8 +57,6 @@ export default class User extends DotBaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
-  name: any
-  description: any
 
   @beforeSave()
   public static async hashPassword(user: User) {

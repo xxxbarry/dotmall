@@ -1,4 +1,4 @@
-import {  belongsTo, BelongsTo, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
+import { belongsTo, BelongsTo, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
 import { DateTime } from 'luxon'
 import DotBaseModel from 'Dot/models/DotBaseModel'
 import { usedPivot } from 'Dot/hooks/orm'
@@ -6,7 +6,6 @@ import User from '../User'
 import { string } from '@ioc:Adonis/Core/Helpers'
 
 export default class Phone extends DotBaseModel {
-
   @column()
   public userId: string
 
@@ -28,16 +27,16 @@ export default class Phone extends DotBaseModel {
   @column({ serializeAs: null })
   public relatedType: string
 
-  @manyToMany(()=>User, {
+  @manyToMany(() => User, {
     pivotForeignKey: 'phone_id',
     pivotRelatedForeignKey: 'related_id',
-    pivotTable: "phones_pivot",
+    pivotTable: 'phones_pivot',
     pivotColumns: ['tag'],
     onQuery: (builder) => {
       // if (tag) {
       //   builder.wherePivot('tag', tag);
       // }
-    }
+    },
   })
   public users: ManyToMany<typeof User>
 

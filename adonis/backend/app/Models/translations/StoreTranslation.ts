@@ -7,7 +7,7 @@ export default class StoreTranslation extends DotBaseTranslation {
   public name: string
 
   @column()
-  public description: string|null
+  public description: string | null
 
   @column()
   public storeId: string

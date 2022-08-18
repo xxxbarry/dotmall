@@ -7,25 +7,23 @@ import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
 import Database from '@ioc:Adonis/Lucid/Database'
 
 export default class File extends DotBaseModel {
-
-
   @column({ isPrimary: true })
   public id: string
 
   @column()
-  public name: string|null
+  public name: string | null
 
   @column()
-  public description: string|null
+  public description: string | null
 
   @column()
-  public path: string|null
+  public path: string | null
 
   @column()
-  public mime: string|null
+  public mime: string | null
 
   @column()
-  public user_id: string
+  public userId: string
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -38,7 +36,6 @@ export default class File extends DotBaseModel {
 
   @column({ serializeAs: null })
   public relatedType: string
-
 
   ////////// RELATED MODELS //////////
   // @manyToMany(()=>Account, {
@@ -62,9 +59,12 @@ export default class File extends DotBaseModel {
     }
   }
 
-
   // static method to handle the photo upload
-  public static async upload(multipartFile: MultipartFileContract, path: string, name: string): Promise<string> {
+  public static async upload(
+    multipartFile: MultipartFileContract,
+    path: string,
+    name: string
+  ): Promise<string> {
     // move file to storege
     await multipartFile.move(Application.publicPath(path), {
       name: `${name}.${multipartFile.extname}`,
@@ -80,28 +80,25 @@ export default class File extends DotBaseModel {
   public static async uploadAndCreate<T extends File>(fileUploadData: _FileUploadData): Promise<T> {
     var fileId = fileUploadData.id ?? DotBaseModel.generateId()
     var uploadPath = File.uploadPath()
-    var path = await File.upload(fileUploadData.multipartFile, uploadPath, fileUploadData.name ?? fileId)
-    var file = await File.create({
+    var path = await File.upload(
+      fileUploadData.multipartFile,
+      uploadPath,
+      fileUploadData.name ?? fileId
+    )
+    var file = (await File.create({
       id: fileId,
       path: path,
       name: fileUploadData.name,
       user_id: fileUploadData.user_id,
-    }) as T
-    await Database
-      .table('files_pivot')
-      .insert({
-        id: DotBaseModel.generateId(),
-        file_id: file.id,
-        related_id: fileUploadData.relatedId,
-        tag: fileUploadData.tag
-      })
+    })) as T
+    await Database.table('files_pivot').insert({
+      id: DotBaseModel.generateId(),
+      file_id: file.id,
+      related_id: fileUploadData.relatedId,
+      tag: fileUploadData.tag,
+    })
     return file
   }
-
-
-
-
-
 
   /**
    * attach file from MultipartFile
@@ -110,12 +107,12 @@ export default class File extends DotBaseModel {
    * @param {string} [tag='file']
    * @returns {Promise<Image>}
    */
-   static async attachModel<T extends File>(options: {
-    related_id: string,
-    file: MultipartFileContract,
-    deleteOld?: boolean,
-    tag: string,
-    user_id: string,
+  static async attachModel<T extends File>(options: {
+    related_id: string
+    file: MultipartFileContract
+    deleteOld?: boolean
+    tag: string
+    user_id: string
   }): Promise<T> {
     var file = await File.uploadAndCreate<T>({
       multipartFile: options.file,
@@ -124,25 +121,25 @@ export default class File extends DotBaseModel {
       user_id: options.user_id,
     })
     if (options.deleteOld && file) {
-      var files_pivot = await Database
-        .from('files_pivot')
+      var files_pivot = await Database.from('files_pivot')
         .where('related_id', options.related_id)
         .whereNot('file_id', file.id)
         .where('tag', options.tag)
-        files_pivot.forEach(async (file_pivot) =>  await (await File.find(file_pivot.file_id))?.delete())
+      files_pivot.forEach(
+        async (file_pivot) => await (await File.find(file_pivot.file_id))?.delete()
+      )
     }
     return file
   }
-
 }
 // _FileAndUploadType
-class _FileUploadData  {
+class _FileUploadData {
   multipartFile: MultipartFileContract
-  id?: string|null
-  name?: string|null
+  id?: string | null
+  name?: string | null
   relatedId?: string
-  relatedType?:typeof DotBaseModel|string
-  tag?: string|null
+  relatedType?: typeof DotBaseModel | string
+  tag?: string | null
   user_id: string
 }
 export class Image extends File {
@@ -172,5 +169,4 @@ export class Image extends File {
   //   }
   //   return photo
   // }
-
 }
