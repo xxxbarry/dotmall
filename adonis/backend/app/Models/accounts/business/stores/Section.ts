@@ -1,10 +1,12 @@
 import { DateTime } from 'luxon'
-import {  beforeFetch, belongsTo, BelongsTo, column, hasMany, HasMany, hasOne, HasOne, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
+import {  beforeFetch, belongsTo, BelongsTo, column, hasMany, HasMany, hasOne, HasOne, ManyToMany, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
 import DotBaseModel from '../../../../../dot/models/DotBaseModel'
 import Store from './Store'
 import SectionTranslation from 'App/Models/translations/SectionTranslation'
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
 import { Image } from 'App/Models/File'
+import Account from 'App/Models/Account'
+import { usePivot } from 'Dot/hooks/orm'
 
 
 export default class Section extends DotBaseModel {
@@ -45,34 +47,13 @@ export default class Section extends DotBaseModel {
   public store: BelongsTo<typeof Store>
 
   ////////////////////////////////////////////////////////////////////////////////
-  @hasOne(() => Image, { foreignKey: "relatedId",
-    onQuery: (builder) => {
-      builder.where('related_type', 'sections:photo')
-    }
-  })
-  public photo: HasOne<typeof Image>
+
+  @usePivot(() => Image)
+  public photos: ManyToMany<typeof Image>
+
   // load photo after fetch
   @beforeFetch()
-  public static async loadPhoto(query: ModelQueryBuilderContract<typeof Section>) {
-    query.preload('photo')
-  }
-
-  /**
-   * set photo from MultipartFile
-   * @param {MultipartFileContract} image
-   * @param {boolean} [deleteOld=false]
-   * @returns {Promise<Image>}
-   */
-  public async setPhoto(image: MultipartFileContract, deleteOld: boolean = true): Promise<Image> {
-    var currentPhoto = await Image.query().where('related_type', 'sections:photo').where('related_id', this.id).first()
-    var photo = await Image.uploadAndCreate<Image>({
-      multipartFile: image,
-      relatedId: this.id,
-      relatedType: Section,
-    })
-    if (deleteOld && photo && currentPhoto) {
-      await currentPhoto.delete()
-    }
-    return photo
+  public static async loadPhoto(query: ModelQueryBuilderContract<typeof Account>) {
+    query.preload('photos')
   }
 }

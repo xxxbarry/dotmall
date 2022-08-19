@@ -342,7 +342,14 @@ class Configs {
   }
 
   String makeUrl(String path) {
-    return assetsServer + path;
+    /// check if contains http or https
+    /// if not, add assetsServer to the beginning of the path
+    /// if contains http or https, return the path as is
+    if (path.contains(RegExp(r'^(http|https)'))) {
+      return path;
+    } else {
+      return '$assetsServer$path';
+    }
   }
 }
 

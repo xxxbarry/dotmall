@@ -89,7 +89,7 @@ export default class File extends DotBaseModel {
       id: fileId,
       path: path,
       name: fileUploadData.name,
-      user_id: fileUploadData.user_id,
+      userId: fileUploadData.user_id,
     })) as T
     await Database.table('files_pivot').insert({
       id: DotBaseModel.generateId(),

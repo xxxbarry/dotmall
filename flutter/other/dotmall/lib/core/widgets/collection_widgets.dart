@@ -632,42 +632,47 @@ class SemanticCard<T extends Model> extends StatelessWidget {
                     );
                   }
                 }),
-              Padding(
-                padding: const EdgeInsets.all(4),
-                child: Column(
-                  crossAxisAlignment:
-                      style?.textAlignment ?? CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (style?.showTitle ?? true)
-                      TextPlaceholder(
-                        enabled: semantic == null,
-                        child: Text(
-                          semantic?.title?.clipAt(style?.maxTitleLetters) ?? "",
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .subtitle2!
-                              .copyWith(height: 1.3),
-                          overflow: TextOverflow.fade,
-                          maxLines: 1,
-                          softWrap: false,
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Column(
+                    crossAxisAlignment:
+                        style?.textAlignment ?? CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (style?.showTitle ?? true)
+                        TextPlaceholder(
+                          enabled: semantic == null,
+                          child: Text(
+                            semantic?.title
+                                    ?.clipAt(style?.maxTitleLetters ?? 22) ??
+                                "",
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .subtitle2!
+                                .copyWith(height: 1.3),
+                            overflow: TextOverflow.fade,
+                            maxLines: 1,
+                            softWrap: false,
+                          ),
                         ),
-                      ),
-                    if (style?.showSubtitle ?? true)
-                      TextPlaceholder(
-                        width: 50,
-                        enabled: semantic == null,
-                        child: Text(
-                          (semantic?.subtitle?.clipAt(style?.maxTitleLetters) ??
-                              ""),
-                          style: Theme.of(context).textTheme.caption,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          softWrap: true,
+                      if (style?.showSubtitle ?? true)
+                        TextPlaceholder(
+                          width: 50,
+                          enabled: semantic == null,
+                          child: Text(
+                            (semantic?.subtitle
+                                    ?.clipAt(style?.maxTitleLetters ?? 22) ??
+                                ""),
+                            style: Theme.of(context).textTheme.caption,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            softWrap: true,
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               )
             ],

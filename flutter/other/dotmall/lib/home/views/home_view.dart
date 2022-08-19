@@ -78,7 +78,13 @@ class HomeView extends StatelessWidget {
               },
               itemBuilder: (context, panel, model, state) {
                 return CategoryCard(
-                    selected: false, onPressed: () {}, model: model);
+                    selected: false,
+                    onPressed: panel.onItemPressed == null
+                        ? null
+                        : () {
+                            panel.onItemPressed!(state.selections, model!);
+                          },
+                    model: model);
               },
             ),
             CollectionPanel<Stores, Store>(
@@ -90,6 +96,15 @@ class HomeView extends StatelessWidget {
               onItemPressed: (List<Model> selections, model) {
                 selections.clear();
                 selections.add(model);
+              },
+              itemBuilder: (context, panel, model, state) {
+                return SizedBox(
+                  width: 170,
+                  child: SemanticCard(
+                    model == null ? null : panel.collection.semanticsOf(model),
+                    onPressed: () {},
+                  ),
+                );
               },
             ),
             CollectionPanel<Products, Product>(

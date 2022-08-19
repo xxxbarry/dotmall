@@ -5,7 +5,6 @@ export default class Files extends DotBaseSchema {
   protected tableName = 'files'
   public useTimestamps = true
   public useSoftDeletes = true
-  public useRelatedTo = true
   public useUserRelation = true
   public usePivotTable = true
   // public useTranslation = true
