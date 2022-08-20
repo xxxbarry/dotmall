@@ -1,5 +1,16 @@
 import { DateTime } from 'luxon'
-import { beforeFetch, BelongsTo, belongsTo, column, hasMany, HasMany, hasOne, HasOne, ManyToMany, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
+import {
+  beforeFetch,
+  BelongsTo,
+  belongsTo,
+  column,
+  hasMany,
+  HasMany,
+  hasOne,
+  HasOne,
+  ManyToMany,
+  ModelQueryBuilderContract,
+} from '@ioc:Adonis/Lucid/Orm'
 import DotBaseModel from '../../../../../dot/models/DotBaseModel'
 import ProductTranslation from '../../../translations/ProductTranslation'
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
@@ -12,7 +23,6 @@ import Account from 'App/Models/Account'
 import { usePivot } from 'Dot/hooks/orm'
 
 export default class Product extends DotBaseModel {
-
   @column()
   public name: string
 
@@ -34,12 +44,11 @@ export default class Product extends DotBaseModel {
   @column()
   public barcode: string
 
-
   @column({
     prepare: (value: Object) => JSON.stringify(value),
     consume: (value: string) => JSON.parse(value),
   })
-  public meta : Object
+  public meta: Object
 
   @column()
   public type: ProductType
@@ -76,7 +85,6 @@ export default class Product extends DotBaseModel {
   @belongsTo(() => Section)
   public section: BelongsTo<typeof Section>
 
-
   @usePivot(() => Image)
   public photos: ManyToMany<typeof Image>
 
@@ -88,13 +96,13 @@ export default class Product extends DotBaseModel {
 }
 
 export enum ProductType {
-  product=0,
+  product = 0,
   // service="service",
 }
 
 export enum ProductStatus {
-  draft=0,
-  published=1,
-  archived=2,
-  suspended=3,
+  draft = 0,
+  published = 1,
+  archived = 2,
+  suspended = 3,
 }

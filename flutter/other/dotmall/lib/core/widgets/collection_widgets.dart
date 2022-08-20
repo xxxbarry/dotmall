@@ -24,6 +24,12 @@ enum ListViewMode {
 class CollectionPanelEvent {}
 
 /// CollectionPanelListEventsq
+class CollectionPanelLoadFindEvent extends CollectionPanelEvent {
+  final ListRequestOptions? options;
+  CollectionPanelLoadFindEvent([this.options]);
+}
+
+/// CollectionPanelListEventsq
 class CollectionPanelLoadListEvent extends CollectionPanelEvent {
   final ListRequestOptions? options;
   CollectionPanelLoadListEvent([this.options]);
@@ -40,13 +46,13 @@ class CollectionPanelCancelEvent extends CollectionPanelEvent {
   CollectionPanelCancelEvent();
 }
 
-/// [CollectionPanelController] is a controller for [CollectionPanel] widget.
-/// It is used to control the [CollectionPanel] widget.
+/// [CollectionPanelController] is a controller for [CollectionListPanel] widget.
+/// It is used to control the [CollectionListPanel] widget.
 class CollectionPanelController extends ValueNotifier<CollectionPanelEvent?> {
   CollectionPanelController(super.value);
 }
 
-/// [CollectionPanel] is a [StatefulWidget] designed to display a list of items from the
+/// [CollectionListPanel] is a [StatefulWidget] designed to display a list of items from the
 /// collection.
 /// it also has some features like:
 /// - load items
@@ -54,7 +60,7 @@ class CollectionPanelController extends ValueNotifier<CollectionPanelEvent?> {
 /// - search items
 /// - CRUD operations
 /// - and more..
-class CollectionPanel<C extends Collection, M extends Model>
+class CollectionListPanel<C extends Collection, M extends Model>
     extends StatefulWidget {
   final C collection;
   final CollectionEventHandlers handlers;
@@ -68,16 +74,16 @@ class CollectionPanel<C extends Collection, M extends Model>
   final int gridCount;
 
   /// builder body
-  final Widget Function(BuildContext context, CollectionPanel<C, M> panel)?
+  final Widget Function(BuildContext context, CollectionListPanel<C, M> panel)?
       bodyBuilder;
-  final Widget Function(BuildContext context, CollectionPanel<C, M> panel)?
+  final Widget Function(BuildContext context, CollectionListPanel<C, M> panel)?
       headBuilder;
-  final Widget Function(BuildContext context, CollectionPanel<C, M> panel,
-      M? model, _CollectionPanelState<C, M> state)? itemBuilder;
+  final Widget Function(BuildContext context, CollectionListPanel<C, M> panel,
+      M? model, _CollectionListPanelState<C, M> state)? itemBuilder;
   final void Function(List<M> selections, M model)? onItemPressed;
   final ScrollController? scrollController;
   final StreamController<CollectionPanelEvent>? controller;
-  const CollectionPanel({
+  const CollectionListPanel({
     super.key,
     required this.collection,
     required this.handlers,
@@ -97,11 +103,12 @@ class CollectionPanel<C extends Collection, M extends Model>
   });
 
   @override
-  State<CollectionPanel<C, M>> createState() => _CollectionPanelState<C, M>();
+  State<CollectionListPanel<C, M>> createState() =>
+      _CollectionListPanelState<C, M>();
 }
 
-class _CollectionPanelState<C extends Collection, M extends Model>
-    extends State<CollectionPanel<C, M>> {
+class _CollectionListPanelState<C extends Collection, M extends Model>
+    extends State<CollectionListPanel<C, M>> {
   late final StreamController<CollectionPanelEvent> controller;
   final CancelToken cancelToken = CancelToken();
   final _responses = <PaginatedModel<M>>[];
@@ -248,8 +255,8 @@ class _CollectionPanelState<C extends Collection, M extends Model>
       _responses.isNotEmpty &&
       _responses.last.meta.currentPage < _responses.last.meta.lastPage;
   List<M> selections = [];
-  Widget _itemBuilder(BuildContext context, CollectionPanel<C, M> panel,
-      M? model, _CollectionPanelState<C, M> state) {
+  Widget _itemBuilder(BuildContext context, CollectionListPanel<C, M> panel,
+      M? model, _CollectionListPanelState<C, M> state) {
     if (panel.itemBuilder != null) {
       return panel.itemBuilder!(context, panel, model, this);
     }
@@ -401,6 +408,270 @@ class _CollectionPanelState<C extends Collection, M extends Model>
                     margin: const EdgeInsets.all(4),
                     count: widget.gridCount,
                   ),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+// FIND
+class CollectionFindPanel<C extends Collection, M extends Model>
+    extends StatefulWidget {
+  final C collection;
+  final CollectionEventHandlers handlers;
+  final Size? bodySize;
+  final String id;
+
+  /// builder body
+  final Widget Function(BuildContext context, CollectionFindPanel<C, M> panel)?
+      bodyBuilder;
+  final Widget Function(BuildContext context, CollectionFindPanel<C, M> panel)?
+      headBuilder;
+  final Widget Function(BuildContext context, CollectionFindPanel<C, M> panel,
+      M? model, _CollectionFindPanelState<C, M> state)? itemBuilder;
+  final void Function(List<M> selections, M model)? onItemPressed;
+  final ScrollController? scrollController;
+  final StreamController<CollectionPanelEvent>? controller;
+  const CollectionFindPanel({
+    super.key,
+    required this.id,
+    required this.collection,
+    required this.handlers,
+    this.headBuilder,
+    this.bodyBuilder,
+    this.itemBuilder,
+    this.bodySize,
+    this.onItemPressed,
+    this.scrollController,
+    this.controller,
+  });
+
+  @override
+  State<CollectionFindPanel<C, M>> createState() =>
+      _CollectionFindPanelState<C, M>();
+}
+
+class _CollectionFindPanelState<C extends Collection, M extends Model>
+    extends State<CollectionFindPanel<C, M>> {
+  late final StreamController<CollectionPanelEvent> controller;
+  final CancelToken cancelToken = CancelToken();
+  M? _response;
+
+  M? get item => _response;
+
+  @override
+  void dispose() {
+    controller.close();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    controller =
+        widget.controller ?? StreamController<CollectionPanelEvent>.broadcast();
+    controller.stream.listen((event) {
+      if (event is CollectionPanelLoadFindEvent) {
+        _findLoad(event.options);
+      } else if (event is CollectionPanelCancelEvent) {
+        _cancel();
+      }
+    });
+    controller.add(CollectionPanelLoadFindEvent());
+    super.initState();
+  }
+
+  // _cancel
+  void _cancel() {
+    setState(() {
+      cancelToken.cancel();
+    });
+  }
+
+  Future<void> _showMessage(String message, {Function? refresh}) async {
+    await showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('حدثت مشكلة'),
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodyText2,
+          ),
+          actions: <Widget>[
+            SizedBox(
+              width: double.infinity,
+              child: Column(
+                children: [
+                  if (refresh != null)
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        icon: Icon(FluentIcons.arrow_clockwise_12_regular),
+                        label: Text('أعد المحاولة'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          refresh.call();
+                        },
+                      ),
+                    ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      child: Text('حسنا'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _findLoad([RequestOptions? requestOptions]) async {
+    requestOptions = requestOptions ?? _requestOptions;
+    if (_findLoading || !mounted) {
+      return;
+    }
+    setState(() {
+      _findError = false;
+      _findLoading = true;
+    });
+    try {
+      CancelToken cancelToken = CancelToken();
+      widget.handlers.onListLoading(cancelToken);
+      await Future.delayed(Duration(milliseconds: 1500));
+      var response = await widget.collection.findR(widget.id,
+          options: requestOptions.copyWith(cancelToken: cancelToken));
+      var parsedRespose =
+          widget.collection.paginatedModelFromMap(response.data!);
+      widget.handlers.onListLoaded(parsedRespose);
+      _response = (parsedRespose as M);
+      setState(() {});
+    } on ValidationException catch (e) {
+      _findError = true;
+      widget.handlers.onListValidationException(e);
+      _showMessage("حدثت مشكلة أثناء تحميل البيانات", refresh: _findLoad);
+    } on DioError catch (e) {
+      _findError = true;
+      widget.handlers.onListDioError(e);
+      var errorMessage = e.error.toString().contains(".message")
+          ? e.error.toString().split(".").first
+          : e.error.toString();
+      _showMessage(errorMessage, refresh: _findLoad);
+    } catch (e) {
+      _findError = true;
+      widget.handlers.onListError(e);
+      _showMessage(e.toString(), refresh: _findLoad);
+    }
+    setState(() {
+      widget.handlers.onListSetState(context);
+      _findLoading = false;
+    });
+  }
+
+  var _requestOptions = ListRequestOptions();
+  var _findLoading = false;
+  var _findError = false;
+  List<M> selections = [];
+  Widget _itemBuilder(BuildContext context, CollectionFindPanel<C, M> panel,
+      M? model, _CollectionFindPanelState<C, M> state) {
+    if (panel.itemBuilder != null) {
+      return panel.itemBuilder!(context, panel, model, this);
+    }
+    return SemanticCard(
+      selected: selections.contains(model),
+      model == null ? null : widget.collection.semanticsOf(model),
+      onPressed: model == null
+          ? null
+          : () {
+              setState(() {
+                widget.onItemPressed?.call(selections, model);
+              });
+            },
+      style: SemanticCardStyle(),
+    );
+  }
+
+  bool get _showPlaceholder => (item == null && _findLoading) || _findLoading;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: !_findLoading && item == null
+                ? Container(
+                    constraints: BoxConstraints(minHeight: 80),
+                    padding: EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (_findError && _response == null) ...[
+                          Icon(
+                            FluentIcons.window_apps_48_regular,
+                            size: 35,
+                            color: Theme.of(context)
+                                .textTheme
+                                .button!
+                                .color!
+                                .withOpacity(0.4),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'حدثت مشكلة أثناء تحميل البيانات',
+                            style:
+                                Theme.of(context).textTheme.bodyText2!.copyWith(
+                                      color: Colors.grey,
+                                    ),
+                          ),
+                        ],
+                        if (_response == null && item == null) ...[
+                          Icon(
+                            FluentIcons.tv_usb_16_regular,
+                            size: 35,
+                            color: Theme.of(context)
+                                .textTheme
+                                .button!
+                                .color!
+                                .withOpacity(0.4),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'لا توجد بيانات',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2!
+                                .copyWith(
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .button!
+                                        .color!
+                                        .withOpacity(0.3)),
+                          )
+                        ],
+                        SizedBox(height: 8),
+                        OutlinedButton(
+                          child: Text('أعد المحاولة'),
+                          onPressed: _findLoad,
+                        ),
+                      ],
+                    ),
+                  )
+                : item != null
+                    ? _itemBuilder(context, widget, item, this)
+                    : _itemBuilder(context, widget, null, this),
           ),
         )
       ],

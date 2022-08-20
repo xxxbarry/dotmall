@@ -5,14 +5,14 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../app/bloc/app_bloc.dart';
 import '../../category/widgets/widgets.dart';
 import '../../core/widgets/collection_widgets.dart';
 import '../../core/widgets/widgets.dart';
 import '../../l10n/l10n.dart';
-import '../bloc/home_bloc.dart';
 
-class HomeView extends StatelessWidget {
-  const HomeView({Key? key}) : super(key: key);
+class CategoryView extends StatelessWidget {
+  const CategoryView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -66,29 +66,8 @@ class HomeView extends StatelessWidget {
                 ),
               ),
             ),
-            CollectionListPanel<Categories, Category>(
-              collection: Categories(Manager(context.read<HomeBloc>().configs)),
-              handlers: CollectionEventHandlers(),
-              scrollDirection: Axis.horizontal,
-              scrollable: true,
-              gridCount: 1,
-              onItemPressed: (List<Model> selections, model) {
-                selections.clear();
-                selections.add(model);
-              },
-              itemBuilder: (context, panel, model, state) {
-                return CategoryCard(
-                    selected: false,
-                    onPressed: panel.onItemPressed == null
-                        ? null
-                        : () {
-                            panel.onItemPressed!(state.selections, model!);
-                          },
-                    model: model);
-              },
-            ),
             CollectionListPanel<Stores, Store>(
-              collection: Stores(Manager(context.read<HomeBloc>().configs)),
+              collection: Stores(Manager(context.read<AppBloc>().configs)),
               handlers: CollectionEventHandlers(),
               scrollDirection: Axis.horizontal,
               scrollable: true,
@@ -103,28 +82,6 @@ class HomeView extends StatelessWidget {
                   child: SemanticCard(
                     model == null ? null : panel.collection.semanticsOf(model),
                     onPressed: () {},
-                  ),
-                );
-              },
-            ),
-            CollectionListPanel<Products, Product>(
-              controller: prooductsPanelController,
-              collection: Products(Manager(context.read<HomeBloc>().configs)),
-              handlers: CollectionEventHandlers(),
-              scrollDirection: Axis.vertical,
-              scrollable: false,
-              gridCount: 2,
-              itemBuilder: (context, panel, model, state) {
-                return SemanticCard(
-                  model == null ? null : panel.collection.semanticsOf(model),
-                  onPressed: () {},
-                  style: SemanticCardStyle(
-                    leadingAspectRatio: 1,
-                    leadingWidth: double.infinity,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    textAlignment: CrossAxisAlignment.center,
-                    direction: Axis.vertical,
                   ),
                 );
               },

@@ -8,18 +8,12 @@ export default class Sections extends DotBaseSchema {
   public useTimestamps = true
   public useSoftDeletes = true
   public useValidatedAt = true
-  public useTranslation = "section"
+  public useTranslation = 'section'
   public setup(table: Knex.CreateTableBuilder): void {
     table.string('name').notNullable()
-    table.string('description').nullable()
+    table.string('description', 500).nullable()
     table.string('slug').nullable().unique()
-    table
-      .string('store_id')
-      .references('stores.id')
-      .onDelete('CASCADE')
-    table
-      .string('category_id')
-      .references('categories.id')
-      .onDelete('CASCADE')
+    table.string('store_id').references('stores.id').onDelete('CASCADE')
+    table.string('category_id').references('categories.id').onDelete('CASCADE')
   }
 }

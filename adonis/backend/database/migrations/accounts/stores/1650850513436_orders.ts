@@ -10,15 +10,9 @@ export default class Orders extends DotBaseSchema {
     table.integer('status').defaultTo(0)
     // Events
     table.timestamp('closed_at', { useTz: true })
-
-
-    table
-      .string('address_id')
-      .references('addresses.id')
-      .onDelete('CASCADE')
-    table
-      .string('customer_profile_id')
-      .references('customer_profiles.id')
-      .onDelete('CASCADE')
+    // items is arrery of order_items
+    table.json('items').notNullable()
+    table.string('address_id').references('addresses.id').onDelete('CASCADE')
+    table.string('customer_profile_id').references('customer_profiles.id').onDelete('CASCADE')
   }
 }

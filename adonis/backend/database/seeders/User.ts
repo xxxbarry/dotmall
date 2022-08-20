@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
 import faker from '@faker-js/faker'
 import Hash from '@ioc:Adonis/Core/Hash'
@@ -21,6 +22,11 @@ import Logger from '@ioc:Adonis/Core/Logger'
 import TechLogosList from 'Dot/TechLogosList'
 import MerchantProfile from 'App/Models/accounts/profiles/MerchantProfile'
 
+// function to get enum keys
+function getEnumKeys(enumType) {
+  // only numbers
+  return Object.values(enumType).filter(Number.isInteger)
+}
 export default class UserSeeder extends BaseSeeder {
   public async run() {
     var users: any = []
@@ -38,7 +44,7 @@ export default class UserSeeder extends BaseSeeder {
     var products: any = []
     var productTranslations: any = []
     var files: any = []
-    var file_id:string = ''
+    var file_id: string = ''
 
     for (let i = 0; i < 50; i++) {
       var file_index = 0
@@ -55,7 +61,7 @@ export default class UserSeeder extends BaseSeeder {
         userFiles.push(
           await Image.create({
             name: faker.lorem.words(2),
-            path:faker.random.arrayElement(TechLogosList).src,  //faker.image.imageUrl(300,200,undefined,true,true),
+            path: faker.random.arrayElement(TechLogosList).src, //faker.image.imageUrl(300,200,undefined,true,true),
             userId: user!.id,
           })
         )
@@ -96,8 +102,8 @@ export default class UserSeeder extends BaseSeeder {
       let account = await Account.create({
         userId: user.id,
         name: faker.name.findName(),
-        description: faker.lorem.paragraph(),
-        type: faker.random.arrayElement(Object.values(AccountType)) as AccountType,
+        description: faker.lorem.paragraph(1),
+        type: faker.random.arrayElement(getEnumKeys(AccountType)) as unknown as AccountType,
         data: {
           name: faker.name.findName(),
           fullname: faker.name.findName(),
@@ -106,11 +112,11 @@ export default class UserSeeder extends BaseSeeder {
       })
       accounts.push(account)
       // attach account to phone
-      file_id= userFiles[file_index++].id.toString()
+      file_id = userFiles[file_index++].id.toString()
       await account.related('photos').attach({
         [file_id]: {
           id: DotBaseModel.generateId(),
-          tag: "account:photo",
+          tag: 'account:photo',
         },
       })
 
@@ -130,15 +136,15 @@ export default class UserSeeder extends BaseSeeder {
       let category = await Category.create({
         // category name
         name: faker.commerce.department(),
-        description: faker.lorem.paragraph(),
+        description: faker.lorem.paragraph(1),
         // slug: faker.commerce.department().toLowerCase(),
       })
       categories.push(category)
-      file_id= userFiles[file_index++].id.toString()
+      file_id = userFiles[file_index++].id.toString()
       await category.related('photos').attach({
         [file_id]: {
           id: DotBaseModel.generateId(),
-          tag: "category:photo",
+          tag: 'category:photo',
         },
       })
       // create category translation
@@ -155,21 +161,21 @@ export default class UserSeeder extends BaseSeeder {
         merchantProfileId: merchant.id,
         name: faker.commerce.department(),
         description: faker.lorem.paragraph(1),
-        status: faker.random.arrayElement(Object.values(StoreStatus)) as StoreStatus,
+        status: faker.random.arrayElement(getEnumKeys(StoreStatus)) as unknown as StoreStatus,
       })
       stores.push(store)
-      file_id= userFiles[file_index++].id.toString()
+      file_id = userFiles[file_index++].id.toString()
       await store.related('photos').attach({
         [file_id]: {
           id: DotBaseModel.generateId(),
-          tag: "store:photo",
+          tag: 'store:photo',
         },
       })
       // create store translation
       let storeTranslation = await StoreTranslation.create({
         locale: 'en',
         name: faker.commerce.department(),
-        description: faker.lorem.paragraph(),
+        description: faker.lorem.paragraph(1),
         storeId: store.id,
       })
       storeTranslations.push(storeTranslation)
@@ -178,22 +184,22 @@ export default class UserSeeder extends BaseSeeder {
       let section = await Section.create({
         storeId: store.id,
         name: faker.commerce.department(),
-        description: faker.lorem.paragraph(),
+        description: faker.lorem.paragraph(1),
         // slug: faker.commerce.department().toLowerCase(),
       })
       sections.push(section)
-      file_id= userFiles[file_index++].id.toString()
+      file_id = userFiles[file_index++].id.toString()
       await section.related('photos').attach({
         [file_id]: {
           id: DotBaseModel.generateId(),
-          tag: "section:photo",
+          tag: 'section:photo',
         },
       })
       // create section translation
       let sectionTranslation = await SectionTranslation.create({
         locale: 'en',
         name: faker.commerce.department(),
-        description: faker.lorem.paragraph(),
+        description: faker.lorem.paragraph(1),
         sectionId: section.id,
       })
       sectionTranslations.push(sectionTranslation)
@@ -203,26 +209,26 @@ export default class UserSeeder extends BaseSeeder {
         sectionId: section.id,
         storeId: store.id,
         name: faker.commerce.productName(),
-        description: faker.lorem.paragraph(),
+        description: faker.lorem.paragraph(1),
         // barcode is string
         barcode: faker.random.word(),
         price: Number(faker.commerce.price()),
         quantity: faker.random.arrayElement([0, 1, 53, 4, 500, 96, 87, 858, 9, 10]),
-        body: faker.lorem.paragraph(),
+        body: faker.lorem.paragraph(1),
         // slug: faker.commerce.productName().toLowerCase(),
-        type: faker.random.arrayElement(Object.values(ProductType)) as ProductType,
-        status: faker.random.arrayElement(Object.values(ProductStatus)) as ProductStatus,
+        status: faker.random.arrayElement(getEnumKeys(ProductStatus)) as unknown as ProductStatus,
+        type: faker.random.arrayElement(getEnumKeys(ProductType)) as unknown as ProductType,
         meta: {
           keywords: faker.lorem.words(),
         },
       })
       products.push(product)
       for (let i = 0; i < 5; i++) {
-        file_id= userFiles[file_index++].id.toString()
+        file_id = userFiles[file_index++].id.toString()
         await product.related('photos').attach({
           [file_id]: {
             id: DotBaseModel.generateId(),
-            tag: "product:photo",
+            tag: 'product:photo',
           },
         })
       }
@@ -230,8 +236,8 @@ export default class UserSeeder extends BaseSeeder {
       let productTranslation = await ProductTranslation.create({
         locale: 'en',
         name: faker.commerce.productName(),
-        description: faker.lorem.paragraph(),
-        body: faker.lorem.paragraph(),
+        description: faker.lorem.paragraph(1),
+        body: faker.lorem.paragraph(1),
         productId: product.id,
         slug: faker.commerce.productName().toLowerCase(),
       })

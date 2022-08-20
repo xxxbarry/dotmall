@@ -1,5 +1,16 @@
 import { DateTime } from 'luxon'
-import {  beforeFetch, belongsTo, BelongsTo, column, hasMany, HasMany, hasOne, HasOne, ManyToMany, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
+import {
+  beforeFetch,
+  belongsTo,
+  BelongsTo,
+  column,
+  hasMany,
+  HasMany,
+  hasOne,
+  HasOne,
+  ManyToMany,
+  ModelQueryBuilderContract,
+} from '@ioc:Adonis/Lucid/Orm'
 import DotBaseModel from '../../../../../dot/models/DotBaseModel'
 import Store from './Store'
 import SectionTranslation from 'App/Models/translations/SectionTranslation'
@@ -7,7 +18,6 @@ import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
 import { Image } from 'App/Models/File'
 import Account from 'App/Models/Account'
 import { usePivot } from 'Dot/hooks/orm'
-
 
 export default class Section extends DotBaseModel {
   @column()

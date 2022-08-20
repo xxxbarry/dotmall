@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../category/bloc/category_bloc.dart';
 import '../../home/bloc/home_bloc.dart';
+import '../../home/views/category_view.dart';
 import '../../home/views/home_view.dart';
 import '../../l10n/l10n.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,7 @@ class App extends StatelessWidget {
     routes: {
       '/auth': (_) => const MaterialPage(child: AuthView()),
       '/': (_) => const MaterialPage(child: HomeView()),
+      '/categories/:id': (_) => const MaterialPage(child: CategoryView()),
 
       // '/feed': (_) => MaterialPage(child: FeedPage()),
       // '/settings': (_) => MaterialPage(child: SettingsPage()),
