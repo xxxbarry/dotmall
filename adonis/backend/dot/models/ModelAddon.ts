@@ -1,5 +1,5 @@
 
-import DotBaseModel from "./DorBaseModel";
+import DotBaseModel from "./DotBaseModel";
 
 /** the model addon is something like mixin on class but for the model
    it add some additional properties to the model

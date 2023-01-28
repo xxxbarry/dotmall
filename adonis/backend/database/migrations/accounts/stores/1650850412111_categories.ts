@@ -13,10 +13,6 @@ export default class Categories extends DotBaseSchema {
     table.string('description').nullable()
     table.string('slug').nullable().unique()
     table
-      .string('store_id')
-      .references('stores.id')
-      .onDelete('CASCADE')
-    table
       .string('category_id')
       .references('categories.id')
       .onDelete('CASCADE') 

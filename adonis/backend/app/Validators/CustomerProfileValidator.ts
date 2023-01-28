@@ -2,7 +2,7 @@ import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import DotValidator from './DotValidator'
 
-export class CreateMerchantProfileValidator implements DotValidator {
+export class CreateCustomerProfileValidator implements DotValidator {
   constructor(protected ctx: HttpContextContract) {
   }
   public schema = schema.create({
@@ -17,9 +17,9 @@ export class CreateMerchantProfileValidator implements DotValidator {
 }
 
 /**
- * UpdateMerchantProfileValidator 
+ * UpdateCustomerProfileValidator 
  */
-export class UpdateMerchantProfileValidator implements DotValidator {
+export class UpdateCustomerProfileValidator implements DotValidator {
   constructor(protected ctx: HttpContextContract) {
 
   }
@@ -28,7 +28,7 @@ export class UpdateMerchantProfileValidator implements DotValidator {
       id: schema.string({ trim: true }, [
         rules.required(),
         rules.minLength(14),
-        rules.exists({ table: 'merchant_profiles', column: 'id'}),
+        rules.exists({ table: 'customer_profiles', column: 'id'}),
       ]),
     }),
     name: schema.string.optional(),
@@ -41,10 +41,10 @@ export class UpdateMerchantProfileValidator implements DotValidator {
   public messages = {}
 }
 /**
- * Show MerchantProfile Validator
+ * Show CustomerProfile Validator
  *
  */
-export class ShowMerchantProfileValidator implements DotValidator {
+export class ShowCustomerProfileValidator implements DotValidator {
   constructor(protected ctx: HttpContextContract) {
 
   }
@@ -53,19 +53,19 @@ export class ShowMerchantProfileValidator implements DotValidator {
       id: schema.string({ trim: true }, [
         rules.required(),
         rules.minLength(14),
-        rules.exists({ table: 'merchant_profiles', column: 'id' }),
+        rules.exists({ table: 'customer_profiles', column: 'id' }),
       ]),
     }),
     load: schema.array.optional().members(
-      schema.enum.optional(["address", "stores", "account", "phones", "emails"] as const)
+      schema.enum.optional(["addresses",  "account", "phones", "emails"] as const)
     ),
   })
   public messages = {}
 }
 /**
- * Destroy MerchantProfile Validator 
+ * Destroy CustomerProfile Validator 
  */
-export class DestroyMerchantProfileValidator implements DotValidator {
+export class DestroyCustomerProfileValidator implements DotValidator {
   constructor(protected ctx: HttpContextContract) {
 
   }
@@ -74,7 +74,7 @@ export class DestroyMerchantProfileValidator implements DotValidator {
       id: schema.string({ trim: true }, [
         rules.required(),
         rules.minLength(14),
-        rules.exists({ table: 'merchant_profiles', column: 'id', }),
+        rules.exists({ table: 'customer_profiles', column: 'id', }),
       ]),
     }),
   })
@@ -83,7 +83,7 @@ export class DestroyMerchantProfileValidator implements DotValidator {
 }
 
 /**
- * List MerchantProfiles Validator
+ * List CustomerProfiles Validator
  * Handles the following:
  * - Pagination
  * - Sorting
@@ -92,7 +92,7 @@ export class DestroyMerchantProfileValidator implements DotValidator {
  * - Filtering
  * 
  */
-export class ListMerchantProfilesValidator implements DotValidator {
+export class ListCustomerProfilesValidator implements DotValidator {
   constructor(protected ctx: HttpContextContract) {
 
   }
@@ -108,7 +108,7 @@ export class ListMerchantProfilesValidator implements DotValidator {
     search: schema.string.optional([rules.minLength(1),]),
     search_by: schema.enum.optional(["id"] as const, [rules.requiredIfExists('search')]),
     load: schema.array.optional().members(
-      schema.enum.optional(["address", "stores", "account", "phones", "emails"] as const)
+      schema.enum.optional(["addresses", "account", "phones", "emails"] as const)
     ),
     where: schema.object().members({
       account_id: schema.string.optional(),

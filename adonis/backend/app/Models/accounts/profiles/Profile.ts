@@ -3,7 +3,7 @@ import { BaseModel, belongsTo, BelongsTo,  column,  hasMany,  HasMany,  HasOne, 
 import Email from '../../ContactOptions/Email'
 import Phone from '../../ContactOptions/Phone'
 import Address from '../../Address'
-import DotBaseModel from 'Dot/models/DorBaseModel'
+import DotBaseModel from 'Dot/models/DotBaseModel'
 
 export enum HumanGender {
     male = 0,
@@ -15,17 +15,29 @@ export class ProfileModel extends DotBaseModel  {
     // @column.dateTime({ autoCreate: true, autoUpdate: true })
     // public updatedAt: DateTime
     @column()
-    public relatedTo: string
+    public relatedId: string
     // has address
-    @hasMany(() => Email, { foreignKey: 'relatedTo' })
+
+    @hasMany(() => Email, {
+        foreignKey: "relatedId",
+        onQuery: (builder) => {
+            builder.where('related_type', 'profiles:emails')
+        }
+    })
     public emails: HasMany<typeof Email>
-    @hasMany(() => Phone, { foreignKey: 'relatedTo' })
+
+    @hasMany(() => Phone, {
+        foreignKey: "relatedId",
+        onQuery: (builder) => {
+            builder.where('related_type', 'profiles:phones')
+        }
+    })
     public phones: HasMany<typeof Phone>
 }
 
 
 // export default class Project extends compose(DotBaseModel, ProfileMixin) {
-    
+
 // }
 
 
@@ -34,7 +46,7 @@ export class ProfileModel extends DotBaseModel  {
 //     public gender: HumanGender
 //     public createdAt: DateTime
 //     public updatedAt: DateTime
-//     public relatedTo: string
+//     public relatedId: string
 //     public address: HasOne<typeof Address>
 //     public email: HasOne<typeof Email>
 //     public phone: HasOne<typeof Phone>

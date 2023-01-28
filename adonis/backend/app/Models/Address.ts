@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
-import DotBaseModel from '../../dot/models/DorBaseModel'
+import DotBaseModel from '../../dot/models/DotBaseModel'
 
 export default class Address extends DotBaseModel {
 
@@ -26,7 +26,7 @@ export default class Address extends DotBaseModel {
   public latitude: string
 
   @column()
-  public longitude: string 
+  public longitude: string
 
   // @column.dateTime({ autoCreate: true })
   // public createdAt: DateTime
@@ -35,7 +35,7 @@ export default class Address extends DotBaseModel {
   // public updatedAt: DateTime
   //
   @column({ serializeAs: null })
-  public relatedTo: string
+  public relatedId: string
 
   @column({ serializeAs: null })
   public relatedType: string

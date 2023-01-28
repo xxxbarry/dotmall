@@ -8,8 +8,7 @@ export default class SignupUserValidator implements DotValidator {
   public schema = schema.create({
     phone: schema.string({}, [
       rules.mobile(),
-      // the phone number must be unique only where related_type is "User"
-      rules.unique({ table: 'phones', column: 'value', where: { related_type: 'User' } }),
+      rules.unique({ table: 'phones', column: 'value'}),
     ]),
     password: schema.string({}, [
       rules.minLength(6),
@@ -38,11 +37,16 @@ export default class SignupUserValidator implements DotValidator {
 
 export class SigninUserValidator implements DotValidator {
   constructor(protected ctx: HttpContextContract) {
+
   }
+  public refs = schema.refs({
+    phoneModel: null
+  })
+
   public schema = schema.create({
     phone: schema.string({}, [
       rules.mobile(),
-      rules.exists({ table: 'phones', column: 'value', where: { related_type: 'User' } }),
+      rules.authUserPhoneExists(),
     ]),
     password: schema.string({}, [
       rules.minLength(6),

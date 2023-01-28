@@ -1,17 +1,17 @@
-import { BaseModel, beforeCreate, column, LucidModel } from "@ioc:Adonis/Lucid/Orm";
+import { BaseModel, beforeCreate, column, ExtractModelRelations, LucidModel, ModelRelations } from "@ioc:Adonis/Lucid/Orm";
 import {customAlphabet} from 'nanoid';
-import DotValidator from "App/Validators/DotValidator";
-import { validator } from '@ioc:Adonis/Core/Validator'
+import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
+import { Image } from "App/Models/File";
+
 const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnoprstuvwxyz';
 const nanoid = customAlphabet(alphabet, 14);
+
 export default class DotBaseModel/*<T extends LucidModel>*/ extends BaseModel {
     @column({ isPrimary: true })
     public id: string
-
-
     /**
      * Before create, generate id for the model
-     * @param model 
+     * @param model
      * @returns {Promise<void>}
      */
     @beforeCreate()
@@ -37,22 +37,40 @@ export default class DotBaseModel/*<T extends LucidModel>*/ extends BaseModel {
      * @returnExample '/uploads/{table_name}/{current_year}'
      * @returnExample '/uploads/{table_name}/{current_year}/{subPath}'
      */
-    public static uploadPath(subPath: String|null = null): string {
-        var path = `/uploads/${this.table}/${new Date().getFullYear()}`
-        if (subPath) {
-            path += `/${subPath}`
+    public static uploadPath(options: UploadPathOptions = {}): string {
+        var path = `/uploads/${options.folder??this.table}`
+        if (options.wrapOnYear) {
+            path += `/${new Date().getFullYear()}`
+        }
+        if (options.subPath) {
+            path += `/${options.subPath}`
         }
         return path
     }
 
-    
+
+  // async pivot<Name extends ExtractModelRelations<this>>(relation: Name): Promise<this[Name] extends ModelRelations ? any : never> {
+
+  //   return await this.related(relation).attach({
+  //     [email.id]: {
+  //       id: "",
+  //       tag: "primary"
+  //     }
+  //   });
+  // }
+
+
 }
 
-
+export class UploadPathOptions {
+    public subPath?: String|null = null
+    public folder?: String|null = null
+    public wrapOnYear?: Boolean = true
+}
 // export class DotBaseModelWithPermission extends DotBaseModel {
 
 //     // hasMany
-//     @hasMany(() => Permission, {foreignKey: 'relatedTo'})
+//     @hasMany(() => Permission, {foreignKey: 'relatedId'})
 //     public permissions: HasMany<typeof Permission>
 
 //     @afterCreate()
@@ -74,15 +92,15 @@ export default class DotBaseModel/*<T extends LucidModel>*/ extends BaseModel {
 //         public updatedAt: DateTime
 
 //         @column()
-//         public relatedTo: string
+//         public relatedId: string
 //         // has address
-//         @hasOne(() => Address, { foreignKey: 'relatedTo' })
+//         @hasOne(() => Address, { foreignKey: 'relatedId' })
 //         public address: HasOne<typeof Address>
 
-//         @hasOne(() => Email, { foreignKey: 'relatedTo' })
+//         @hasOne(() => Email, { foreignKey: 'relatedId' })
 //         public email: HasOne<typeof Email>
 
-//         @hasOne(() => Phone, { foreignKey: 'relatedTo' })
+//         @hasOne(() => Phone, { foreignKey: 'relatedId' })
 //         public phone: HasOne<typeof Phone>
 
 //         @belongsTo(() => Account)
@@ -102,15 +120,15 @@ export default class DotBaseModel/*<T extends LucidModel>*/ extends BaseModel {
 //         public updatedAt: DateTime
 
 //         @column()
-//         public relatedTo: string
+//         public relatedId: string
 //         // has address
-//         @hasOne(() => Address, { foreignKey: 'relatedTo' })
+//         @hasOne(() => Address, { foreignKey: 'relatedId' })
 //         public address: HasOne<typeof Address>
 
-//         @hasOne(() => Email, { foreignKey: 'relatedTo' })
+//         @hasOne(() => Email, { foreignKey: 'relatedId' })
 //         public email: HasOne<typeof Email>
 
-//         @hasOne(() => Phone, { foreignKey: 'relatedTo' })
+//         @hasOne(() => Phone, { foreignKey: 'relatedId' })
 //         public phone: HasOne<typeof Phone>
 
 //         @belongsTo(() => Account)

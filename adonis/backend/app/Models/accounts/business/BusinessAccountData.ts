@@ -1,10 +1,10 @@
 // import { DateTime } from 'luxon'
 // import {  belongsTo, BelongsTo, column, hasOne, HasOne } from '@ioc:Adonis/Lucid/Orm'
-// import Account, { AccountData } from '../Account'
 // import DotBaseModel from '../../../../dot/models/DorBaseModel'
 // import { HumanGender } from '../profiles/Profile'
 
-import { AccountData } from "../Account";
+import { AccountData } from "App/Models/Account";
+
 
 // export default class BusinessAccountData extends AccountData {
 

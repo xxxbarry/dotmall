@@ -1,28 +1,29 @@
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import DotValidator from './DotValidator'
-import { AccountType } from 'App/Models/Account'
 
-export class CreateAccountValidator extends DotValidator {
+export class CreateStoreValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
     super()
   }
   public schema = schema.create({
+
+    merchant_profile_id: schema.string({}, [
+      rules.required(),
+      rules.exists({ table: 'merchant_profiles', column: 'id' }),
+    ]),
     name: schema.string.optional(),
     description: schema.string.optional(),
-    type: schema.string({}, []),
-    // photo is optional, but if it is provided, it must be a valid image
-    photo: schema.file.optional({}, [
-    ]),
+    photo: schema.file.optional({}, []),
   })
 
   public messages = {}
 }
 
 /*
- * UpdateAccountValidator
+ * UpdateStoreValidator 
  */
-export class UpdateAccountValidator extends DotValidator {
+export class UpdateStoreValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
     super()
   }
@@ -31,23 +32,21 @@ export class UpdateAccountValidator extends DotValidator {
       id: schema.string({ trim: true }, [
         rules.required(),
         rules.minLength(14),
-        rules.exists({ table: 'accounts', column: 'id' }),
+        rules.exists({ table: 'stores', column: 'id' }),
       ]),
     }),
     name: schema.string.optional(),
     description: schema.string.optional(),
-    // type: schema.string.optional(),
-    // photo is optional, but if it is provided, it must be a valid image
     photo: schema.file.optional(),
   })
 
   public messages = {}
 }
 /*
- * Show Account Validator
+ * Show Store Validator
  *
  */
-export class ShowAccountValidator extends DotValidator {
+export class ShowStoreValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
     super()
   }
@@ -56,19 +55,28 @@ export class ShowAccountValidator extends DotValidator {
       id: schema.string({ trim: true }, [
         rules.required(),
         rules.minLength(14),
-        rules.exists({ table: 'accounts', column: 'id' }),
+        rules.exists({ table: 'stores', column: 'id' }),
       ]),
     }),
+
     load: schema.array.optional().members(
-      schema.enum.optional(["users", "photos", "customer", "merchant",/* "merchant.store"*/] as const)
+      schema.enum.optional([
+        "products",
+        "categories",
+        "orders",
+        "address",
+        "email",
+        "phone",
+        "photo",
+        "merchant"] as const)
     ),
   })
   public messages = {}
 }
 /*
- * Destroy Account Validator
+ * Destroy Store Validator 
  */
-export class DestroyAccountValidator extends DotValidator {
+export class DestroyStoreValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
     super()
   }
@@ -77,7 +85,7 @@ export class DestroyAccountValidator extends DotValidator {
       id: schema.string({ trim: true }, [
         rules.required(),
         rules.minLength(14),
-        rules.exists({ table: 'accounts', column: 'id' }),
+        rules.exists({ table: 'stores', column: 'id' }),
       ]),
     }),
   })
@@ -86,16 +94,16 @@ export class DestroyAccountValidator extends DotValidator {
 }
 
 /*
- * List Accounts Validator
+ * List Stores Validator
  * Handles the following:
  * - Pagination
  * - Sorting
  * - Filtering
  * - Searching
  * - Filtering
- *
+ * 
  */
-export class ListAccountsValidator extends DotValidator {
+export class ListStoresValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
     super()
   }
@@ -111,14 +119,22 @@ export class ListAccountsValidator extends DotValidator {
       order: schema.enum.optional(["asc", "desc"] as const),
       // type: schema.enum.optional(["personal', 'business"] as const),
       search: schema.string.optional([rules.minLength(1),]),
-      search_by:
+      search_by: 
         schema.enum.optional(["name"] as const, [rules.requiredIfExists('search')]),
       load: schema.array.optional().members(
-        schema.enum(["users", "photos", "customer", "merchant",/* "merchant.store"*/] as const)
+        schema.enum.optional([
+          "products",
+          "categories",
+          "orders",
+          "address",
+          "email",
+          "phone",
+          "photo",
+          "merchant"] as const)
       ),
       where: schema.object().members({
-        user_id: schema.string.optional(),
-        type: schema.enum.optional(["business", "business"] as const),
+        merchant_profile_id: schema.string.optional(),
+        status: schema.enum.optional([0,1,2] as const),
         name: schema.string.optional(),
         description: schema.string.optional(),
       })

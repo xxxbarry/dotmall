@@ -1,6 +1,7 @@
+
 import { BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
-import DotBaseModel from '../../../dot/models/DorBaseModel'
-import Category from '../accounts/business/stores/Category'
+import DotBaseModel from '../../../dot/models/DotBaseModel'
+import Category from '../Category'
 
 export default class CategoryTranslation extends DotBaseModel {
   @column()
@@ -13,7 +14,7 @@ export default class CategoryTranslation extends DotBaseModel {
   public description: string | null
 
   @column()
-  public categoryId: string
+  public sectionId: string
 
   @belongsTo(() => Category)
   public category: BelongsTo<typeof Category>

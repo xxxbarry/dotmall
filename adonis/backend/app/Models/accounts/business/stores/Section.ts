@@ -1,10 +1,10 @@
 import { DateTime } from 'luxon'
 import {  belongsTo, BelongsTo, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm' 
-import DotBaseModel from '../../../../../dot/models/DorBaseModel'
+import DotBaseModel from '../../../../../dot/models/DotBaseModel'
 import Store from './Store'
-import CategoryTranslation from 'App/Models/translations/CategoryTranslation'
+import SectionTranslation from 'App/Models/translations/SectionTranslation'
 
-export default class Category extends DotBaseModel {
+export default class Section extends DotBaseModel {
   @column()
   public storeId: string
 
@@ -31,13 +31,13 @@ export default class Category extends DotBaseModel {
   @belongsTo(() => Store)
   public account: BelongsTo<typeof Store>
 
-  @belongsTo(() => Category)
-  public parent: BelongsTo<typeof Category>
+  @belongsTo(() => Section)
+  public parent: BelongsTo<typeof Section>
 
-  @hasMany(() => Category)
-  public children: HasMany<typeof Category>
+  @hasMany(() => Section)
+  public children: HasMany<typeof Section>
 
 
-  @hasMany(() => CategoryTranslation)
-  public translations: HasMany<typeof CategoryTranslation>
+  @hasMany(() => SectionTranslation)
+  public translations: HasMany<typeof SectionTranslation>
 }

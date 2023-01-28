@@ -1,17 +1,17 @@
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import DotValidator from './DotValidator'
-import { AccountType } from 'App/Models/Account'
 
-export class CreateAccountValidator extends DotValidator {
+/**
+ * CreateCategoryValidator 
+ */
+export class CreateCategoryValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
     super()
   }
   public schema = schema.create({
     name: schema.string.optional(),
     description: schema.string.optional(),
-    type: schema.string({}, []),
-    // photo is optional, but if it is provided, it must be a valid image
     photo: schema.file.optional({}, [
     ]),
   })
@@ -19,10 +19,10 @@ export class CreateAccountValidator extends DotValidator {
   public messages = {}
 }
 
-/*
- * UpdateAccountValidator
+/**
+ * UpdateCategoryValidator 
  */
-export class UpdateAccountValidator extends DotValidator {
+export class UpdateCategoryValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
     super()
   }
@@ -31,23 +31,22 @@ export class UpdateAccountValidator extends DotValidator {
       id: schema.string({ trim: true }, [
         rules.required(),
         rules.minLength(14),
-        rules.exists({ table: 'accounts', column: 'id' }),
+        rules.exists({ table: 'categories', column: 'id' }),
       ]),
     }),
     name: schema.string.optional(),
     description: schema.string.optional(),
-    // type: schema.string.optional(),
     // photo is optional, but if it is provided, it must be a valid image
     photo: schema.file.optional(),
   })
 
   public messages = {}
 }
-/*
- * Show Account Validator
- *
+/**
+ * Show Category Validator
+ * 
  */
-export class ShowAccountValidator extends DotValidator {
+export class ShowCategoryValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
     super()
   }
@@ -56,19 +55,19 @@ export class ShowAccountValidator extends DotValidator {
       id: schema.string({ trim: true }, [
         rules.required(),
         rules.minLength(14),
-        rules.exists({ table: 'accounts', column: 'id' }),
+        rules.exists({ table: 'categories', column: 'id' }),
       ]),
     }),
     load: schema.array.optional().members(
-      schema.enum.optional(["users", "photos", "customer", "merchant",/* "merchant.store"*/] as const)
+      schema.enum.optional(["parent", "children", "translations","photo"] as const)
     ),
   })
   public messages = {}
 }
 /*
- * Destroy Account Validator
+ * Destroy Category Validator 
  */
-export class DestroyAccountValidator extends DotValidator {
+export class DestroyCategoryValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
     super()
   }
@@ -77,7 +76,7 @@ export class DestroyAccountValidator extends DotValidator {
       id: schema.string({ trim: true }, [
         rules.required(),
         rules.minLength(14),
-        rules.exists({ table: 'accounts', column: 'id' }),
+        rules.exists({ table: 'categories', column: 'id' }),
       ]),
     }),
   })
@@ -86,16 +85,16 @@ export class DestroyAccountValidator extends DotValidator {
 }
 
 /*
- * List Accounts Validator
+ * List Categories Validator
  * Handles the following:
  * - Pagination
  * - Sorting
  * - Filtering
  * - Searching
  * - Filtering
- *
+ * 
  */
-export class ListAccountsValidator extends DotValidator {
+export class ListCategoriesValidator extends DotValidator {
   constructor(protected ctx: HttpContextContract) {
     super()
   }
@@ -107,14 +106,14 @@ export class ListAccountsValidator extends DotValidator {
       limit: schema.number.optional([
         rules.range(1, 24),
       ]),
-      sort: schema.enum.optional(['name', 'type', 'created_at', 'updated_at'] as const),
+      sort: schema.enum.optional(['name', 'description', 'created_at', 'updated_at'] as const),
       order: schema.enum.optional(["asc", "desc"] as const),
       // type: schema.enum.optional(["personal', 'business"] as const),
       search: schema.string.optional([rules.minLength(1),]),
-      search_by:
-        schema.enum.optional(["name"] as const, [rules.requiredIfExists('search')]),
+      search_by: 
+        schema.enum.optional(["name","description"] as const, [rules.requiredIfExists('search')]),
       load: schema.array.optional().members(
-        schema.enum(["users", "photos", "customer", "merchant",/* "merchant.store"*/] as const)
+        schema.enum.optional(["parent", "children", "translations","photo",] as const)
       ),
       where: schema.object().members({
         user_id: schema.string.optional(),

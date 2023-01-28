@@ -9,7 +9,6 @@ export default class Stores extends DotBaseSchema {
   public useTranslation = "store"
   public useStatus: boolean = true
   public setup(table: Knex.CreateTableBuilder): void {
-    // the address primary is line 1
     table.string('name').notNullable()
     table.string('description').nullable()
     // Geo location

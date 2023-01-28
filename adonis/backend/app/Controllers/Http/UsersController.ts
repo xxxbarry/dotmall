@@ -2,8 +2,9 @@ import { OpaqueTokenContract } from '@ioc:Adonis/Addons/Auth'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { ModelObject } from '@ioc:Adonis/Lucid/Orm'
 import Phone from 'App/Models/ContactOptions/Phone'
-import User from 'App/Models/User'
+import User,{ AuthPivotTags } from 'App/Models/User'
 import SignupUserValidator, { SigninUserValidator, UpdateUserValidator } from 'App/Validators/UserValidators'
+import DotBaseModel from 'Dot/models/DotBaseModel'
 
 export default class UsersController {
   /**
@@ -20,11 +21,15 @@ export default class UsersController {
     var user = await User.create({
       password: payload.password,
     })
-    var phone = await user.related('phones').create({
+    var phone = await Phone.create({
       value: payload.phone,
-      relatedType: "User",
     })
-
+    await user.related('phones').attach({
+      [phone.id]: {
+        id: DotBaseModel.generateId(),
+        tag: AuthPivotTags.user,
+      }
+    })
     return {
       phones: [phone],
       user: user.toJSON(),
@@ -43,13 +48,15 @@ export default class UsersController {
    */
   public async signin({ request, auth }: HttpContextContract): Promise<SigninResponse> {
     const payload = await request.validate(SigninUserValidator)
-    const phone = (await Phone.query().where('related_type', "User").where('value', payload.phone).first())!
-    var user = await auth.verifyCredentials(phone.relatedTo, payload.password)
-    
+    const phone   = await Phone.query().where('value', payload.phone).first()
+    const pivot   = await phone!.related("users").pivotQuery().where('tag', AuthPivotTags.user).first()
+    const user    = await User.query().where('id', pivot.related_id).first()
+    await auth.verifyCredentials(user!.id, payload.password)
+
     return {
-      phones: [phone.toJSON()],
-      user: user.toJSON(),
-      token: await auth.use('api').generate(user),
+      phones: [phone!.toJSON()],
+      user: user!.toJSON(),
+      token: await auth.use('api').generate(user!),
     }
   }
 
@@ -64,7 +71,7 @@ export default class UsersController {
   public async signout({ auth }: HttpContextContract): Promise<void> {
     return await auth.logout()
   }
-  
+
   /**
    * GET: /api/v1/auth/users/me
    * get user info

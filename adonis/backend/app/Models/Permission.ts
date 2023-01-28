@@ -1,5 +1,5 @@
 import { BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
-import DotBaseModel from 'Dot/models/DorBaseModel'
+import DotBaseModel from 'Dot/models/DotBaseModel'
 import Store from './accounts/business/stores/Store'
 import User from './User'
 
@@ -8,12 +8,12 @@ export class Permission extends DotBaseModel {
   public value: string
 
   @column({ serializeAs: null })
-  public relatedTo: string
+  public relatedId: string
 
   @column({ serializeAs: null })
   public relatedType: string
 
-  @belongsTo(() => User, { foreignKey: 'relatedTo' })
+  @belongsTo(() => User, { foreignKey: 'relatedId' })
   public user: BelongsTo<typeof User>
 }
 

@@ -1,11 +1,19 @@
+import { action } from '@ioc:Adonis/Addons/Bouncer'
 import { BasePolicy } from '@ioc:Adonis/Addons/Bouncer'
+import Account from 'App/Models/Account'
 import Store, { StoreStatus } from 'App/Models/accounts/business/stores/Store'
 import MerchantProfile from 'App/Models/accounts/profiles/MerchantProfile'
-import { StorePermission } from 'App/Models/Permission'
 import User from 'App/Models/User'
 
 export default class StorePolicy extends BasePolicy {
+
+    @action({ allowGuest: true })
+    public async viewList(user: User| null, payload: any) {
+        return true
+    }
+    @action({ allowGuest: true })
     public async view(user: User | null, store: Store) {
+        return true;
         if (store.status === StoreStatus.active) {
             return true
         } else if (user) {
@@ -18,8 +26,10 @@ export default class StorePolicy extends BasePolicy {
         return false
     }
     // create a store
-    public async create(user: User | null) {
-        if (user) {
+    public async create(user: User | null, payload: any) {
+        var merchantProfile = await MerchantProfile.find(payload.merchant_profile_id)
+        await merchantProfile?.load('account')
+        if (user && merchantProfile?.account.userId === user.id) {
             return true
         }
         return false
@@ -35,4 +45,5 @@ export default class StorePolicy extends BasePolicy {
         }
         return false
     }
+    public delete = this.update
 }

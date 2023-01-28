@@ -1,11 +1,12 @@
 import { DateTime } from 'luxon'
 import { afterDelete, BaseModel, beforeFetch, beforeSave, column, LucidModel, ModelAssignOptions, ModelAttributes, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
-import DotBaseModel from '../../dot/models/DorBaseModel'
+import DotBaseModel from '../../dot/models/DotBaseModel'
 import Drive from '@ioc:Adonis/Core/Drive'
 import Application from '@ioc:Adonis/Core/Application'
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
 
 export default class File extends DotBaseModel {
+
 
   @column({ isPrimary: true })
   public id: string
@@ -29,7 +30,7 @@ export default class File extends DotBaseModel {
   public updatedAt: DateTime
 
   @column({ serializeAs: null })
-  public relatedTo: string
+  public relatedId: string
 
   @column({ serializeAs: null })
   public relatedType: string
@@ -37,14 +38,14 @@ export default class File extends DotBaseModel {
 
   // before delete, delete file if it exists
   @afterDelete()
-  public static async deleteAvatar(instance: File) {
+  public static async deletePhoto(instance: File) {
     if (instance.path) {
       await Drive.delete(Application.publicPath(instance.path))
     }
   }
 
 
-  // static method to handle the avatar upload
+  // static method to handle the photo upload
   public static async upload(multipartFile: MultipartFileContract, path: string, name: string): Promise<string> {
     // move file to storege
     await multipartFile.move(Application.publicPath(path), {
@@ -54,33 +55,42 @@ export default class File extends DotBaseModel {
   }
 
   // public static async uploadAndCreates<T extends LucidModel>(this: T, values: Partial<ModelAttributes<InstanceType<T>>>, options?: ModelAssignOptions): Promise<InstanceType<T>>{
-    
+
   // }
 
   // uploadAndCreate
   public static async uploadAndCreate<T extends File>(fileUploadData: _FileUploadData): Promise<T> {
     var fileId = fileUploadData.id ?? DotBaseModel.generateId()
-    var uploadPath = fileUploadData.relatedType?.uploadPath() ?? File.uploadPath()
+    var uploadPath = File.uploadPath()
+    // if (typeof fileUploadData.relatedType === 'string') {
+    //   uploadPath = File.uploadPath({
+    //     folder: fileUploadData.relatedType,
+    //   })
+    // } else if (typeof fileUploadData.relatedType === 'object') {
+    //   uploadPath = File.uploadPath({
+    //     folder: (fileUploadData.relatedType as LucidModel).table,
+    //   })
+    // }
     // move file to storege
     var path = await File.upload(fileUploadData.multipartFile, uploadPath, fileUploadData.name ?? fileId)
     return await File.create({
       id: fileId,
       path: path,
       name: fileUploadData.name,
-      relatedTo: fileUploadData.relatedTo,
-      relatedType: fileUploadData.relatedType?.table,
+      relatedId: fileUploadData.relatedId,
+      relatedType: typeof fileUploadData.relatedType === 'string' ? fileUploadData.relatedType : fileUploadData.relatedType?.table,
     }) as T
   }
 
-  
+
 }
 // _FileAndUploadType
 class _FileUploadData  {
   multipartFile: MultipartFileContract
   id?: string|null
   name?: string|null
-  relatedTo?: string
-  relatedType?:typeof DotBaseModel
+  relatedId?: string
+  relatedType?:typeof DotBaseModel|string
 }
 export class Image extends File {
   public static table = 'files'

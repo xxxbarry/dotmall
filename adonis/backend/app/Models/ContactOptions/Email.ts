@@ -1,7 +1,9 @@
-import { BaseModel, belongsTo, BelongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, belongsTo, BelongsTo, column, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
+import { usedPivot } from 'Dot/hooks/orm'
 import { DateTime } from 'luxon'
-import DotBaseModel from '../../../dot/models/DorBaseModel'
+import DotBaseModel from '../../../dot/models/DotBaseModel'
 import User from '../User'
+import Phone from './Phone'
 
 export default class Email extends DotBaseModel {
 
@@ -14,21 +16,21 @@ export default class Email extends DotBaseModel {
   @column.dateTime()
   public validatedAt: DateTime
 
-  // @column.dateTime({ autoCreate: true })
-  // public createdAt: DateTime
+  @column.dateTime({ autoCreate: true })
+  public createdAt: DateTime
 
-  // @column.dateTime({ autoCreate: true, autoUpdate: true })
-  // public updatedAt: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  public updatedAt: DateTime
 
   //
   @column({ serializeAs: null })
-  public relatedTo: string
+  public relatedId: string
 
   @column({ serializeAs: null })
   public relatedType: string
 
-  @belongsTo(() => User)
-  public user: BelongsTo<typeof User>
+  @usedPivot(() => User, () => Phone)
+  public users: ManyToMany<typeof User>
 
   //
   // @column()

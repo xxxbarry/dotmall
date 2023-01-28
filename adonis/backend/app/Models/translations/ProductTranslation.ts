@@ -1,5 +1,5 @@
 import { BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
-import DotBaseModel from '../../../dot/models/DorBaseModel'
+import DotBaseModel from '../../../dot/models/DotBaseModel'
 import Product from '../accounts/business/stores/Product'
 
 export default class ProductTranslation extends DotBaseModel {

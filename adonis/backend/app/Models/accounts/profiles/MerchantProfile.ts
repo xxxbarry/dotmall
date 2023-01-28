@@ -1,13 +1,18 @@
-import { belongsTo, BelongsTo, column, HasMany, hasMany, hasOne, HasOne, LucidModel } from '@ioc:Adonis/Lucid/Orm'
-import { HumanGender, ProfileModel } from './Profile'
+import { belongsTo, BelongsTo, column, HasMany, hasMany, HasManyThrough, hasManyThrough, hasOne, HasOne, LucidModel } from '@ioc:Adonis/Lucid/Orm'
 import Store from '../business/stores/Store'
-import Account from '../Account'
 import Address from 'App/Models/Address'
+import Account from 'App/Models/Account'
+import { ProfileModel } from './Profile'
 export default class MerchantProfile extends ProfileModel {
   @column()
   public accountId: string
 
-  @hasOne(() => Address, { foreignKey: 'relatedTo' })
+  @hasOne(() => Address, {
+    foreignKey: "relatedId",
+    onQuery: (builder) => {
+      builder.where('related_type', 'merchants:address')
+    }
+  })
   public address: HasOne<typeof Address>
   // has many stores
   @hasMany(() => Store)
@@ -15,6 +20,8 @@ export default class MerchantProfile extends ProfileModel {
 
   @belongsTo(() => Account)
   public account: BelongsTo<typeof Account>
+
+
 
 }
 
