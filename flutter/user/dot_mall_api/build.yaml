@@ -1,0 +1,18 @@
+targets:
+  $default:
+    builders:
+      generators|annotations:
+        enabled: true
+
+builders:
+  generators:
+    target: ":generators"
+    # 1
+    import: "package:generators/builder.dart"
+    # 2
+    builder_factories: ["generateSubclass", "generateExtension"]
+    # 3
+    build_extensions: { ".dart": [".g.dart"] }
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]

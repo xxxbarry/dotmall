@@ -1,6 +1,12 @@
 import { DateTime } from 'luxon'
+<<<<<<< HEAD
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
 import DotBaseModel from '../../dot/models/DotBaseModel'
+=======
+import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import DotBaseModel from '../../dot/models/DotBaseModel'
+import User from './User'
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 
 export default class Address extends DotBaseModel {
 
@@ -23,17 +29,21 @@ export default class Address extends DotBaseModel {
   public country: string
 
   @column()
-  public latitude: string
+  public latitude: number
 
   @column()
+<<<<<<< HEAD
   public longitude: string
+=======
+  public longitude: number
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 
-  // @column.dateTime({ autoCreate: true })
-  // public createdAt: DateTime
+  @column()
+  public userId: string
 
-  // @column.dateTime({ autoCreate: true, autoUpdate: true })
-  // public updatedAt: DateTime
-  //
+  @belongsTo(() => User)
+  public user: BelongsTo<typeof User>
+
   @column({ serializeAs: null })
   public relatedId: string
 

@@ -1,0 +1,10 @@
+builders:
+  collectionGeneratorBuilder:
+    import: 'package:auto_sdk_generator/auto_sdk_generator.dart'
+    builder_factories: [
+      'tableGeneratorBuilder',
+    ]
+    auto_apply: dependents
+    build_extensions: {".dart": [".table.part"]}
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]

@@ -1,15 +1,19 @@
-import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, BelongsTo,  column,  hasMany,  HasMany,  HasOne, hasOne, LucidModel } from '@ioc:Adonis/Lucid/Orm'
 import Email from '../../ContactOptions/Email'
 import Phone from '../../ContactOptions/Phone'
+<<<<<<< HEAD
 import Address from '../../Address'
 import DotBaseModel from 'Dot/models/DotBaseModel'
+=======
+import DotBaseModel from 'Dot/models/DotBaseModel'
+import { column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 
 export enum HumanGender {
     male = 0,
     female = 1,
 }
 export class ProfileModel extends DotBaseModel  {
+<<<<<<< HEAD
     // @column.dateTime({ autoCreate: true })
     // public createdAt: DateTime
     // @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -33,6 +37,8 @@ export class ProfileModel extends DotBaseModel  {
         }
     })
     public phones: HasMany<typeof Phone>
+=======
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 }
 
 

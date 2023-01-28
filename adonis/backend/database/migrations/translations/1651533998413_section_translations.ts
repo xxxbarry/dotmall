@@ -1,21 +1,15 @@
-import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+import DotBaseSchema from '../../../dot/DotBaseSchema'
+import { Knex } from 'knex'
 
-export default class SectionTranslations extends BaseSchema {
+export default class SectionTranslations extends DotBaseSchema {
   protected tableName = 'section_translations'
-
-  public async up () {
-    this.schema.createTable(this.tableName, (table) => {
-      table.increments('id')
-
-      /**
-       * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
-       */
-      table.timestamp('created_at', { useTz: true })
-      table.timestamp('updated_at', { useTz: true })
-    })
-  }
-
-  public async down () {
-    this.schema.dropTable(this.tableName)
+  public useValidatedAt: boolean = false
+  public useSoftDeletes: boolean = false
+  public useTimestamps: boolean = false
+  public setup(table: Knex.CreateTableBuilder): void {
+    table.string('locale', 5).notNullable()
+    table.string('name').nullable()
+    table.string('description', 500).nullable()
+    table.string('section_id').references('sections.id').onDelete('CASCADE').notNullable()
   }
 }

@@ -1,0 +1,8 @@
+{
+    "@@locale": "en",
+    "counterAppBarTitle": "Anibal",
+    "@counterAppBarTitle": {
+        "description": "Text shown in the AppBar of the Counter Page"
+    },
+    "description": "Application that allows you to create and manage stores and items"
+}

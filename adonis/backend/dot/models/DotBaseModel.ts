@@ -1,12 +1,18 @@
+<<<<<<< HEAD
 import { BaseModel, beforeCreate, column, ExtractModelRelations, LucidModel, ModelRelations } from "@ioc:Adonis/Lucid/Orm";
 import {customAlphabet} from 'nanoid';
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
 import { Image } from "App/Models/File";
+=======
+import { BaseModel, beforeCreate, column } from "@ioc:Adonis/Lucid/Orm";
+import {customAlphabet} from 'nanoid';
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 
 const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnoprstuvwxyz';
 const nanoid = customAlphabet(alphabet, 14);
 
 export default class DotBaseModel/*<T extends LucidModel>*/ extends BaseModel {
+
     @column({ isPrimary: true })
     public id: string
     /**
@@ -138,3 +144,11 @@ export class UploadPathOptions {
 
 //     return AProfileModel;
 // }
+<<<<<<< HEAD
+=======
+
+export class DotBaseTranslation extends DotBaseModel {
+    @column()
+    public locale: string
+}
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865

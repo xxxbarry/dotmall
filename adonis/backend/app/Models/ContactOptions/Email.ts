@@ -1,12 +1,17 @@
+<<<<<<< HEAD
 import { BaseModel, belongsTo, BelongsTo, column, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
 import { usedPivot } from 'Dot/hooks/orm'
 import { DateTime } from 'luxon'
 import DotBaseModel from '../../../dot/models/DotBaseModel'
 import User from '../User'
 import Phone from './Phone'
+=======
+import { column } from '@ioc:Adonis/Lucid/Orm'
+import { DateTime } from 'luxon'
+import DotBaseModel from '../../../dot/models/DotBaseModel'
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 
 export default class Email extends DotBaseModel {
-
   @column({ isPrimary: true })
   public type: string
 
@@ -29,6 +34,7 @@ export default class Email extends DotBaseModel {
   @column({ serializeAs: null })
   public relatedType: string
 
+<<<<<<< HEAD
   @usedPivot(() => User, () => Phone)
   public users: ManyToMany<typeof User>
 
@@ -46,4 +52,8 @@ export default class Email extends DotBaseModel {
   //   const emailRegexp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
   //   return emailRegexp.test(_email);
   // }
+=======
+  @column()
+  public userId: string
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 }

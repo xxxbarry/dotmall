@@ -11,6 +11,6 @@
 //     _table.text('body').nullable()
 //     _table.string('slug').nullable()
 //     _table.string('barcode').nullable()
-//     _table.string('product_type').defaultTo('simple_product')
+//     _table.string('type').defaultTo('simple_product')
 //   }
 // }

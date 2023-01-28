@@ -1,14 +1,29 @@
+<<<<<<< HEAD
 import {  belongsTo, BelongsTo, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
+=======
+import { belongsTo, BelongsTo, column, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 import { DateTime } from 'luxon'
+import DotBaseModel from 'Dot/models/DotBaseModel'
+import { usedPivot } from 'Dot/hooks/orm'
 import User from '../User'
+<<<<<<< HEAD
 import DotBaseModel from 'Dot/models/DotBaseModel'
 import { usedPivot, usePivot } from 'Dot/hooks/orm'
+=======
+import { string } from '@ioc:Adonis/Core/Helpers'
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 
 export default class Phone extends DotBaseModel {
+  @column()
+  public userId: string
 
+<<<<<<< HEAD
   // @column()
   // public code: number
 
+=======
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
   @column()
   public value: string
 
@@ -27,8 +42,22 @@ export default class Phone extends DotBaseModel {
   @column({ serializeAs: null })
   public relatedType: string
 
+<<<<<<< HEAD
 
   @usedPivot(() => User, () => Phone)
+=======
+  @manyToMany(() => User, {
+    pivotForeignKey: 'phone_id',
+    pivotRelatedForeignKey: 'related_id',
+    pivotTable: 'phones_pivot',
+    pivotColumns: ['tag'],
+    onQuery: (builder) => {
+      // if (tag) {
+      //   builder.wherePivot('tag', tag);
+      // }
+    },
+  })
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
   public users: ManyToMany<typeof User>
 
   //

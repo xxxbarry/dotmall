@@ -6,6 +6,10 @@ import { ListMerchantProfilesValidator } from 'App/Validators/MerchantProfileVal
 
 export default class MerchantPolicy extends BasePolicy {
 	public async viewList(user: User, payload: any) {
+<<<<<<< HEAD
+=======
+    return true
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 		if (user) {
 			var account = await Account.find(payload.where.account_id)
 			return account && user.id === account.userId
@@ -13,9 +17,17 @@ export default class MerchantPolicy extends BasePolicy {
 		return false
 	}
 	public async view(user: User, merchantProfile: MerchantProfile) {
+<<<<<<< HEAD
 		return true
 	}
 	public async create(user: User, accountId: string) {
+=======
+    return true
+		return true
+	}
+	public async create(user: User, accountId: string) {
+    return true
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 		var account = await Account.find(accountId)
 		if (account && user.id === account.userId) {
 			return true
@@ -23,6 +35,10 @@ export default class MerchantPolicy extends BasePolicy {
 		return false
 	}
 	public async update(user: User,  merchantProfile: MerchantProfile) {
+<<<<<<< HEAD
+=======
+    return true
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 		return this.create(user, merchantProfile.accountId)
 	}
 	public delete = this.update

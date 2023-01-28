@@ -1,0 +1,8 @@
+{
+    "@@locale": "ar",
+    "counterAppBarTitle": "أنيبال",
+    "@counterAppBarTitle": {
+        "description": "Texto mostrado en la AppBar de la página del contador"
+    },
+    "description": "تطبيق يسمح لك بإنشاء وإدارة متاجر وسلع"
+}

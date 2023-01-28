@@ -1,13 +1,17 @@
-// import { DateTime } from 'luxon'
-// import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import DotBaseModel from 'Dot/models/DotBaseModel'
+import Product from './accounts/business/stores/Product'
 
-// export default class Price extends BaseModel {
-//   @column({ isPrimary: true })
-//   public id: number
+export default class Price extends DotBaseModel {
+  @column()
+  public value: number
 
-//   @column.dateTime({ autoCreate: true })
-//   public createdAt: DateTime
+  @column()
+  public currencyId: string
 
-//   @column.dateTime({ autoCreate: true, autoUpdate: true })
-//   public updatedAt: DateTime
-// }
+  @column()
+  public productId: string
+
+  @belongsTo(() => Product)
+  public product: BelongsTo<typeof Product>
+}

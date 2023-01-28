@@ -21,10 +21,25 @@ export default class MerchantProfilesController {
         await bouncer.with('MerchantPolicy').authorize('viewList', payload)
         var merchantsQuery = MerchantProfile.query()
         var page = 1
+<<<<<<< HEAD
         var limit = 24
 
         if (payload.search) {
             merchantsQuery = merchantsQuery.where(payload.search_by!, 'like', `%${payload.search}%`)
+=======
+        var limit = 12
+
+
+        if (payload.search) {
+          for (let i = 0; i < payload.search_in!.length; i++) {
+            const element = payload.search_in![i];
+            if (i == 0) {
+              merchantsQuery = merchantsQuery.where(element, 'like', `%${payload.search}%`)
+            } else {
+              merchantsQuery = merchantsQuery.orWhere(element, 'like', `%${payload.search}%`)
+            }
+          }
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
         }
         if (payload.sort) {
             merchantsQuery = merchantsQuery.orderBy(payload.sort, payload.order)
@@ -82,7 +97,11 @@ export default class MerchantProfilesController {
                 await merchant!.load(load)
             }
         }
+<<<<<<< HEAD
         return merchant!.toJSON()
+=======
+        return {merchant_profile:merchant!.toJSON()}
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
     }
 
     /**

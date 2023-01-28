@@ -55,6 +55,7 @@ export const { actions } = Bouncer
 |****************************************************************
 */
 export const { policies } = Bouncer.registerPolicies({
+<<<<<<< HEAD
     StorePolicy: () => import('App/Policies/StorePolicy'),
     ProductPolicy: () => import('App/Policies/ProductPolicy'),
     CategoryPolicy: () => import('App/Policies/CategoryPolicy'),
@@ -64,4 +65,24 @@ export const { policies } = Bouncer.registerPolicies({
     AccountPolicy: () => import('App/Policies/AccountPolicy'),
     MerchantPolicy: () => import('App/Policies/MerchantPolicy'),
     CustomerPolicy: () => import('App/Policies/CustomerPolicy')
+=======
+  StorePolicy: () => import('App/Policies/StorePolicy'),
+  UserPolicy: () => import('App/Policies/UserPolicy'),
+  ProductPolicy: () => import('App/Policies/ProductPolicy'),
+  SectionPolicy: () => import('App/Policies/SectionPolicy'),
+  CategoryPolicy: () => import('App/Policies/CategoryPolicy'),
+  OrderPolicy: () => import('App/Policies/OrderPolicy'),
+  OrderItemPolicy: () => import('App/Policies/OrderItemPolicy'),
+  ProfilePolicy: () => import('App/Policies/ProfilePolicy'),
+  /////////
+  AccountPolicy:  () => import('App/Policies/AccountPolicy'),
+  MerchantPolicy: () => import('App/Policies/MerchantPolicy'),
+  CustomerPolicy: () => import('App/Policies/CustomerPolicy'),
+  /////////
+  AddressPolicy: () => import('App/Policies/AddressPolicy'),
+  StoreTranslationPolicy: () => import('App/Policies/StoreTranslationPolicy'),
+  CategoryTranslationPolicy: () => import('App/Policies/CategoryTranslationPolicy'),
+  SectionTranslationPolicy: () => import('App/Policies/SectionTranslationPolicy'),
+  ProductTranslationPolicy: () => import('App/Policies/ProductTranslationPolicy'),
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 })

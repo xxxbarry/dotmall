@@ -1,5 +1,9 @@
 import { DateTime } from 'luxon'
+<<<<<<< HEAD
 import {  afterDelete, beforeFetch, belongsTo, BelongsTo, column, hasMany, HasMany, hasOne, HasOne, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
+=======
+import {  afterDelete, beforeFetch, belongsTo, BelongsTo, column, hasMany, HasMany, hasOne, HasOne, ManyToMany, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 import Product from './Product'
 import Section from './Section'
 import Order from './Order'
@@ -10,11 +14,21 @@ import { Image } from 'App/Models/File'
 import MerchantProfile from '../../profiles/MerchantProfile'
 import DotBaseModel from '../../../../../dot/models/DotBaseModel'
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
+<<<<<<< HEAD
 export enum StoreStatus {
   panding = 1,
   active = 2,
   inactive = 3,
   suspended = 4,
+=======
+import StoreTranslation from 'App/Models/translations/StoreTranslation'
+import { usePivot } from 'Dot/hooks/orm'
+export enum StoreStatus {
+  panding = 0,
+  active = 1,
+  inactive = 2,
+  suspended = 3,
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 }
 export default class Store extends DotBaseModel {
 
@@ -50,6 +64,12 @@ export default class Store extends DotBaseModel {
   @hasMany(() => Order)
   public orders: HasMany<typeof Order>
 
+<<<<<<< HEAD
+=======
+  @hasMany(() => StoreTranslation)
+  public translations: HasMany<typeof StoreTranslation>
+
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 
   @hasOne(() => Address, {
     foreignKey: "relatedId",
@@ -76,6 +96,7 @@ export default class Store extends DotBaseModel {
   })
   public phone: HasOne<typeof Phone>
 
+<<<<<<< HEAD
 
   @hasOne(() => Image, {
     foreignKey: "relatedId",
@@ -84,22 +105,41 @@ export default class Store extends DotBaseModel {
     }
   })
   public photo: HasOne<typeof Image>
+=======
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 
+  // @hasOne(() => Image, {
+  //   foreignKey: "relatedId",
+  //   onQuery: (builder) => {
+  //     builder.where('related_type', 'stores:photo')
+  //   }
+  // })
+  // public photo: HasOne<typeof Image>
+
+  @usePivot(() => Image)
+  public photos: ManyToMany<typeof Image>
   // belongs to
 
   @belongsTo(() => MerchantProfile)
   public merchant: BelongsTo<typeof MerchantProfile>
 
   // merchantProfileId
-  @column({serializeAs: null})
+  @column()
   public merchantProfileId: string
 
 
   // load photo after fetch
+<<<<<<< HEAD
   // @beforeFetch()
   // public static async loadPhoto(query: ModelQueryBuilderContract<typeof Store>) {
   //   query.preload('photo')
   // }
+=======
+  @beforeFetch()
+  public static async loadPhoto(query: ModelQueryBuilderContract<typeof Store>) {
+    query.preload('photos')
+  }
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 
 
   // before delete, delete photo
@@ -110,6 +150,7 @@ export default class Store extends DotBaseModel {
       await photo.delete()
     }
   }
+<<<<<<< HEAD
   /**
    * set photo from MultipartFile
    * @param {MultipartFileContract} image
@@ -129,4 +170,6 @@ export default class Store extends DotBaseModel {
     return photo
   }
 
+=======
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 }

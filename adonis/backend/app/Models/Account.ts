@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 import { afterDelete, BaseModel, beforeFetch, belongsTo, BelongsTo, column, hasOne, HasOne, ManyToMany, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
 import { usedPivot, usePivot } from 'Dot/hooks/orm'
 import { DateTime } from 'luxon'
+=======
+import { afterDelete, beforeFetch, BelongsTo, belongsTo, column, hasOne, HasOne, ManyToMany, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
+import { usedPivot, usePivot } from 'Dot/hooks/orm'
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 import DotBaseModel from '../../dot/models/DotBaseModel'
 import { BusinessAccountData } from './accounts/business/BusinessAccountData'
 import { PersonalAccountData } from './accounts/PersonalAccountData'
@@ -8,9 +13,12 @@ import CustomerProfile from './accounts/profiles/CustomerProfile'
 import MerchantProfile from './accounts/profiles/MerchantProfile'
 import { Image } from './File'
 import User from './User'
+<<<<<<< HEAD
 import Phone from './ContactOptions/Phone'
 import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser'
 
+=======
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 export default class Account extends DotBaseModel {
   static table: string = 'accounts'
   @column()
@@ -24,6 +32,11 @@ export default class Account extends DotBaseModel {
 
   @column()
   public userId: string
+<<<<<<< HEAD
+=======
+  @belongsTo(() => User)
+  public users: BelongsTo<typeof User>
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 
   @column({
     prepare: (value: BusinessAccountData | PersonalAccountData) => JSON.stringify(value),
@@ -40,8 +53,11 @@ export default class Account extends DotBaseModel {
     query.preload('photos')
   }
 
+<<<<<<< HEAD
   @usedPivot(() => User, () => Phone)
   public users: ManyToMany<typeof User>
+=======
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 
   @hasOne(() => CustomerProfile, {
     foreignKey: "relatedId",
@@ -75,6 +91,7 @@ export default class Account extends DotBaseModel {
     }
   }
 
+<<<<<<< HEAD
   /**
    * set photo from MultipartFile
    * @param {MultipartFileContract} image
@@ -93,6 +110,9 @@ export default class Account extends DotBaseModel {
     }
     return photo
   }
+=======
+
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 }
 export abstract class AccountData {
   constructor(data: any) {
@@ -103,6 +123,11 @@ export abstract class AccountData {
 }
 
 export enum AccountType {
+<<<<<<< HEAD
   business = 'business',
   personal = 'personal',
+=======
+  personal = 0,
+  business = 1,
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
 }

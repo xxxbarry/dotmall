@@ -20,10 +20,25 @@ export default class CustomerProfilesController {
         await bouncer.with('CustomerPolicy').authorize('viewList', payload)
         var customersQuery = CustomerProfile.query()
         var page = 1
+<<<<<<< HEAD
         var limit = 24
 
         if (payload.search) {
             customersQuery = customersQuery.where(payload.search_by!, 'like', `%${payload.search}%`)
+=======
+        var limit = 12
+
+
+        if (payload.search) {
+          for (let i = 0; i < payload.search_in!.length; i++) {
+            const element = payload.search_in![i];
+            if (i == 0) {
+              customersQuery = customersQuery.where(element, 'like', `%${payload.search}%`)
+            } else {
+              customersQuery = customersQuery.orWhere(element, 'like', `%${payload.search}%`)
+            }
+          }
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
         }
         if (payload.sort) {
             customersQuery = customersQuery.orderBy(payload.sort, payload.order)
@@ -80,7 +95,11 @@ export default class CustomerProfilesController {
                 await customer!.load(load)
             }
         }
+<<<<<<< HEAD
         return customer!.toJSON()
+=======
+        return {customer_profile:customer!.toJSON()}
+>>>>>>> 423608d22a1abdf567c0150bf4f5b0bb3a406865
     }
 
     /**
